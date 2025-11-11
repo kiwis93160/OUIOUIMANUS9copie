@@ -463,7 +463,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
             return (
                 <div
                     key={`${promotion.promotion_id}-${promotion.name}`}
-                    className="flex items-center rounded-xl shadow-lg transition-transform hover:scale-[1.01] overflow-hidden py-3"
+                    className="flex items-center rounded-xl shadow-lg transition-transform hover:scale-[1.01] overflow-hidden py-2"
                     style={{
                         backgroundColor: bgColor,
                     }}
@@ -476,7 +476,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                         {getPromotionIcon(promotion)}
                     </div>
                     <div className="flex-1 px-2.5 flex items-center justify-between min-w-0 gap-2 h-full">
-                        <p className="font-bold text-white text-sm sm:text-base truncate">{promotion.name}</p>
+                        <p className="font-bold text-white text-sm sm:text-base leading-tight truncate">{promotion.name}</p>
                         <span className="text-sm sm:text-base font-bold text-white whitespace-nowrap shrink-0">
                             -{formatCurrencyCOP(discountAmount)}
                         </span>
@@ -502,7 +502,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
     if (variant === 'hero') {
         return (
             <div className={containerClasses}>
-                <div className="relative w-full max-w-4xl overflow-hidden rounded-3xl border-[3px] border-orange-300/70 bg-brand-primary p-6 text-white shadow-2xl sm:p-8">
+                <div className="relative w-full max-w-4xl overflow-hidden rounded-3xl border-[6px] border-orange-300/70 bg-brand-primary p-6 text-white shadow-2xl sm:p-8">
                     <div className="pointer-events-none absolute inset-0 opacity-70">
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.18),_transparent_65%)]" />
                         <div className="absolute -bottom-32 right-0 h-64 w-64 rounded-full bg-gradient-to-br from-white/20 via-amber-200/30 to-orange-300/30 blur-3xl" />
@@ -936,10 +936,10 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                                         return (
                                             <div
                                                 key={item.id}
-                                                className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/95 pl-24 pr-6 py-4 text-slate-900 shadow-xl transition-all hover:-translate-y-0.5 hover:border-amber-300/60 hover:shadow-amber-500/30"
+                                                className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/95 pl-28 pr-6 py-4 text-slate-900 shadow-xl transition-all hover:-translate-y-0.5 hover:border-amber-300/60 hover:shadow-amber-500/30"
                                             >
-                                                <div className="absolute inset-y-0 left-0 flex w-20 items-center justify-center bg-gradient-to-b from-orange-500 to-rose-500 text-2xl font-black text-white shadow-inner shadow-amber-500/40">
-                                                    <span className="rounded-lg bg-white/15 px-4 py-1 text-lg font-bold leading-none">
+                                                <div className="absolute inset-y-0 left-0 flex w-24 items-center justify-center bg-gradient-to-b from-orange-500 to-rose-500 text-4xl font-black text-white shadow-inner shadow-amber-500/40">
+                                                    <span className="rounded-lg bg-white/15 px-5 py-2 text-3xl font-bold leading-tight">
                                                         {item.quantite}
                                                     </span>
                                                 </div>
@@ -1006,16 +1006,16 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                                 </div>
                             )}
 
-                            <div className="mt-6 space-y-4 border-t border-white/20 pt-5">
+                            <div className="mt-6 space-y-3 border-t border-white/20 pt-5">
                                 {totalDiscount > 0 && (
-                                    <div className="flex items-center justify-between rounded-lg bg-emerald-500/10 px-4 py-3 border border-emerald-500/20">
-                                        <span className="text-sm font-semibold text-emerald-300">Réductions totales</span>
-                                        <span className="text-base font-bold text-emerald-300">- {formatCurrencyCOP(totalDiscount)}</span>
+                                    <div className="flex items-center justify-between text-sm font-semibold text-emerald-300">
+                                        <span>Réductions totales</span>
+                                        <span className="text-base font-bold">- {formatCurrencyCOP(totalDiscount)}</span>
                                     </div>
                                 )}
-                                <div className="flex items-center justify-between rounded-xl bg-gradient-to-r from-amber-500/20 to-orange-500/20 px-5 py-4 border border-amber-500/30 shadow-lg">
-                                    <span className="text-base font-bold text-white sm:text-lg">Total à payer</span>
-                                    <span className="text-2xl font-extrabold text-white sm:text-3xl">{formatCurrencyCOP(order.total)}</span>
+                                <div className="flex items-center justify-between text-white">
+                                    <span className="text-base font-bold sm:text-lg">Total à payer</span>
+                                    <span className="text-2xl font-extrabold sm:text-3xl">{formatCurrencyCOP(order.total)}</span>
                                 </div>
                             </div>
                         </div>
@@ -1487,9 +1487,11 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                                         <div className="pointer-events-none absolute -left-16 -top-10 h-24 w-24 rounded-full bg-white/10 blur-2xl opacity-50" />
                                         <div className="relative flex items-start justify-between gap-4">
                                             <div className="flex flex-1 items-start gap-3">
-                                                <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-base font-bold text-white shadow-md ${
-                                                    variant === 'hero' ? 'ring-2 ring-white/40' : ''
-                                                }`}>
+                                                <div
+                                                    className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-2xl font-extrabold text-white shadow-md ${
+                                                        variant === 'hero' ? 'ring-2 ring-white/40' : ''
+                                                    }`}
+                                                >
                                                     {item.quantite}
                                                 </div>
                                                 <div className="min-w-0 space-y-2">
@@ -1576,11 +1578,11 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                     {promotionsSectionContent}
 
                     {totalDiscount > 0 && (
-                        <div className={`mt-4 flex items-center justify-between rounded-lg border px-3 py-2 text-sm font-semibold ${
-                            variant === 'hero'
-                                ? 'border-emerald-300/30 bg-emerald-500/15 text-emerald-100'
-                                : 'border-emerald-200 bg-emerald-50 text-emerald-700'
-                        }`}>
+                        <div
+                            className={`mt-4 flex items-center justify-between text-sm font-semibold ${
+                                variant === 'hero' ? 'text-emerald-200' : 'text-emerald-700'
+                            }`}
+                        >
                             <span>Réductions totales</span>
                             <span>-{formatCurrencyCOP(totalDiscount)}</span>
                         </div>
