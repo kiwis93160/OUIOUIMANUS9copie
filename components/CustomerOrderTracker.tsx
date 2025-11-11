@@ -499,6 +499,68 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
 
     const itemsCount = order.items?.length ?? 0;
 
+    const receiptModalContent = useMemo(() => {
+        if (!receiptUrl) {
+            return <p>Aucun justificatif fourni.</p>;
+        }
+
+        if (canDisplayReceiptImage) {
+            return (
+                <img
+                    src={receiptUrl}
+                    alt="Justificatif"
+                    className="h-auto w-full rounded-md"
+                    onError={() => setReceiptPreviewError(true)}
+                />
+            );
+        }
+
+        if (isReceiptPdf) {
+            return (
+                <div className="space-y-4">
+                    <object
+                        data={receiptUrl}
+                        type="application/pdf"
+                        className="h-[70vh] w-full rounded-xl border border-slate-200"
+                    >
+                        <p className="p-4 text-sm text-slate-600">
+                            Impossible d'afficher le PDF. Vous pouvez l'ouvrir dans un nouvel onglet ci-dessous.
+                        </p>
+                    </object>
+                    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                        <span>Si le PDF ne s'affiche pas, ouvrez-le dans un nouvel onglet.</span>
+                        <button
+                            type="button"
+                            onClick={handleOpenReceiptInNewTab}
+                            className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-700"
+                        >
+                            <Receipt size={16} /> Ouvrir le document
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        return (
+            <div className="flex flex-col items-center gap-4 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center text-slate-600">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-inner">
+                    <Receipt size={24} className="text-slate-500" />
+                </div>
+                <div className="space-y-1">
+                    <p className="text-base font-semibold text-slate-700">Prévisualisation indisponible</p>
+                    <p className="text-sm text-slate-500">Touchez le bouton ci-dessous pour afficher le justificatif.</p>
+                </div>
+                <button
+                    type="button"
+                    onClick={handleOpenReceiptInNewTab}
+                    className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-700"
+                >
+                    <Receipt size={16} /> Ouvrir le document
+                </button>
+            </div>
+        );
+    }, [receiptUrl, canDisplayReceiptImage, isReceiptPdf, handleOpenReceiptInNewTab, setReceiptPreviewError]);
+
     if (variant === 'hero') {
         return (
             <div className={containerClasses}>
