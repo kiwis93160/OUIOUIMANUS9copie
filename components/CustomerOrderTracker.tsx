@@ -15,6 +15,8 @@ type TrackerProgressStyle = React.CSSProperties & {
     '--tracker-progress-target': string;
 };
 
+const isFreeShippingType = (type?: string | null) => (type ?? '').toLowerCase() === 'free_shipping';
+
 const saveOrderToHistory = (order: Order) => {
     try {
         const historyJSON = localStorage.getItem('customer-order-history');
@@ -379,8 +381,8 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
     const clientPhone = order.clientInfo?.telephone ?? order.client_phone ?? '';
     const clientAddress = order.clientInfo?.adresse ?? order.client_address ?? '';
     const hasClientDetails = Boolean(clientName || clientPhone || clientAddress);
-    const getPromotionIcon = (promo: { type: string }) => {
-        if (promo.type === 'free_shipping') return <TruckIcon size={16} />;
+    const getPromotionIcon = (promo: { type?: string | null }) => {
+        if (isFreeShippingType(promo.type)) return <TruckIcon size={16} />;
         if (promo.type === 'percentage') return <Percent size={16} />;
         if (promo.type === 'buy_x_get_y') return <Gift size={16} />;
         return <Tag size={16} />;

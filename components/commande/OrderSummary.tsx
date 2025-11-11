@@ -3,6 +3,8 @@ import { Check, DollarSign, MessageSquare, MinusCircle, PlusCircle, Send } from 
 import type { Order, OrderItem } from '../../types';
 import { formatCurrencyCOP } from '../../utils/formatIntegerAmount';
 
+const isFreeShippingType = (type?: string | null) => (type ?? '').toLowerCase() === 'free_shipping';
+
 export type CategorizedOrderItems = {
     pending: { item: OrderItem; index: number }[];
     sent: { item: OrderItem; index: number }[];
@@ -167,7 +169,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                             <span>{formatCurrencyCOP(order.shipping_cost)}</span>
                         </div>
                     )}
-                    {order.shipping_cost === 0 && order.applied_promotions?.some(p => p.type === 'FREE_SHIPPING') && (
+                    {order.shipping_cost === 0 && order.applied_promotions?.some(p => isFreeShippingType(p.type)) && (
                         <div className="flex flex-wrap items-center justify-between gap-2 text-green-600">
                             <span>Livraison gratuite</span>
                             <span>{formatCurrencyCOP(0)}</span>
