@@ -10,6 +10,8 @@ interface OrderConfirmationModalProps {
   whatsappNumber?: string;
 }
 
+const isFreeShippingType = (type?: string | null) => (type ?? '').toLowerCase() === 'free_shipping';
+
 const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
   isOpen,
   order,
@@ -91,7 +93,7 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
     if (order.shipping_cost !== undefined) {
       if (order.shipping_cost > 0) {
         messageParts.push(`Costo de envío: ${formatCurrencyCOP(order.shipping_cost)}`);
-      } else if (order.applied_promotions?.some(p => p.type === 'FREE_SHIPPING')) {
+      } else if (order.applied_promotions?.some(p => isFreeShippingType(p.type))) {
         messageParts.push('Costo de envío: Gratis');
       }
     }
@@ -183,7 +185,7 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
                   <span>{formatCurrencyCOP(order.shipping_cost)}</span>
                 </div>
               )}
-              {order.shipping_cost === 0 && order.applied_promotions?.some(p => p.type === 'FREE_SHIPPING') && (
+              {order.shipping_cost === 0 && order.applied_promotions?.some(p => isFreeShippingType(p.type)) && (
                 <div className="flex justify-between items-center text-green-600">
                   <span>Livraison gratuite:</span>
                   <span>{formatCurrencyCOP(0)}</span>
