@@ -45,6 +45,22 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
     const [loading, setLoading] = useState(true);
     const [isReceiptModalOpen, setReceiptModalOpen] = useState(false);
     const [productDescriptions, setProductDescriptions] = useState<Record<string, string>>({});
+    const [isReceiptPreviewError, setReceiptPreviewError] = useState(false);
+
+    const receiptUrl = order?.receipt_url ?? '';
+    const sanitizedReceiptUrl = receiptUrl.split('?')[0]?.toLowerCase() ?? '';
+    const isReceiptPdf = sanitizedReceiptUrl.endsWith('.pdf');
+    const canDisplayReceiptImage = Boolean(receiptUrl) && !isReceiptPdf && !isReceiptPreviewError;
+
+    useEffect(() => {
+        setReceiptPreviewError(false);
+    }, [receiptUrl]);
+
+    const handleOpenReceiptInNewTab = useCallback(() => {
+        if (receiptUrl && typeof window !== 'undefined') {
+            window.open(receiptUrl, '_blank', 'noopener,noreferrer');
+        }
+    }, [receiptUrl]);
 
     const steps = [
         { name: 'Enviado', icon: FileText, description: 'Votre commande a été transmise avec succès', subtext: 'Nous vérifions votre commande' },
@@ -418,6 +434,68 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
         : null;
 
     const itemsCount = order.items?.length ?? 0;
+
+    const receiptModalContent = useMemo(() => {
+        if (!receiptUrl) {
+            return <p>Aucun justificatif fourni.</p>;
+        }
+
+        if (canDisplayReceiptImage) {
+            return (
+                <img
+                    src={receiptUrl}
+                    alt="Justificatif"
+                    className="h-auto w-full rounded-md"
+                    onError={() => setReceiptPreviewError(true)}
+                />
+            );
+        }
+
+        if (isReceiptPdf) {
+            return (
+                <div className="space-y-4">
+                    <object
+                        data={receiptUrl}
+                        type="application/pdf"
+                        className="h-[70vh] w-full rounded-xl border border-slate-200"
+                    >
+                        <p className="p-4 text-sm text-slate-600">
+                            Impossible d'afficher le PDF. Vous pouvez l'ouvrir dans un nouvel onglet ci-dessous.
+                        </p>
+                    </object>
+                    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                        <span>Si le PDF ne s'affiche pas, ouvrez-le dans un nouvel onglet.</span>
+                        <button
+                            type="button"
+                            onClick={handleOpenReceiptInNewTab}
+                            className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-700"
+                        >
+                            <Receipt size={16} /> Ouvrir le document
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        return (
+            <div className="flex flex-col items-center gap-4 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center text-slate-600">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-inner">
+                    <Receipt size={24} className="text-slate-500" />
+                </div>
+                <div className="space-y-1">
+                    <p className="text-base font-semibold text-slate-700">Prévisualisation indisponible</p>
+                    <p className="text-sm text-slate-500">Touchez le bouton ci-dessous pour afficher le justificatif.</p>
+                </div>
+                <button
+                    type="button"
+                    onClick={handleOpenReceiptInNewTab}
+                    className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-700"
+                >
+                    <Receipt size={16} /> Ouvrir le document
+                </button>
+            </div>
+        );
+    }, [receiptUrl, canDisplayReceiptImage, isReceiptPdf, handleOpenReceiptInNewTab, setReceiptPreviewError]);
 
     if (variant === 'hero') {
         return (
@@ -799,26 +877,43 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                                 )}
                                 {order.receipt_url && (
                                     <div className="rounded-2xl bg-gradient-to-br from-white/10 to-white/5 p-5 backdrop-blur-sm border border-white/10 flex flex-col">
-                                        <p className="text-xs font-bold uppercase tracking-wider text-white/50 mb-3">Justificatif de paiement</p>
-                                        <button
-                                            type="button"
-                                            onClick={() => setReceiptModalOpen(true)}
-                                            className="group relative w-full flex-1 overflow-hidden rounded-xl border border-white/20 bg-black/30 shadow-lg transition-transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-white/50"
-                                            aria-label="Ouvrir le justificatif de paiement"
-                                        >
-                                            <img
-                                                src={order.receipt_url}
-                                                alt="Aperçu du justificatif"
-                                                className="h-full w-full object-cover transition duration-500 ease-out group-hover:scale-105"
-                                            />
-                                            <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition duration-300 group-hover:opacity-100">
-                                                <div className="flex flex-col items-center gap-2 text-white">
-                                                    <Receipt size={24} />
-                                                    <span className="text-xs font-semibold">Voir le justificatif</span>
-                                                </div>
-                                            </div>
-                                        </button>
-                                    </div>
+                                            <p className="text-xs font-bold uppercase tracking-wider text-white/50 mb-3">Justificatif de paiement</p>
+                                            <button
+                                                type="button"
+                                                onClick={() => setReceiptModalOpen(true)}
+                                            className="group relative flex w-full flex-1 min-h-[160px] overflow-hidden rounded-xl border border-white/20 bg-black/30 shadow-lg transition-transform hover:-translate-y-0.5 hover:shadow-amber-500/20 focus:outline-none focus:ring-2 focus:ring-white/50"
+                                                aria-label="Ouvrir le justificatif de paiement"
+                                            >
+                                                {canDisplayReceiptImage ? (
+                                                    <img
+                                                        src={order.receipt_url}
+                                                        alt="Aperçu du justificatif"
+                                                        className="h-full w-full object-cover transition duration-500 ease-out group-hover:scale-105"
+                                                        onError={() => setReceiptPreviewError(true)}
+                                                    />
+                                                ) : (
+                                                    <div className="flex h-full w-full flex-col items-center justify-center gap-3 rounded-xl bg-black/40 p-6 text-center text-white/80">
+                                                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10">
+                                                            <Receipt size={26} />
+                                                        </div>
+                                                        <div className="space-y-1">
+                                                            <p className="text-sm font-semibold">
+                                                                {isReceiptPdf ? 'Justificatif au format PDF' : 'Prévisualisation indisponible'}
+                                                            </p>
+                                                            <p className="text-xs text-white/60">Touchez pour ouvrir le document</p>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                {canDisplayReceiptImage && (
+                                                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition duration-300 group-hover:opacity-100">
+                                                        <div className="flex flex-col items-center gap-2 text-white">
+                                                            <Receipt size={24} />
+                                                            <span className="text-xs font-semibold">Voir le justificatif</span>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </button>
+                                        </div>
                                 )}
                             </div>
                         )}
@@ -834,31 +929,65 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                                         const isDomicilio = item.nom_produit === 'Domicilio';
                                         const isFreeShipping = isDomicilio && item.prix_unitaire === 0;
                                         const itemDescription = productDescriptions[item.produitRef] || null;
+                                        const trimmedComment = typeof item.commentaire === 'string' && item.commentaire.trim().length > 0 ? item.commentaire.trim() : null;
 
                                         return (
-                                            <div key={item.id} className="rounded-2xl bg-white p-5 border border-slate-200 shadow-sm">
-                                                <div className="flex items-center justify-between gap-4">
-                                                    <div className="flex min-w-0 flex-1 items-center gap-4">
-                                                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-slate-700 to-slate-900 text-lg font-bold text-white shadow-lg">
+                                            <div
+                                                key={item.id}
+                                                className="group relative overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-br from-slate-900/80 via-slate-900/55 to-slate-900/40 p-5 shadow-lg backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:border-amber-400/40 hover:shadow-amber-500/20"
+                                            >
+                                                <div className="pointer-events-none absolute -right-16 top-1/2 h-32 w-32 -translate-y-1/2 rounded-full bg-amber-500/25 blur-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-80" />
+                                                <div className="pointer-events-none absolute -left-10 -top-6 h-28 w-28 rounded-full bg-white/10 blur-2xl opacity-60" />
+                                                <div className="relative flex items-start justify-between gap-4">
+                                                    <div className="flex min-w-0 flex-1 items-start gap-4">
+                                                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-lg font-black text-white shadow-lg ring-2 ring-white/40">
                                                             {item.quantite}
                                                         </div>
-                                                        <div className="min-w-0 flex-1">
-                                                            <p className="text-lg font-bold text-slate-900 leading-tight">
-                                                                {item.nom_produit}
-                                                            </p>
+                                                        <div className="min-w-0 space-y-2 text-white">
+                                                            <div className="space-y-1">
+                                                                <p className="text-lg font-semibold leading-tight text-balance">
+                                                                    {item.nom_produit}
+                                                                </p>
+                                                                {!isFreeShipping && (
+                                                                    <p className="text-xs font-medium uppercase tracking-wider text-white/50">
+                                                                        {formatCurrencyCOP(item.prix_unitaire)} /u
+                                                                    </p>
+                                                                )}
+                                                            </div>
                                                             {itemDescription && (
-                                                                <p className="text-sm text-slate-600 mt-1 leading-snug">{itemDescription}</p>
+                                                                <p className="text-sm leading-snug text-white/70">{itemDescription}</p>
                                                             )}
-                                                            {item.commentaire && (
-                                                                <p className="text-sm italic text-amber-600 mt-1.5 leading-snug">"{item.commentaire}"</p>
+                                                            {trimmedComment && (
+                                                                <div className="rounded-xl border border-amber-400/30 bg-black/25 px-4 py-2 text-sm italic text-amber-100/90 shadow-inner shadow-black/30">
+                                                                    « {trimmedComment} »
+                                                                </div>
+                                                            )}
+                                                            {isDomicilio && (
+                                                                <div className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${
+                                                                    isFreeShipping
+                                                                        ? 'border border-emerald-300/40 bg-emerald-500/20 text-emerald-100'
+                                                                        : 'border border-white/15 bg-black/30 text-white/80'
+                                                                }`}>
+                                                                    <TruckIcon size={14} />
+                                                                    {isFreeShipping ? 'Livraison offerte' : 'Livraison'}
+                                                                </div>
                                                             )}
                                                         </div>
                                                     </div>
-                                                    <div className="shrink-0">
+                                                    <div className="flex shrink-0 flex-col items-end gap-2 text-right">
                                                         {isFreeShipping ? (
-                                                            <span className="inline-flex items-center rounded-full bg-emerald-100 px-4 py-2 text-sm font-bold text-emerald-700 shadow-sm">GRATUIT</span>
+                                                            <>
+                                                                <span className="inline-flex items-center gap-2 rounded-full border border-emerald-300/40 bg-emerald-500/20 px-4 py-1.5 text-sm font-semibold text-emerald-100 shadow-inner shadow-emerald-500/20">
+                                                                    <Gift size={16} /> Gratuit
+                                                                </span>
+                                                                <span className="text-xs font-medium text-emerald-100/80 line-through decoration-emerald-200/70">
+                                                                    {formatCurrencyCOP(8000)}
+                                                                </span>
+                                                            </>
                                                         ) : (
-                                                            <span className="text-lg font-extrabold text-slate-900">{formatCurrencyCOP(item.prix_unitaire * item.quantite)}</span>
+                                                            <span className="rounded-full bg-black/30 px-4 py-1.5 text-lg font-bold text-white shadow-inner shadow-black/40">
+                                                                {formatCurrencyCOP(item.prix_unitaire * item.quantite)}
+                                                            </span>
                                                         )}
                                                     </div>
                                                 </div>
@@ -911,11 +1040,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                     onClose={() => setReceiptModalOpen(false)}
                     title="Justificatif de Paiement"
                 >
-                    {order.receipt_url ? (
-                        <img src={order.receipt_url} alt="Justificatif" className="h-auto w-full rounded-md" />
-                    ) : (
-                        <p>Aucun justificatif fourni.</p>
-                    )}
+                    {receiptModalContent}
                 </Modal>
             </div>
         );
@@ -1328,7 +1453,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                                     onClick={() => setReceiptModalOpen(true)}
                                     className={`mt-4 inline-flex items-center gap-2 text-sm font-semibold underline-offset-2 hover:underline ${variant === 'hero' ? 'text-white' : 'text-blue-500'}`}
                                 >
-                                    <Receipt size={16} /> Voir le justificatif
+                                    <Receipt size={16} /> {isReceiptPdf ? 'Ouvrir le PDF du paiement' : 'Voir le justificatif'}
                                 </button>
                             )}
                         </div>
@@ -1350,37 +1475,91 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                                 return (
                                     <div
                                         key={item.id}
-                                        className={`flex flex-col gap-2 rounded-lg border-b border-dashed border-gray-200/70 pb-3 pt-2 last:border-b-0 last:pb-0 ${
-                                            variant === 'hero' ? 'text-gray-200' : 'text-gray-600'
+                                        className={`group relative overflow-hidden rounded-2xl border px-5 py-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg ${
+                                            variant === 'hero'
+                                                ? 'border-white/10 bg-white/10 text-gray-200 backdrop-blur-sm'
+                                                : 'border-slate-200 bg-white text-slate-600'
                                         }`}
                                     >
-                                        <div className="flex items-start justify-between gap-4">
-                                            <div className="flex-1">
-                                                <p className="text-[clamp(0.95rem,1.8vw,1.1rem)] font-semibold leading-snug text-balance">
-                                                    {item.quantite}x {item.nom_produit}
-                                                </p>
-                                                <p className={`mt-1 text-sm ${variant === 'hero' ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                    {isFreeShipping ? 'Livraison offerte' : `${formatCurrencyCOP(item.prix_unitaire)} /u`}
-                                                </p>
-                                                {itemDescription && (
-                                                    <p className="mt-1 text-sm text-gray-500">
-                                                        {itemDescription}
-                                                    </p>
-                                                )}
-                                                {itemComment && (
-                                                    <p className="mt-1 text-sm italic text-amber-600">
-                                                        “{itemComment}”
-                                                    </p>
-                                                )}
-                                            </div>
-                                            <div className="whitespace-nowrap text-right text-sm font-semibold">
-                                                {isFreeShipping ? (
-                                                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                                                        <span className="text-xs text-gray-400 line-through">{formatCurrencyCOP(8000)}</span>
-                                                        <span className="text-sm font-bold text-green-600">GRATIS</span>
+                                        <div className="pointer-events-none absolute -right-14 top-1/2 h-28 w-28 -translate-y-1/2 rounded-full bg-amber-400/20 blur-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-80" />
+                                        <div className="pointer-events-none absolute -left-16 -top-10 h-24 w-24 rounded-full bg-white/10 blur-2xl opacity-50" />
+                                        <div className="relative flex items-start justify-between gap-4">
+                                            <div className="flex flex-1 items-start gap-3">
+                                                <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-base font-bold text-white shadow-md ${
+                                                    variant === 'hero' ? 'ring-2 ring-white/40' : ''
+                                                }`}>
+                                                    {item.quantite}
+                                                </div>
+                                                <div className="min-w-0 space-y-2">
+                                                    <div className="space-y-1">
+                                                        <p className={`text-lg font-semibold leading-tight text-balance ${variant === 'hero' ? 'text-white' : 'text-slate-900'}`}>
+                                                            {item.nom_produit}
+                                                        </p>
+                                                        <p className={`text-xs font-medium uppercase tracking-wide ${variant === 'hero' ? 'text-white/60' : 'text-slate-500'}`}>
+                                                            {isFreeShipping ? 'Livraison offerte' : `${formatCurrencyCOP(item.prix_unitaire)} /u`}
+                                                        </p>
                                                     </div>
+                                                    {itemDescription && (
+                                                        <p className={`text-sm leading-snug ${variant === 'hero' ? 'text-white/70' : 'text-slate-500'}`}>
+                                                            {itemDescription}
+                                                        </p>
+                                                    )}
+                                                    {itemComment && (
+                                                        <div className={`rounded-xl border px-3 py-2 text-sm italic shadow-inner ${
+                                                            variant === 'hero'
+                                                                ? 'border-amber-300/30 bg-black/30 text-amber-100/90'
+                                                                : 'border-amber-200 bg-amber-50 text-amber-700'
+                                                        }`}>
+                                                            « {itemComment} »
+                                                        </div>
+                                                    )}
+                                                    {isDomicilio && (
+                                                        <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold ${
+                                                            isFreeShipping
+                                                                ? variant === 'hero'
+                                                                    ? 'border-emerald-300/40 bg-emerald-500/20 text-emerald-100'
+                                                                    : 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                                                                : variant === 'hero'
+                                                                    ? 'border-white/15 bg-black/30 text-white/80'
+                                                                    : 'border-slate-200 bg-slate-50 text-slate-600'
+                                                        }`}>
+                                                            <TruckIcon size={14} />
+                                                            {isFreeShipping ? 'Livraison offerte' : 'Livraison'}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div className="flex shrink-0 flex-col items-end gap-1 text-right">
+                                                {isFreeShipping ? (
+                                                    <>
+                                                        <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-semibold ${
+                                                            variant === 'hero'
+                                                                ? 'border border-emerald-300/40 bg-emerald-500/20 text-emerald-100'
+                                                                : 'border border-emerald-200 bg-emerald-50 text-emerald-700'
+                                                        }`}>
+                                                            <Gift size={16} /> Gratuit
+                                                        </span>
+                                                        <span className={`text-xs font-medium line-through ${
+                                                            variant === 'hero' ? 'text-emerald-100/70 decoration-emerald-200/70' : 'text-emerald-600/70 decoration-emerald-400'
+                                                        }`}>
+                                                            {formatCurrencyCOP(8000)}
+                                                        </span>
+                                                    </>
                                                 ) : (
-                                                    <span>{formatCurrencyCOP(item.prix_unitaire * item.quantite)}</span>
+                                                    <span className={`rounded-full px-4 py-1.5 text-lg font-bold ${
+                                                        variant === 'hero' ? 'bg-black/30 text-white shadow-inner shadow-black/30' : 'bg-slate-100 text-slate-900'
+                                                    }`}>
+                                                        {formatCurrencyCOP(item.prix_unitaire * item.quantite)}
+                                                    </span>
+                                                )}
+                                                {!isFreeShipping ? (
+                                                    <span className={`text-xs font-medium ${variant === 'hero' ? 'text-white/50' : 'text-slate-500'}`}>
+                                                        Total TTC
+                                                    </span>
+                                                ) : (
+                                                    <span className={`text-xs font-medium ${variant === 'hero' ? 'text-emerald-200/80' : 'text-emerald-600/80'}`}>
+                                                        Livraison économisée
+                                                    </span>
                                                 )}
                                             </div>
                                         </div>
@@ -1434,7 +1613,16 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                             {order.receipt_url && (
                                 <div className="flex items-center justify-between">
                                     <span className="font-medium">Comprobante de pago:</span>
-                                    <button onClick={() => setReceiptModalOpen(true)} className="flex items-center text-blue-400 hover:underline"><Receipt size={16} className="mr-2"/>Voir</button>
+                                    <button
+                                        onClick={() => setReceiptModalOpen(true)}
+                                        className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-semibold transition ${
+                                            variant === 'hero'
+                                                ? 'bg-white/10 text-white/90 hover:bg-white/20'
+                                                : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+                                        }`}
+                                    >
+                                        <Receipt size={16} /> {isReceiptPdf ? 'Ouvrir le PDF' : 'Voir'}
+                                    </button>
                                 </div>
                             )}
                         </div>
@@ -1472,11 +1660,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                 onClose={() => setReceiptModalOpen(false)}
                 title="Justificatif de Paiement"
             >
-                {order.receipt_url ? (
-                    <img src={order.receipt_url} alt="Justificatif" className="w-full h-auto rounded-md" />
-                ) : (
-                    <p>Aucun justificatif fourni.</p>
-                )}
+                {receiptModalContent}
             </Modal>
         </div>
     );
