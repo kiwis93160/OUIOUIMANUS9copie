@@ -502,7 +502,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
     if (variant === 'hero') {
         return (
             <div className={containerClasses}>
-                <div className="relative w-full max-w-4xl overflow-hidden rounded-3xl border border-orange-300/50 bg-brand-primary p-6 text-white shadow-2xl backdrop-blur-xl sm:p-8">
+                <div className="relative w-full max-w-4xl overflow-hidden rounded-3xl border-[3px] border-orange-300/70 bg-brand-primary p-6 text-white shadow-2xl sm:p-8">
                     <div className="pointer-events-none absolute inset-0 opacity-70">
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.18),_transparent_65%)]" />
                         <div className="absolute -bottom-32 right-0 h-64 w-64 rounded-full bg-gradient-to-br from-white/20 via-amber-200/30 to-orange-300/30 blur-3xl" />
@@ -527,7 +527,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                                 Commande #{order.id.slice(-6)}
                             </h2>
                             {isOrderCompleted ? (
-                                <div className="inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-emerald-500/20 to-green-500/20 px-5 py-2.5 border border-emerald-500/30 backdrop-blur-sm">
+                                <div className="inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-emerald-500/35 to-green-500/35 px-5 py-2.5 border border-emerald-500/50 backdrop-blur-2xl shadow-inner shadow-emerald-500/20">
                                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500/30">
                                         {order.type_commande === 'livraison' ? (
                                             <TruckIcon size={18} className="text-emerald-300" />
@@ -549,7 +549,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                                     </div>
                                 </div>
                             ) : queuePosition !== null && (
-                                <div className="inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-amber-500/20 to-orange-500/20 px-5 py-2.5 border border-amber-500/30 backdrop-blur-sm">
+                                <div className="inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-amber-500/35 to-orange-500/35 px-5 py-2.5 border border-amber-500/50 backdrop-blur-2xl shadow-inner shadow-amber-500/20">
                                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-500/30 font-bold text-amber-200">
                                         #{queuePosition}
                                     </div>
@@ -577,7 +577,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                                         ? 'bg-gradient-to-br from-emerald-400/80 to-emerald-600/80 border-white/35 text-white shadow-lg shadow-emerald-500/25'
                                         : isActive
                                             ? 'bg-gradient-to-br from-amber-400/95 via-orange-500/90 to-red-500/95 border-white/30 text-white shadow-xl shadow-orange-500/25 tracker-step-active'
-                                            : 'bg-white/10 border-white/10 text-white/70 backdrop-blur-sm hover:bg-white/15 hover:border-white/20'
+                                            : 'bg-slate-900/40 border-white/15 text-white/70 backdrop-blur-2xl hover:bg-slate-900/45 hover:border-white/25'
                                 } ${isActive ? 'scale-[1.02]' : ''}`;
                                 const iconWrapperClasses = `tracker-step-icon-wrapper relative flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-2xl bg-black/25 ${
                                     isCompletedStep || isActive ? 'text-white' : 'text-white/70'
@@ -611,7 +611,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                                                         {step.description}
                                                     </p>
                                                     {getEstimatedTime(index) && (
-                                                        <div className="mt-2 rounded-full bg-white/20 px-2.5 py-1 backdrop-blur-sm">
+                                                        <div className="mt-2 rounded-full bg-black/35 px-2.5 py-1 backdrop-blur-xl">
                                                             <p className="text-[10px] sm:text-xs font-bold text-white">
                                                                 ⏱️ {getEstimatedTime(index)}
                                                             </p>
@@ -814,7 +814,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                                 `}</style>
                                 <div className="stamp relative">
                                     {/* Tampon avec effet de rotation */}
-                                    <div className="relative flex items-center justify-center w-32 h-32 sm:w-40 sm:h-40 rounded-full border-8 border-emerald-500 bg-emerald-500/10 backdrop-blur-sm shadow-2xl">
+                                    <div className="relative flex items-center justify-center w-32 h-32 sm:w-40 sm:h-40 rounded-full border-8 border-emerald-500 bg-emerald-500/20 backdrop-blur-2xl shadow-2xl">
                                         {/* Texte du tampon */}
                                         <div className="text-center">
                                             <p className="text-xl sm:text-2xl font-black text-emerald-500 tracking-wider" style={{ fontFamily: 'Impact, sans-serif', textShadow: '2px 2px 4px rgba(0,0,0,0.3)' }}>
@@ -834,7 +834,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                         {(hasClientDetails || order.receipt_url) && (
                             <div className="grid gap-4 sm:grid-cols-2 items-stretch">
                                 {hasClientDetails && (
-                                    <div className="rounded-2xl bg-gradient-to-br from-white/10 to-white/5 p-5 backdrop-blur-sm border border-white/10 flex flex-col">
+                                    <div className="rounded-2xl bg-gradient-to-br from-slate-900/40 via-slate-900/30 to-slate-900/25 p-5 backdrop-blur-2xl border border-white/15 flex flex-col">
                                         <p className="text-xs font-bold uppercase tracking-wider text-white/50 mb-3">Informations client</p>
                                         <div className="space-y-2.5">
                                             {clientName && (
@@ -878,7 +878,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                                     </div>
                                 )}
                                 {order.receipt_url && (
-                                    <div className="rounded-2xl bg-gradient-to-br from-white/10 to-white/5 p-5 backdrop-blur-sm border border-white/10 flex flex-col">
+                                    <div className="rounded-2xl bg-gradient-to-br from-slate-900/40 via-slate-900/30 to-slate-900/25 p-5 backdrop-blur-2xl border border-white/15 flex flex-col">
                                             <p className="text-xs font-bold uppercase tracking-wider text-white/50 mb-3">Justificatif de paiement</p>
                                             <button
                                                 type="button"
@@ -920,7 +920,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                             </div>
                         )}
 
-                        <div className="rounded-2xl border border-white/20 bg-white/15 p-6 backdrop-blur-sm">
+                        <div className="rounded-2xl border border-white/25 bg-slate-900/35 p-6 backdrop-blur-2xl">
                             <div className="flex items-center justify-between mb-5">
                                 <h3 className="text-base font-bold uppercase tracking-wider text-white">Votre commande</h3>
                                 <span className="rounded-full bg-white/20 px-4 py-1.5 text-sm font-bold text-white shadow-sm">{itemsCount} {itemsCount > 1 ? 'articles' : 'article'}</span>
@@ -936,45 +936,43 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                                         return (
                                             <div
                                                 key={item.id}
-                                                className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white p-5 text-slate-800 shadow-xl transition-all hover:-translate-y-0.5 hover:border-amber-300/40 hover:shadow-amber-500/30"
+                                                className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/95 pl-24 pr-6 py-4 text-slate-900 shadow-xl transition-all hover:-translate-y-0.5 hover:border-amber-300/60 hover:shadow-amber-500/30"
                                             >
-                                                <div className="pointer-events-none absolute -right-16 top-1/2 h-32 w-32 -translate-y-1/2 rounded-full bg-amber-500/25 blur-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-80" />
-                                                <div className="pointer-events-none absolute -left-10 -top-6 h-28 w-28 rounded-full bg-white/40 blur-2xl opacity-60" />
-                                                <div className="relative flex items-start justify-between gap-4">
-                                                    <div className="flex min-w-0 flex-1 items-start gap-4">
-                                                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-lg font-black text-white shadow-lg ring-2 ring-amber-200/70">
-                                                            {item.quantite}
-                                                        </div>
-                                                        <div className="min-w-0 space-y-2">
-                                                            <div className="space-y-1">
-                                                                <p className="text-lg font-semibold leading-tight text-balance text-slate-900">
-                                                                    {item.nom_produit}
+                                                <div className="absolute inset-y-0 left-0 flex w-20 items-center justify-center bg-gradient-to-b from-orange-500 to-rose-500 text-2xl font-black text-white shadow-inner shadow-amber-500/40">
+                                                    <span className="rounded-lg bg-white/15 px-4 py-1 text-lg font-bold leading-none">
+                                                        {item.quantite}
+                                                    </span>
+                                                </div>
+                                                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                                    <div className="min-w-0 flex-1 space-y-2">
+                                                        <div className="space-y-1">
+                                                            <p className="text-base font-semibold leading-tight text-balance text-slate-900 sm:text-lg">
+                                                                {item.nom_produit}
+                                                            </p>
+                                                            {!isFreeShipping && (
+                                                                <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
+                                                                    {formatCurrencyCOP(item.prix_unitaire)} /u
                                                                 </p>
-                                                                {!isFreeShipping && (
-                                                                    <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
-                                                                        {formatCurrencyCOP(item.prix_unitaire)} /u
-                                                                    </p>
-                                                                )}
-                                                            </div>
-                                                            {itemDescription && (
-                                                                <p className="text-sm leading-snug text-slate-600">{itemDescription}</p>
-                                                            )}
-                                                            {trimmedComment && (
-                                                                <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-sm italic text-amber-700 shadow-inner shadow-amber-200/60">
-                                                                    « {trimmedComment} »
-                                                                </div>
-                                                            )}
-                                                            {isDomicilio && (
-                                                                <div className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${
-                                                                    isFreeShipping
-                                                                        ? 'border border-emerald-200 bg-emerald-50 text-emerald-700'
-                                                                        : 'border border-slate-200 bg-slate-50 text-slate-600'
-                                                                }`}>
-                                                                    <TruckIcon size={14} />
-                                                                    {isFreeShipping ? 'Livraison offerte' : 'Livraison'}
-                                                                </div>
                                                             )}
                                                         </div>
+                                                        {itemDescription && (
+                                                            <p className="text-sm leading-snug text-slate-600">{itemDescription}</p>
+                                                        )}
+                                                        {trimmedComment && (
+                                                            <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-sm italic text-amber-700 shadow-inner shadow-amber-200/60">
+                                                                « {trimmedComment} »
+                                                            </div>
+                                                        )}
+                                                        {isDomicilio && (
+                                                            <div className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${
+                                                                isFreeShipping
+                                                                    ? 'border border-emerald-200 bg-emerald-50 text-emerald-700'
+                                                                    : 'border border-slate-200 bg-slate-50 text-slate-600'
+                                                            }`}>
+                                                                <TruckIcon size={14} />
+                                                                {isFreeShipping ? 'Livraison offerte' : 'Livraison'}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                     <div className="flex shrink-0 flex-col items-end gap-2 text-right">
                                                         {isFreeShipping ? (
@@ -1423,7 +1421,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                         <div
                             className={`mt-6 rounded-xl border p-4 ${
                                 variant === 'hero'
-                                    ? 'border-white/30 bg-white/10 backdrop-blur text-white'
+                                    ? 'border-white/40 bg-slate-900/40 backdrop-blur-2xl text-white'
                                     : 'border-gray-200 bg-gray-50 text-gray-700'
                             }`}
                         >
@@ -1481,7 +1479,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                                         key={item.id}
                                         className={`group relative overflow-hidden rounded-2xl border px-5 py-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg ${
                                             variant === 'hero'
-                                                ? 'border-white/10 bg-white/10 text-gray-200 backdrop-blur-sm'
+                                                ? 'border-white/20 bg-slate-900/35 text-gray-100 backdrop-blur-2xl'
                                                 : 'border-slate-200 bg-white text-slate-600'
                                         }`}
                                     >
