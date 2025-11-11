@@ -596,7 +596,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
     }
 
     return (
-        <div className="min-h-screen flex flex-col lg:flex-row" style={heroBackgroundStyle}>
+        <div className="order-online-page min-h-screen flex flex-col lg:flex-row" style={heroBackgroundStyle}>
             {/* Main Content */}
             <div class="flex-1 p-4 lg:p-8 bg-white">
                 <div class="flex items-center justify-between mb-6 bg-white p-3 rounded-lg shadow-md">

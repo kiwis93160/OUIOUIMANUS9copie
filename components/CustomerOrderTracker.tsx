@@ -526,29 +526,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                             <h2 className="text-3xl font-bold text-center text-white sm:text-4xl">
                                 Commande #{order.id.slice(-6)}
                             </h2>
-                            {isOrderCompleted ? (
-                                <div className="inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-emerald-500/35 to-green-500/35 px-5 py-2.5 border border-emerald-500/50 backdrop-blur-2xl shadow-inner shadow-emerald-500/20">
-                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500/30">
-                                        {order.type_commande === 'livraison' ? (
-                                            <TruckIcon size={18} className="text-emerald-300" />
-                                        ) : (
-                                            <PackageCheck size={18} className="text-emerald-300" />
-                                        )}
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-bold text-white">
-                                            {order.type_commande === 'livraison' 
-                                                ? "🚀 Votre commande est prête pour la livraison !" 
-                                                : "✅ Vous pouvez venir récupérer votre commande !"}
-                                        </p>
-                                        <p className="text-xs text-white/70 mt-0.5">
-                                            {order.type_commande === 'livraison' 
-                                                ? "Le livreur partira très bientôt" 
-                                                : "Présentez-vous au comptoir avec votre numéro de commande"}
-                                        </p>
-                                    </div>
-                                </div>
-                            ) : queuePosition !== null && (
+                            {isOrderCompleted ? null : queuePosition !== null && (
                                 <div className="inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-amber-500/35 to-orange-500/35 px-5 py-2.5 border border-amber-500/50 backdrop-blur-2xl shadow-inner shadow-amber-500/20">
                                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-500/30 font-bold text-amber-200">
                                         #{queuePosition}
@@ -1636,8 +1614,8 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                 <div className="mt-8 text-center space-y-4">
                     {isOrderCompleted && (
                         <div className="flex justify-center">
-                            <span className="inline-flex items-center gap-2 rounded-full bg-green-100 px-4 py-2 text-sm font-semibold text-green-700">
-                                <CheckCircle size={16} /> Pedido listo
+                            <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-emerald-400/40 bg-emerald-500/10 text-emerald-400">
+                                <CheckCircle size={18} />
                             </span>
                         </div>
                     )}
