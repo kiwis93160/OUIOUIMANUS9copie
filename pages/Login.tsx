@@ -815,7 +815,7 @@ const Login: React.FC = () => {
 
             <div className="mx-auto mt-10 grid w-full max-w-6xl gap-8 md:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
               <div className="grid gap-6">
-                <article className="h-full rounded-[24px] border border-white/70 bg-white/75 p-4 shadow-[0_24px_48px_-30px_rgba(15,23,42,0.5)] backdrop-blur">
+                <article className="h-full rounded-[24px] border border-white/70 bg-white/75 p-4 text-left shadow-[0_24px_48px_-30px_rgba(15,23,42,0.5)] backdrop-blur">
                   <div className="flex items-start gap-3">
                     <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-orange-500 text-white">
                       <MapPin className="h-5 w-5" />
@@ -843,7 +843,7 @@ const Login: React.FC = () => {
                   </div>
                 </article>
 
-                <article className="h-full rounded-[24px] border border-white/70 bg-white/75 p-4 shadow-[0_24px_48px_-30px_rgba(15,23,42,0.5)] backdrop-blur">
+                <article className="h-full rounded-[24px] border border-white/70 bg-white/75 p-4 text-left shadow-[0_24px_48px_-30px_rgba(15,23,42,0.5)] backdrop-blur">
                   <div className="flex items-start gap-3">
                     <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-orange-500 text-white">
                       <Clock className="h-5 w-5" />
@@ -871,12 +871,12 @@ const Login: React.FC = () => {
                   </div>
                 </article>
 
-                <article className="h-full rounded-[24px] border border-white/70 bg-white/75 p-4 shadow-[0_24px_48px_-30px_rgba(15,23,42,0.5)] backdrop-blur">
+                <article className="h-full rounded-[24px] border border-white/70 bg-white/75 p-4 text-left shadow-[0_24px_48px_-30px_rgba(15,23,42,0.5)] backdrop-blur">
                   <div className="flex items-start gap-3">
                     <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-orange-500 text-white">
                       <Phone className="h-5 w-5" />
                     </div>
-                    <div className="flex-1 space-y-3">
+                    <div className="flex-1 space-y-3 text-left">
                       {renderRichTextElement(
                         'findUs.cityLabel',
                         'h3',
