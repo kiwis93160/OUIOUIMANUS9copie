@@ -41,7 +41,7 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({ pro
       
       {/* Nom du produit */}
       <p
-        className="font-extrabold flex-grow text-black leading-snug text-[clamp(1rem,2.2vw,1.2rem)] break-words text-balance whitespace-normal [hyphens:auto] tracking-tight"
+        className="font-extrabold flex-grow text-white drop-shadow-md leading-snug text-[clamp(1rem,2.2vw,1.2rem)] break-words text-balance whitespace-normal [hyphens:auto] tracking-tight"
       >
         {product.nom_produit}
       </p>
