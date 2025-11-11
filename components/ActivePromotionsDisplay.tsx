@@ -39,6 +39,31 @@ const ActivePromotionsDisplay: React.FC = () => {
     return <Tag size={16} />;
   };
 
+  const lightenColor = (color: string, amount = 0.35) => {
+    const hex = color.replace('#', '');
+    if (hex.length !== 6 && hex.length !== 3) {
+      return color;
+    }
+
+    const normalizedHex = hex.length === 3
+      ? hex.split('').map((char) => char + char).join('')
+      : hex;
+
+    const channels = [
+      parseInt(normalizedHex.slice(0, 2), 16),
+      parseInt(normalizedHex.slice(2, 4), 16),
+      parseInt(normalizedHex.slice(4, 6), 16),
+    ];
+
+    const adjustChannel = (channel: number) =>
+      Math.min(255, Math.round(channel + (255 - channel) * amount));
+
+    const toHex = (channel: number) => channel.toString(16).padStart(2, '0');
+
+    const [r, g, b] = channels.map(adjustChannel);
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+  };
+
   const getPromotionDescription = (promo: Promotion) => {
     const discount = promo.discount;
     const conditions = promo.conditions;
@@ -98,21 +123,30 @@ const ActivePromotionsDisplay: React.FC = () => {
           }
           
           // Sinon, afficher le format compact habituel
+          const gradientMidColor = lightenColor(bgColor, 0.5);
+          const gradientEndColor = lightenColor(bgColor, 0.8);
+
           return (
-                     <div
-                  className="flex items-center rounded-lg shadow-sm transition-transform hover:scale-[1.01] overflow-hidden"
+            <div
+              key={promo.id}
+              className="flex items-center rounded-lg shadow-md transition-transform hover:scale-[1.01] overflow-hidden border-l-4"
               style={{
                 borderLeftColor: bgColor,
-                background: `linear-gradient(to right, ${bgColor}15, white)`,
+                background: `linear-gradient(to right, ${bgColor} 0%, ${gradientMidColor} 55%, ${gradientEndColor} 100%)`,
               }}
-                      >
-                      <div
-                className="flex items-center justify-center w-10 h-10 flex-shrink-0"       style={{ backgroundColor: bgColor, color: promo.visuals?.badge_color || '#FFFFFF' }}
+            >
+              <div
+                className="flex items-center justify-center w-12 h-12 flex-shrink-0"
+                style={{
+                  backgroundColor: bgColor,
+                  color: promo.visuals?.badge_color || '#FFFFFF',
+                }}
               >
                 {getPromotionIcon(promo)}
-                </div>              <div className="flex-1 px-2 py-1 flex items-center justify-between">
-                <p className="font-bold text-gray-900 text-sm">{promo.name}</p>
-                <p className="text-xs text-gray-600 truncate ml-2">{getPromotionDescription(promo)}</p>
+              </div>
+              <div className="flex-1 px-3 py-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                <p className="font-bold text-gray-900 text-sm drop-shadow-sm">{promo.name}</p>
+                <p className="text-xs text-gray-700 truncate sm:ml-2">{getPromotionDescription(promo)}</p>
               </div>
             </div>
           );

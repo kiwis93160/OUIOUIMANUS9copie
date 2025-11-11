@@ -617,7 +617,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                 </div>
 
                 {/* Category Filters */}
-                <div className="flex space-x-3 mb-6 overflow-x-auto pb-2 p-4 rounded-lg shadow-md bg-white">
+                <div className="flex space-x-3 mb-6 overflow-x-auto pb-2">
                     <button
                         onClick={() => setActiveCategoryId('all')}
                         className={`px-5 py-2 rounded-full text-sm font-bold transition-all ${activeCategoryId === 'all' ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg scale-105 border-2 border-orange-600' : 'bg-white text-gray-800 shadow-md hover:bg-gray-100 border-2 border-gray-300'}`}
