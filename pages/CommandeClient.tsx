@@ -598,8 +598,8 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
     return (
         <div className="order-online-page min-h-screen flex flex-col lg:flex-row" style={heroBackgroundStyle}>
             {/* Main Content */}
-            <div class="flex-1 p-4 lg:p-8 bg-white">
-                <div class="flex items-center justify-between mb-6 bg-white p-3 rounded-lg shadow-md">
+            <div className="flex-1 p-4 lg:p-8 space-y-6">
+                <div className="flex items-center justify-between bg-white p-3 rounded-lg shadow-md">
                     <h1 className="text-2xl font-bold text-gray-900 drop-shadow-md">Realizar Pedido</h1>
                     <button
                         type="button"
@@ -612,7 +612,9 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                 </div>
 
                 {/* Active Promotions Display */}
-                <div class="bg-white p-4 rounded-lg shadow-md"><ActivePromotionsDisplay /></div>
+                <div className="bg-white p-4 rounded-lg shadow-md">
+                    <ActivePromotionsDisplay />
+                </div>
 
                 {/* Category Filters */}
                 <div className="flex space-x-3 mb-6 overflow-x-auto pb-2 p-4 rounded-lg shadow-md bg-white">
@@ -647,7 +649,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
 
             {/* Order Summary / Cart */}
             <div className="lg:w-96 flex flex-col">
-                <div className="bg-white p-4 lg:p-6 shadow-lg flex flex-col">
+                <div className="order-cart rounded-3xl p-4 lg:p-6 shadow-xl flex flex-col">
                     <h2 className="text-3xl font-bold text-gray-900 drop-shadow-md mb-4">Mon panier</h2>
                     {/* Tus ultimos pedidos - Compact version in cart */}
                     {orderHistory.length > 0 && (
