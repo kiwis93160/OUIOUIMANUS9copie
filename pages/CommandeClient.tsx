@@ -37,6 +37,8 @@ const createDeliveryFeeItem = (isFree: boolean = false): OrderItem => ({
     estado: 'en_attente',
 });
 
+const isFreeShippingType = (type?: string | null) => (type ?? '').toLowerCase() === 'free_shipping';
+
 interface SelectedProductState {
     product: Product;
     commentaire?: string;
@@ -336,7 +338,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
         const automaticPromotionsDiscount = totalDiscount - currentPromoCodeDiscount;
 
         let deliveryFee = orderType === 'pedir_en_linea' ? DOMICILIO_FEE : 0;
-        const freeShippingPromotionApplied = updatedOrder.applied_promotions.some(p => p.type === 'FREE_SHIPPING');
+        const freeShippingPromotionApplied = updatedOrder.applied_promotions.some(p => isFreeShippingType(p.type));
         if (freeShippingPromotionApplied) {
             deliveryFee = 0;
         }
@@ -486,9 +488,15 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
             }
         }
 
+        const itemsToSubmit =
+            orderType === 'pedir_en_linea'
+                ? [...cart, createDeliveryFeeItem(isFreeShipping)]
+                : cart;
+
         const finalOrder: Order = {
             id: `ord_${Date.now()}`,
-            items: cart,
+            type: orderType,
+            items: itemsToSubmit,
             clientInfo: {
                 nom: clientName,
                 telephone: clientPhone,
@@ -496,6 +504,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
             },
             shipping_cost: deliveryFee,
             order_type: orderType,
+            statut: 'pendiente_validacion',
             payment_method: paymentMethod,
             receipt_url: receiptUrl,
             subtotal: orderTotals.subtotal,
@@ -503,7 +512,6 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
             total_discount: orderTotals.automaticPromotionsDiscount + orderTotals.promoCodeDiscount,
             promo_code: appliedPromoCode || undefined,
             applied_promotions: orderTotals.appliedPromotions,
-            status: 'pending',
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
         };
