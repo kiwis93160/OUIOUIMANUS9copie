@@ -900,17 +900,17 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                                         return (
                                             <div
                                                 key={item.id}
-                                                className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/95 pl-28 pr-6 py-4 text-slate-900 shadow-xl transition-all hover:-translate-y-0.5 hover:border-amber-300/60 hover:shadow-amber-500/30"
+                                                className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/95 pl-28 pr-6 py-3 text-slate-900 shadow-xl transition-all hover:-translate-y-0.5 hover:border-amber-300/60 hover:shadow-amber-500/30 sm:pl-28"
                                             >
-                                                <div className="absolute inset-y-0 left-0 flex w-24 items-center justify-center bg-gradient-to-b from-orange-500 to-rose-500 text-4xl font-black text-white shadow-inner shadow-amber-500/40">
+                                                <div className="absolute left-0 top-1/2 flex h-24 w-24 -translate-y-1/2 items-center justify-center bg-gradient-to-b from-orange-500 to-rose-500 text-4xl font-black text-white shadow-inner shadow-amber-500/40">
                                                     <span className="rounded-lg bg-white/15 px-5 py-2 text-3xl font-bold leading-tight">
                                                         {item.quantite}
                                                     </span>
                                                 </div>
-                                                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                                    <div className="min-w-0 flex-1 space-y-2">
-                                                        <div className="space-y-1">
-                                                            <p className="text-base font-semibold leading-tight text-balance text-slate-900 sm:text-lg">
+                                                <div className="flex min-h-[6rem] flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
+                                                    <div className="min-w-0 flex-1 space-y-1.5">
+                                                        <div className="space-y-0.5">
+                                                            <p className="text-[1.3rem] font-semibold leading-snug text-balance text-slate-900 sm:text-[1.45rem]">
                                                                 {item.nom_produit}
                                                             </p>
                                                             {!isFreeShipping && (
@@ -920,7 +920,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                                                             )}
                                                         </div>
                                                         {itemDescription && (
-                                                            <p className="text-sm leading-snug text-slate-600">{itemDescription}</p>
+                                                            <p className="text-sm leading-tight text-slate-600">{itemDescription}</p>
                                                         )}
                                                         {trimmedComment && (
                                                             <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-sm italic text-amber-700 shadow-inner shadow-amber-200/60">
