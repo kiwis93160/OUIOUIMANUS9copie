@@ -25,6 +25,10 @@ import {
 } from '../types';
 import { ROLE_HOME_PAGE_META_KEY, ROLES, SITE_CUSTOMIZER_PERMISSION_KEY } from '../constants';
 import { resolveSiteContent, sanitizeSiteContentInput } from '../utils/siteContent';
+import {
+  convertPriceToUsageUnit,
+  convertUsageQuantityToStockUnit,
+} from '../utils/ingredientUnits';
 
 type SupabasePermissions = Role['permissions'] & {
   [key in typeof ROLE_HOME_PAGE_META_KEY]?: string;
@@ -56,6 +60,10 @@ type SupabaseOrderMetaRow = {
 type SupabaseRecipeRow = {
   ingredient_id: string;
   qte_utilisee: number;
+};
+
+type SupabaseProductRecipeUsageRow = SupabaseRecipeRow & {
+  product_id: string;
 };
 
 type SupabaseProductRow = {
@@ -264,12 +272,9 @@ const calculateCost = (recipe: RecipeItem[], ingredientMap: Map<string, Ingredie
       return total;
     }
 
-    let unitPrice = ingredient.prix_unitaire;
-    if (ingredient.unite === 'kg' || ingredient.unite === 'L') {
-      unitPrice = unitPrice / 1000;
-    }
+    const usageUnitPrice = convertPriceToUsageUnit(ingredient.unite, ingredient.prix_unitaire);
 
-    return total + unitPrice * item.qte_utilisee;
+    return total + usageUnitPrice * item.qte_utilisee;
   }, 0);
 };
 
@@ -393,6 +398,114 @@ const mapProductRow = (row: SupabaseProductRow, ingredientMap?: Map<string, Ingr
 
 const isUuid = (value?: string | null): value is string =>
   !!value && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+
+const deductIngredientsStockForOrderItems = async (items: OrderItem[]): Promise<void> => {
+  const productItems = items.filter(item => isUuid(item.produitRef) && item.quantite > 0);
+
+  if (productItems.length === 0) {
+    return;
+  }
+
+  const productIds = Array.from(new Set(productItems.map(item => item.produitRef)));
+
+  const recipesResponse = await supabase
+    .from('product_recipes')
+    .select('product_id, ingredient_id, qte_utilisee')
+    .in('product_id', productIds);
+
+  const recipeRows = unwrap<SupabaseProductRecipeUsageRow[]>(
+    recipesResponse as SupabaseResponse<SupabaseProductRecipeUsageRow[]>,
+  );
+
+  if (!recipeRows || recipeRows.length === 0) {
+    return;
+  }
+
+  const recipeMap = new Map<string, SupabaseProductRecipeUsageRow[]>();
+  for (const row of recipeRows) {
+    if (!recipeMap.has(row.product_id)) {
+      recipeMap.set(row.product_id, []);
+    }
+    recipeMap.get(row.product_id)!.push(row);
+  }
+
+  const consumptionMap = new Map<string, number>();
+
+  for (const item of productItems) {
+    const recipe = recipeMap.get(item.produitRef);
+    if (!recipe) {
+      continue;
+    }
+
+    const excluded = new Set(item.excluded_ingredients ?? []);
+
+    for (const recipeItem of recipe) {
+      if (excluded.has(recipeItem.ingredient_id)) {
+        continue;
+      }
+
+      const usage = recipeItem.qte_utilisee * item.quantite;
+      if (!Number.isFinite(usage) || usage <= 0) {
+        continue;
+      }
+
+      consumptionMap.set(
+        recipeItem.ingredient_id,
+        (consumptionMap.get(recipeItem.ingredient_id) ?? 0) + usage,
+      );
+    }
+  }
+
+  if (consumptionMap.size === 0) {
+    return;
+  }
+
+  const ingredientIds = Array.from(consumptionMap.keys());
+
+  const ingredientsResponse = await supabase
+    .from('ingredients')
+    .select('id, unite, stock_actuel')
+    .in('id', ingredientIds);
+
+  const ingredientRows = unwrap<SupabaseIngredientRow[]>(
+    ingredientsResponse as SupabaseResponse<SupabaseIngredientRow[]>,
+  );
+
+  const updates: Array<{ id: string; stock_actuel: number }> = [];
+
+  for (const row of ingredientRows) {
+    const usage = consumptionMap.get(row.id) ?? 0;
+    const usageInStockUnit = convertUsageQuantityToStockUnit(row.unite, usage);
+    if (usageInStockUnit <= 0) {
+      continue;
+    }
+
+    const currentStock = toNumber(row.stock_actuel) ?? 0;
+    const newStock = Math.max(currentStock - usageInStockUnit, 0);
+
+    if (Math.abs(newStock - currentStock) < 0.000001) {
+      continue;
+    }
+
+    updates.push({ id: row.id, stock_actuel: newStock });
+  }
+
+  if (updates.length === 0) {
+    return;
+  }
+
+  await Promise.all(
+    updates.map(update =>
+      supabase
+        .from('ingredients')
+        .update({ stock_actuel: update.stock_actuel })
+        .eq('id', update.id)
+        .select('id')
+        .single()
+        .then(response => unwrap(response as SupabaseResponse<{ id: string }>)),
+    ),
+  );
+};
 
 const mapOrderItemRow = (row: SupabaseOrderItemRow): OrderItem => ({
   id: row.id,
@@ -2752,6 +2865,12 @@ export const api = {
         telephone: insertedOrder.client_telephone ?? '',
         adresse: insertedOrder.client_adresse ?? undefined,
       };
+    }
+
+    try {
+      await deductIngredientsStockForOrderItems(finalItems);
+    } catch (error) {
+      console.error('Failed to deduct ingredient stock after order creation', error);
     }
 
     publishOrderChange({ includeNotifications: true });

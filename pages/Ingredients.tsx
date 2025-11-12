@@ -5,6 +5,12 @@ import { Ingredient } from '../types';
 import Modal from '../components/Modal';
 import { PlusCircle, Edit, Trash2, PackagePlus, Search } from 'lucide-react';
 import { formatCurrencyCOP } from '../utils/formatIntegerAmount';
+import {
+    convertPriceFromBaseToStorage,
+    convertPriceFromStorageToBase,
+    getPriceDisplayLabel,
+    getPriceDisplayUnitLabel,
+} from '../utils/ingredientUnits';
 
 const Ingredients: React.FC = () => {
     const { role } = useAuth();
@@ -87,7 +93,7 @@ const Ingredients: React.FC = () => {
                                 <th className="p-3 text-sm font-medium text-gray-500 uppercase tracking-wider">Nom</th>
                                 <th className="p-3 text-sm font-medium text-gray-500 uppercase tracking-wider">Stock Actuel</th>
                                 <th className="p-3 text-sm font-medium text-gray-500 uppercase tracking-wider">Stock Minimum</th>
-                                <th className="p-3 text-sm font-medium text-gray-500 uppercase tracking-wider">Prix unitaire moyen</th>
+                                <th className="p-3 text-sm font-medium text-gray-500 uppercase tracking-wider">Prix unitaire moyen (base)</th>
                                 {canEdit && <th className="p-3 text-right text-sm font-medium text-gray-500 uppercase tracking-wider">Actions</th>}
                             </tr>
                         </thead>
@@ -103,8 +109,8 @@ const Ingredients: React.FC = () => {
                                     <td className={`p-3 ${isLowStock ? 'text-red-800' : 'text-gray-700'}`}>
                                         {ing.stock_minimum} {ing.unite}
                                     </td>
-                                     <td className={`p-3 ${isLowStock ? 'text-red-800' : 'text-gray-700'}`}>
-                                        {formatCurrencyCOP(ing.prix_unitaire)}
+                                    <td className={`p-3 ${isLowStock ? 'text-red-800' : 'text-gray-700'}`}>
+                                        {formatCurrencyCOP(convertPriceFromStorageToBase(ing.unite, ing.prix_unitaire))} / {getPriceDisplayUnitLabel(ing.unite)}
                                     </td>
                                     {canEdit && (
                                         <td className="p-3 text-right">
@@ -212,15 +218,19 @@ const AddEditIngredientModal: React.FC<{ isOpen: boolean; onClose: () => void; o
 
 const ResupplyModal: React.FC<{ isOpen: boolean; onClose: () => void; onSuccess: () => void; ingredient: Ingredient }> = ({ isOpen, onClose, onSuccess, ingredient }) => {
     const [quantity, setQuantity] = useState(0);
-    const [unitPrice, setUnitPrice] = useState(0);
+    const [unitPrice, setUnitPrice] = useState(() => convertPriceFromStorageToBase(ingredient.unite, ingredient.prix_unitaire));
     const [isSubmitting, setSubmitting] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (quantity <= 0 || unitPrice < 0) return;
+        if (!Number.isFinite(quantity) || quantity <= 0 || !Number.isFinite(unitPrice) || unitPrice < 0) return;
         setSubmitting(true);
         try {
-            await api.resupplyIngredient(ingredient.id, quantity, unitPrice);
+            await api.resupplyIngredient(
+                ingredient.id,
+                quantity,
+                convertPriceFromBaseToStorage(ingredient.unite, unitPrice),
+            );
             onSuccess();
             onClose();
         } catch (error) {
@@ -235,11 +245,17 @@ const ResupplyModal: React.FC<{ isOpen: boolean; onClose: () => void; onSuccess:
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                     <label htmlFor="quantity" className="block text-sm font-medium text-gray-700">Quantité Achetée ({ingredient.unite})</label>
-                    <input type="number" id="quantity" min="0.01" step="0.01" value={quantity} onChange={e => setQuantity(parseFloat(e.target.value))} required className="mt-1 ui-input"/>
+                    <input type="number" id="quantity" min="0.01" step="0.01" value={quantity} onChange={e => {
+                        const value = parseFloat(e.target.value);
+                        setQuantity(Number.isNaN(value) ? 0 : value);
+                    }} required className="mt-1 ui-input"/>
                 </div>
                 <div>
-                    <label htmlFor="unitPrice" className="block text-sm font-medium text-gray-700">Prix par unité ({ingredient.unite})</label>
-                    <input type="number" id="unitPrice" min="0" step="0.01" value={unitPrice} onChange={e => setUnitPrice(parseFloat(e.target.value))} required className="mt-1 ui-input"/>
+                    <label htmlFor="unitPrice" className="block text-sm font-medium text-gray-700">{getPriceDisplayLabel(ingredient.unite)}</label>
+                    <input type="number" id="unitPrice" min="0" step="0.01" value={unitPrice} onChange={e => {
+                        const value = parseFloat(e.target.value);
+                        setUnitPrice(Number.isNaN(value) ? 0 : value);
+                    }} required className="mt-1 ui-input"/>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3 pt-4">
                     <button type="button" onClick={onClose} className="w-full ui-btn-secondary py-3">Annuler</button>
