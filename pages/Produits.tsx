@@ -8,6 +8,7 @@ import { Product, Category, Ingredient, RecipeItem } from '../types';
 import Modal from '../components/Modal';
 import { PlusCircle, Edit, Trash2, Search, Settings, GripVertical, CheckCircle, Clock, XCircle, MoreVertical, Upload, HelpCircle } from 'lucide-react';
 import { formatCurrencyCOP, formatIntegerAmount } from '../utils/formatIntegerAmount';
+import { convertPriceToUsageUnit, getUsageUnitLabel } from '../utils/ingredientUnits';
 
 const BEST_SELLER_RANKS = [1, 2, 3, 4, 5, 6];
 
@@ -334,10 +335,7 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
             const ingredient = ingredientMap.get(item.ingredient_id);
             if (!ingredient) return total;
 
-            let unitPrice = ingredient.prix_unitaire;
-            if (ingredient.unite === 'kg' || ingredient.unite === 'L') {
-                unitPrice = unitPrice / 1000;
-            }
+            const unitPrice = convertPriceToUsageUnit(ingredient.unite, ingredient.prix_unitaire);
 
             return total + unitPrice * item.qte_utilisee;
         }, 0);
@@ -562,17 +560,22 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                             </div>
                         )}
                         <div className="space-y-2">
-                            {formData.recipe.map((item, index) => (
-                                <div key={index} className="flex items-center gap-2">
-                                    <GripVertical className="text-gray-400 cursor-move" size={16}/>
-                                    <select value={item.ingredient_id} onChange={event => handleRecipeChange(index, 'ingredient_id', event)} className="ui-select flex-grow">
-                                        {ingredients.map(i => <option key={i.id} value={i.id}>{i.nom}</option>)}
-                                    </select>
-                                    <input type="number" placeholder="Qté" value={item.qte_utilisee} onChange={event => handleRecipeChange(index, 'qte_utilisee', event)} className="ui-input w-24" />
-                                    <span className="text-gray-500 text-sm w-12">{ingredients.find(i => i.id === item.ingredient_id)?.unite === 'kg' ? 'g' : ingredients.find(i => i.id === item.ingredient_id)?.unite}</span>
-                                    <button type="button" onClick={() => removeRecipeItem(index)} className="p-1 text-red-500 hover:bg-red-100 rounded-full"><Trash2 size={16}/></button>
-                                </div>
-                            ))}
+                            {formData.recipe.map((item, index) => {
+                                const ingredientUnit = ingredients.find(i => i.id === item.ingredient_id)?.unite;
+                                const usageUnitLabel = ingredientUnit ? getUsageUnitLabel(ingredientUnit) : '';
+
+                                return (
+                                    <div key={index} className="flex items-center gap-2">
+                                        <GripVertical className="text-gray-400 cursor-move" size={16}/>
+                                        <select value={item.ingredient_id} onChange={event => handleRecipeChange(index, 'ingredient_id', event)} className="ui-select flex-grow">
+                                            {ingredients.map(i => <option key={i.id} value={i.id}>{i.nom}</option>)}
+                                        </select>
+                                        <input type="number" placeholder="Qté" value={item.qte_utilisee} onChange={event => handleRecipeChange(index, 'qte_utilisee', event)} className="ui-input w-24" />
+                                        <span className="text-gray-500 text-sm w-12">{usageUnitLabel}</span>
+                                        <button type="button" onClick={() => removeRecipeItem(index)} className="p-1 text-red-500 hover:bg-red-100 rounded-full"><Trash2 size={16}/></button>
+                                    </div>
+                                );
+                            })}
                         </div>
                         <button type="button" onClick={addRecipeItem} className="mt-2 text-sm text-blue-600 hover:underline">Ajouter un ingrédient</button>
                     </div>
