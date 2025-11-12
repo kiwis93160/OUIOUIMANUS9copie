@@ -1902,6 +1902,39 @@ body {
   background: linear-gradient(155deg, var(--color-bg) 0%, var(--color-bg-muted) 100%);
 }
 
+body.customization-mode {
+  background: #ffffff;
+}
+
+body.customization-mode .app-shell,
+body.customization-mode .app-main,
+body.customization-mode .app-content {
+  background: #ffffff;
+  background-image: none;
+}
+
+body.customization-mode .app-header {
+  background: #ffffff;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+body.customization-mode .app-content {
+  color: var(--color-heading);
+}
+
+body.customization-mode .app-content__inner {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+body.customization-mode .site-customization {
+  color: inherit;
+}
+
 .app-main {
   flex: 1;
   display: flex;

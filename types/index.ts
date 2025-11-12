@@ -98,6 +98,7 @@ const BASE_EDITABLE_ELEMENT_KEYS = [
   'findUs.hoursLabel',
   'findUs.hours',
   'findUs.mapLabel',
+  'findUs.mapUrl',
   'findUs.style.background',
   'footer.text',
   'footer.style.background',

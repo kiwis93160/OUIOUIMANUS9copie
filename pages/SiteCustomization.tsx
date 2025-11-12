@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { AlertTriangle, CheckCircle2, Copy, Loader2, Upload } from 'lucide-react';
 import Modal from '../components/Modal';
 import SitePreviewCanvas, { resolveZoneFromElement } from '../components/SitePreviewCanvas';
@@ -116,6 +116,7 @@ const BASE_ELEMENT_LABELS: Partial<Record<EditableElementKey, string>> = {
   'findUs.hoursLabel': 'Libellé des horaires',
   'findUs.hours': 'Horaires',
   'findUs.mapLabel': 'Libellé du lien carte',
+  'findUs.mapUrl': 'Lien personnalisé de la carte',
   'findUs.style.background': 'Fond Encuéntranos',
   'footer.text': 'Texte du pied de page',
   'footer.style.background': 'Fond du pied de page',
@@ -753,6 +754,14 @@ const CUSTOMIZATION_SECTIONS: CustomizationSection[] = [
             element: 'findUs.mapLabel',
             label: 'Libellé du lien carte',
           },
+          {
+            id: 'find-us-map-url',
+            type: 'text',
+            element: 'findUs.mapUrl',
+            label: 'Lien personnalisé de la carte',
+            description: 'Indiquez une URL Google Maps ou tout lien d\'itinéraire à afficher.',
+            placeholder: 'https://maps.google.com/...',
+          },
         ],
       },
       {
@@ -1010,7 +1019,7 @@ const TextFieldEditorContent: React.FC<TextFieldEditorContentProps> = ({
       </div>
 
       {allowRichText && (
-        <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+        <div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-4">
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-sm font-medium text-slate-700">Mise en forme avancée</p>
@@ -1646,6 +1655,17 @@ const SiteCustomization: React.FC = () => {
   const [editorElement, setEditorElement] = useState<EditableElementKey | null>(null);
   const [isLibraryOpen, setIsLibraryOpen] = useState<boolean>(false);
 
+  useLayoutEffect(() => {
+    if (typeof document === 'undefined') {
+      return;
+    }
+    const className = 'customization-mode';
+    document.body.classList.add(className);
+    return () => {
+      document.body.classList.remove(className);
+    };
+  }, []);
+
   useEffect(() => {
     if (content) {
       setDraft(cloneSiteContent(content));
@@ -1866,7 +1886,7 @@ const SiteCustomization: React.FC = () => {
               onAssetAdded={appendAssetToDraft}
               multiline={field.multiline}
               allowRichText={field.allowRichText}
-              showStyleOptions={field.showStyleOptions}
+              showStyleOptions={field.showStyleOptions ?? TEXT_ELEMENT_KEYS.has(field.element)}
               placeholder={field.placeholder}
             />
           </FieldWrapper>
@@ -1931,7 +1951,7 @@ const SiteCustomization: React.FC = () => {
   const assets = draft.assets?.library ?? [];
 
   return (
-    <div className="space-y-8 px-4 sm:px-6 lg:px-0">
+    <div className="site-customization space-y-8 px-4 sm:px-6 lg:px-0">
       <header className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-slate-900">Site public</h1>
@@ -2000,7 +2020,7 @@ const SiteCustomization: React.FC = () => {
       <div>
         {activeTab === 'preview' ? (
           <div className="mx-auto w-full max-w-6xl">
-            <div className="rounded-[2.5rem] border border-slate-200 bg-slate-50 p-6">
+            <div className="rounded-[2.5rem] border border-slate-200 bg-white p-6">
               <SitePreviewCanvas
                 content={draft}
                 bestSellerProducts={bestSellerProducts}
@@ -2019,7 +2039,7 @@ const SiteCustomization: React.FC = () => {
               </div>
             )}
             <div className="mx-auto w-full max-w-7xl">
-              <div className="rounded-[2.75rem] border border-slate-200 bg-slate-50 p-4 shadow-inner sm:p-6 lg:p-8">
+              <div className="rounded-[2.75rem] border border-slate-200 bg-white p-4 shadow-inner sm:p-6 lg:p-8">
                 <SitePreviewCanvas
                   content={draft}
                   bestSellerProducts={bestSellerProducts}
