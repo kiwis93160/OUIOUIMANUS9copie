@@ -612,14 +612,15 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
   findUs: {
     title: 'Encuéntranos',
     addressLabel: 'Dirección',
-    address: 'Cra. 53 #75-98\nBarranquilla, Atlántico\nColombie',
+    address:
+      'OuiOuiTacos\n⭐ 4,3 · 18 avis\n$ 20 000 – 30 000 · Restauration rapide\nCra. 51B #82-254\nBarranquilla, Atlántico, Colombie',
     cityLabel: 'Contact',
     city: 'hola@ouiouipos.co',
     hoursLabel: 'Horarios',
     hours: 'Lunes a domingo · 11h00 - 23h00',
-    mapLabel: 'Ver en Google Maps',
+    mapLabel: 'Ver OuiOuiTacos en Google Maps',
     mapUrl:
-      'https://www.google.com/maps?q=OUIOUITACOS%2C%20Cra%2053%20%2375-98%2C%20Barranquilla%2C%20Atl%C3%A1ntico%2C%20Colombie',
+      'https://www.google.com/maps/place/OuiOuiTacos/@11.004013,-74.8184659,17z/data=!3m1!4b1!4m6!3m5!1s0x8ef42be1b67d1a59:0x3d31292d89237cb3!8m2!3d11.004013!4d-74.8162772!16s%2Fg%2F11pv1r8yj9',
     style: DEFAULT_FIND_US_STYLE,
   },
   footer: {
