@@ -599,21 +599,21 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
         <div className="order-online-page min-h-screen flex flex-col lg:flex-row" style={heroBackgroundStyle}>
             {/* Main Content */}
             <div className="flex-1 p-4 lg:p-8 space-y-6">
-                <div className="flex items-center justify-between p-3">
-                    <h1 className="text-2xl font-bold text-gray-900 drop-shadow-md">Realizar Pedido</h1>
-                    <button
-                        type="button"
-                        onClick={() => navigate('/')}
-                        className="inline-flex items-center text-sm font-semibold text-brand-primary hover:text-brand-primary/80 transition-colors"
-                    >
-                        <ArrowLeft size={14} className="mr-1" />
-                        Volver
-                    </button>
-                </div>
-
                 {/* Active Promotions Display */}
-                <div className="p-4">
-                    <ActivePromotionsDisplay />
+                <div className="px-4 pt-0 pb-4">
+                    <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                            <ActivePromotionsDisplay />
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => navigate('/')}
+                            className="inline-flex items-center text-sm font-semibold text-brand-primary hover:text-brand-primary/80 transition-colors self-start"
+                        >
+                            <ArrowLeft size={14} className="mr-1" />
+                            Volver
+                        </button>
+                    </div>
                 </div>
 
                 {/* Category Filters */}
