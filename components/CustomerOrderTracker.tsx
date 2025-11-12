@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { api } from '../services/api';
 import { Order } from '../types';
-import { CheckCircle, ChefHat, FileText, PackageCheck, User, MapPin, Receipt, Phone, Tag, TruckIcon, Percent, Gift } from 'lucide-react';
+import { Check, CheckCircle, ChefHat, FileText, PackageCheck, User, MapPin, Receipt, Phone, Tag, TruckIcon, Percent, Gift } from 'lucide-react';
 import { formatCurrencyCOP } from '../utils/formatIntegerAmount';
 import {
     clearActiveCustomerOrder,
@@ -35,6 +35,43 @@ const saveOrderToHistory = (order: Order) => {
         console.error("Failed to save order to history:", e);
     }
 };
+
+const CompletionStamp: React.FC<{ className?: string }> = ({ className }) => (
+    <div className={`pointer-events-none select-none ${className ?? ''}`} aria-hidden="true">
+        <style>{`
+            @keyframes completion-stamp-pop {
+                0% {
+                    transform: scale(0) rotate(-18deg);
+                    opacity: 0;
+                }
+                55% {
+                    transform: scale(1.12) rotate(-8deg);
+                }
+                100% {
+                    transform: scale(1) rotate(-12deg);
+                    opacity: 1;
+                }
+            }
+        `}</style>
+        <div className="relative h-28 w-28 sm:h-32 sm:w-32 md:h-36 md:w-36 animate-[completion-stamp-pop_0.6s_cubic-bezier(0.34,1.56,0.64,1)_forwards]">
+            <div className="absolute inset-0 rounded-full bg-emerald-400/30 blur-xl" />
+            <div className="absolute inset-1 rounded-full border-2 border-emerald-300/50" />
+            <div className="absolute inset-0 rounded-full border border-white/30 opacity-50 mix-blend-screen" />
+            <div className="relative flex h-full w-full items-center justify-center rounded-full border-[6px] border-emerald-400/80 bg-gradient-to-br from-emerald-500/30 via-emerald-500/20 to-teal-400/25 shadow-[0_18px_45px_rgba(16,185,129,0.35)] backdrop-blur">
+                <div className="absolute inset-[14%] rounded-full border-2 border-dashed border-emerald-300/70" />
+                <div className="absolute inset-[22%] rounded-full border border-emerald-400/40" />
+                <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.45),transparent_55%)] opacity-40" />
+                <div className="relative flex flex-col items-center justify-center text-center text-emerald-50 drop-shadow-[0_4px_12px_rgba(15,118,110,0.45)]">
+                    <div className="mb-1 flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/20 shadow-inner shadow-emerald-600/30">
+                        <Check className="h-5 w-5 text-emerald-100" strokeWidth={3} />
+                    </div>
+                    <span className="text-xs sm:text-sm font-black uppercase tracking-[0.35em] text-emerald-100">Pedido</span>
+                    <span className="text-lg sm:text-xl font-black uppercase tracking-[0.3em] text-emerald-50">Listo</span>
+                </div>
+            </div>
+        </div>
+    </div>
+);
 
 interface CustomerOrderTrackerProps {
   orderId: string;
@@ -509,18 +546,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                     </div>
                     <div className="relative flex flex-col gap-6">
                         {isOrderCompleted && (
-                            <div className="pointer-events-none absolute -top-6 right-4 sm:right-8">
-                                <div className="relative" style={{ transform: 'rotate(10deg)' }}>
-                                    <div className="stamp-container scale-75 sm:scale-90">
-                                        <div className="stamp-border">
-                                            <div className="stamp-inner">
-                                                <span className="stamp-text">PEDIDO</span>
-                                                <span className="stamp-text stamp-text-large">LISTO</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <CompletionStamp className="absolute -top-14 -right-6 z-20 sm:-top-16 sm:-right-10 lg:-top-16 lg:-right-14" />
                         )}
                         <div className="flex flex-col items-center gap-2 text-center">
                             <h2 className="text-3xl font-bold text-center text-white sm:text-4xl">
@@ -769,44 +795,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
 
                         {/* Tampon PEDIDO LISTO pour commande prête */}
                         {isOrderCompleted && (
-                            <div className="stamp-container pointer-events-none absolute top-8 right-8 z-10">
-                                <style>{`
-                                    @keyframes stamp-appear {
-                                        0% { 
-                                            transform: scale(0) rotate(-15deg); 
-                                            opacity: 0; 
-                                        }
-                                        50% { 
-                                            transform: scale(1.2) rotate(-15deg); 
-                                        }
-                                        100% { 
-                                            transform: scale(1) rotate(-15deg); 
-                                            opacity: 1; 
-                                        }
-                                    }
-                                    .stamp {
-                                        animation: stamp-appear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-                                        animation-delay: 0.5s;
-                                        opacity: 0;
-                                    }
-                                `}</style>
-                                <div className="stamp relative">
-                                    {/* Tampon avec effet de rotation */}
-                                    <div className="relative flex items-center justify-center w-32 h-32 sm:w-40 sm:h-40 rounded-full border-8 border-emerald-500 bg-emerald-500/20 backdrop-blur-2xl shadow-2xl">
-                                        {/* Texte du tampon */}
-                                        <div className="text-center">
-                                            <p className="text-xl sm:text-2xl font-black text-emerald-500 tracking-wider" style={{ fontFamily: 'Impact, sans-serif', textShadow: '2px 2px 4px rgba(0,0,0,0.3)' }}>
-                                                PEDIDO
-                                            </p>
-                                            <p className="text-xl sm:text-2xl font-black text-emerald-500 tracking-wider" style={{ fontFamily: 'Impact, sans-serif', textShadow: '2px 2px 4px rgba(0,0,0,0.3)' }}>
-                                                LISTO
-                                            </p>
-                                        </div>
-                                        {/* Effet de cercle extérieur */}
-                                        <div className="absolute inset-0 rounded-full border-4 border-emerald-400/50 animate-ping" style={{ animationDuration: '2s' }}></div>
-                                    </div>
-                                </div>
-                            </div>
+                            <CompletionStamp className="absolute -top-12 -right-4 z-20 sm:-top-14 sm:-right-8" />
                         )}
 
                         {(hasClientDetails || order.receipt_url) && (
@@ -1277,122 +1266,11 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                         }
                     }
 
-                    .stamp-container {
-                        position: relative;
-                        width: 180px;
-                        height: 180px;
-                        animation: stamp-appear 0.5s ease-out;
-                    }
-                    
-                    @keyframes stamp-appear {
-                        0% {
-                            transform: scale(0) rotate(-45deg);
-                            opacity: 0;
-                        }
-                        60% {
-                            transform: scale(1.1) rotate(0deg);
-                        }
-                        100% {
-                            transform: scale(1) rotate(0deg);
-                            opacity: 1;
-                        }
-                    }
-                    
-                    .stamp-border {
-                        width: 100%;
-                        height: 100%;
-                        border: 4px solid #dc2626;
-                        border-radius: 50%;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        background: rgba(220, 38, 38, 0.05);
-                        position: relative;
-                        box-shadow: 0 0 0 2px #dc2626;
-                    }
-                    
-                    .stamp-border::before {
-                        content: '';
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        right: 0;
-                        bottom: 0;
-                        border-radius: 50%;
-                        background: repeating-linear-gradient(
-                            45deg,
-                            transparent,
-                            transparent 2px,
-                            rgba(220, 38, 38, 0.03) 2px,
-                            rgba(220, 38, 38, 0.03) 4px
-                        );
-                    }
-                    
-                    .stamp-inner {
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        justify-content: center;
-                        text-align: center;
-                        z-index: 1;
-                    }
-                    
-                    .stamp-text {
-                        font-family: 'Arial Black', 'Arial Bold', sans-serif;
-                        font-weight: 900;
-                        color: #dc2626;
-                        text-transform: uppercase;
-                        letter-spacing: 2px;
-                        line-height: 1;
-                        text-shadow: 
-                            1px 1px 0 rgba(220, 38, 38, 0.3),
-                            -1px -1px 0 rgba(220, 38, 38, 0.3);
-                    }
-                    
-                    .stamp-text:first-child {
-                        font-size: 20px;
-                        margin-bottom: 6px;
-                    }
-                    
-                    .stamp-text-large {
-                        font-size: 42px;
-                        font-weight: 900;
-                    }
-                    
-                    /* Effet de texture grunge */
-                    .stamp-border::after {
-                        content: '';
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        right: 0;
-                        bottom: 0;
-                        border-radius: 50%;
-                        background-image: 
-                            radial-gradient(circle at 20% 30%, transparent 0%, transparent 2%, rgba(220, 38, 38, 0.1) 2%, transparent 3%),
-                            radial-gradient(circle at 80% 70%, transparent 0%, transparent 2%, rgba(220, 38, 38, 0.1) 2%, transparent 3%),
-                            radial-gradient(circle at 40% 80%, transparent 0%, transparent 1%, rgba(220, 38, 38, 0.1) 1%, transparent 2%),
-                            radial-gradient(circle at 60% 20%, transparent 0%, transparent 1%, rgba(220, 38, 38, 0.1) 1%, transparent 2%);
-                        opacity: 0.8;
-                    }
                 `}</style>
                 
                 <div className={detailContainerClasses}>
                     {/* Tampon PEDIDO LISTO */}
-                    {isOrderCompleted && (
-                        <div className="absolute top-4 right-4 z-10 pointer-events-none">
-                            <div className="relative" style={{ transform: 'rotate(15deg)' }}>
-                                <div className="stamp-container">
-                                    <div className="stamp-border">
-                                        <div className="stamp-inner">
-                                            <span className="stamp-text">PEDIDO</span>
-                                            <span className="stamp-text stamp-text-large">LISTO</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
+                    {isOrderCompleted && <CompletionStamp className="absolute -top-12 -right-6 z-20 sm:-top-14 sm:-right-8" />}
                     <h3 className={`mt-10 text-xl font-bold ${variant === 'hero' ? 'text-white' : 'text-gray-800'}`}>Résumé de la commande</h3>
 
                     {isTakeawayOrder && hasClientDetails && (
