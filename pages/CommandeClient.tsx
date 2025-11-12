@@ -599,7 +599,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
         <div className="order-online-page min-h-screen flex flex-col lg:flex-row" style={heroBackgroundStyle}>
             {/* Main Content */}
             <div className="flex-1 p-4 lg:p-8 space-y-6">
-                <div className="flex items-center justify-between bg-white p-3 rounded-lg shadow-md">
+                <div className="flex items-center justify-between p-3">
                     <h1 className="text-2xl font-bold text-gray-900 drop-shadow-md">Realizar Pedido</h1>
                     <button
                         type="button"
@@ -612,7 +612,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                 </div>
 
                 {/* Active Promotions Display */}
-                <div className="bg-white p-4 rounded-lg shadow-md">
+                <div className="p-4">
                     <ActivePromotionsDisplay />
                 </div>
 
