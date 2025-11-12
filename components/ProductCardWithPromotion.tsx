@@ -17,10 +17,10 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({ pro
   const { promotions, loading } = useProductPromotions(product);
 
   return (
-    <div 
+    <div
       onClick={() => product.estado === 'disponible' && onClick()}
-      className={`relative border rounded-2xl p-6 flex flex-col items-center text-center transition-shadow bg-white/90 shadow-md ${
-        product.estado === 'disponible' ? 'cursor-pointer hover:shadow-xl' : 'opacity-50'
+      className={`relative rounded-2xl border border-white/60 bg-white/70 backdrop-blur-md p-6 flex flex-col items-center text-center transition-shadow shadow-lg ${
+        product.estado === 'disponible' ? 'cursor-pointer hover:shadow-xl' : 'opacity-60'
       }`}
     >
       {/* Afficher tous les badges promotionnels si des promotions sont applicables */}
@@ -41,7 +41,7 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({ pro
       
       {/* Nom du produit */}
       <p
-        className="font-extrabold flex-grow text-white drop-shadow-md leading-snug text-[clamp(1rem,2.2vw,1.2rem)] break-words text-balance whitespace-normal [hyphens:auto] tracking-tight"
+        className="font-extrabold flex-grow text-gray-900 leading-snug text-[clamp(1rem,2.2vw,1.2rem)] break-words text-balance whitespace-normal [hyphens:auto] tracking-tight"
       >
         {product.nom_produit}
       </p>

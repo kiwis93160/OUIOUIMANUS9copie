@@ -171,63 +171,6 @@ body {
   backdrop-filter: none;
 }
 
-.order-online-page .bg-white,
-.order-online-page .bg-white\/90,
-.order-online-page .bg-white\/80,
-.order-online-page .bg-gray-50,
-.order-online-page .bg-gray-100 {
-  background-color: rgba(255, 255, 255, 0.18) !important;
-  backdrop-filter: blur(18px);
-  box-shadow: 0 25px 55px rgba(15, 23, 42, 0.16);
-  border-color: rgba(255, 255, 255, 0.2) !important;
-}
-
-.order-online-page .bg-green-50,
-.order-online-page .bg-yellow-50,
-.order-online-page .bg-blue-50 {
-  background-color: rgba(255, 255, 255, 0.16) !important;
-  backdrop-filter: blur(18px);
-  border-color: rgba(255, 255, 255, 0.2) !important;
-}
-
-.order-online-page .border-gray-200,
-.order-online-page .border-gray-300,
-.order-online-page .border-gray-100 {
-  border-color: rgba(255, 255, 255, 0.24) !important;
-}
-
-.order-online-page .text-gray-900,
-.order-online-page .text-gray-800,
-.order-online-page .text-gray-700 {
-  color: rgba(15, 23, 42, 0.92);
-}
-
-.order-online-page .text-gray-600,
-.order-online-page .text-gray-500,
-.order-online-page .text-gray-400 {
-  color: rgba(15, 23, 42, 0.72);
-}
-
-.order-online-page input,
-.order-online-page textarea,
-.order-online-page select {
-  background-color: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.25);
-  color: rgba(15, 23, 42, 0.92);
-}
-
-.order-online-page input::placeholder,
-.order-online-page textarea::placeholder {
-  color: rgba(15, 23, 42, 0.55);
-}
-
-.order-online-page input:focus,
-.order-online-page textarea:focus,
-.order-online-page select:focus {
-  border-color: rgba(250, 204, 21, 0.6);
-  box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.25);
-  outline: none;
-}
 
 .reviews-track {
   display: flex;
