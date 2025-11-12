@@ -285,7 +285,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
   return (
     <EditButtonVisibilityContext.Provider value={showEditButtons}>
       <div
-        className="space-y-6 rounded-[2.5rem] border border-gray-200 bg-slate-50 p-6 shadow-inner"
+        className="space-y-6 rounded-[2.5rem] border border-gray-200 bg-white p-6 shadow-inner"
         data-preview-boundary="true"
       >
       <SectionCard zone="navigation" activeZone={activeZone}>
