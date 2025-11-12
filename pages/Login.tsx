@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
 import { api } from '../services/api';
 import { EditableElementKey, EditableZoneKey, Product, Order, SiteContent, SectionStyle } from '../types';
-import { Clock, MapPin, Menu, MessageCircle, Phone, X } from 'lucide-react';
+import { Clock, Mail, MapPin, Menu, MessageCircle, X } from 'lucide-react';
 import CustomerOrderTracker from '../components/CustomerOrderTracker';
 import { clearActiveCustomerOrder, getActiveCustomerOrder } from '../services/customerOrderStorage';
 import { formatCurrencyCOP } from '../utils/formatIntegerAmount';
@@ -406,6 +406,8 @@ const Login: React.FC = () => {
       : 'about:blank';
   const hasMapLocation = hasCustomMapUrl || encodedFindUsQuery.length > 0;
   const findUsMapTitle = findUsMapQuery.length > 0 ? findUsMapQuery : findUs.title;
+  const googleReviewEmbedUrl =
+    'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3976.058002872856!2d-74.8184659!3d11.004013!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8ef42be1b67d1a59%3A0x3d31292d89237cb3!2sOuiOuiTacos!5e0!3m2!1ses!2sco!4v1700000000000!5m2!1ses!2sco';
   const whatsappTestNumber = '0681161642';
   const whatsappInternationalNumber = `33${whatsappTestNumber.replace(/^0/, '')}`;
   const whatsappUrl = `https://wa.me/${whatsappInternationalNumber}`;
@@ -874,7 +876,7 @@ const Login: React.FC = () => {
                 <article className="h-full rounded-[24px] border border-white/70 bg-white/75 p-4 text-left shadow-[0_24px_48px_-30px_rgba(15,23,42,0.5)] backdrop-blur">
                   <div className="flex items-start gap-3">
                     <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-orange-500 text-white">
-                      <Phone className="h-5 w-5" />
+                      <Mail className="h-5 w-5" />
                     </div>
                     <div className="flex-1 space-y-3 text-left">
                       {renderRichTextElement(
@@ -888,13 +890,9 @@ const Login: React.FC = () => {
                       )}
                       <div className="flex flex-col gap-3 text-base font-medium text-gray-700" style={findUsBodyTextStyle}>
                         <div className="flex items-center gap-2">
-                          <a
-                            href={`tel:${whatsappTestNumber}`}
-                            className="inline-flex items-center gap-2 text-base font-semibold text-gray-900 transition hover:text-orange-500"
-                          >
-                            <Phone className="h-5 w-5 text-orange-500" />
+                          <span className="inline-flex items-center gap-2 text-base font-semibold text-gray-900">
                             {whatsappTestNumber}
-                          </a>
+                          </span>
                           <a
                             href={whatsappUrl}
                             target="_blank"
@@ -950,6 +948,16 @@ const Login: React.FC = () => {
                       )}
                     </a>
                   ) : null}
+                </div>
+                <div className="mt-6 overflow-hidden rounded-3xl border border-white/70 bg-white/75 shadow-[0_20px_45px_-28px_rgba(15,23,42,0.55)]">
+                  <iframe
+                    title="Opiniones oficiales de Google de OuiOuiTacos Barranquilla"
+                    src={googleReviewEmbedUrl}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    className="h-[380px] w-full border-0"
+                    allowFullScreen
+                  />
                 </div>
               </div>
             </div>
