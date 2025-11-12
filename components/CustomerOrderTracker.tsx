@@ -37,7 +37,10 @@ const saveOrderToHistory = (order: Order) => {
 };
 
 const CompletionStamp: React.FC<{ className?: string }> = ({ className }) => (
-    <div className={`pointer-events-none select-none ${className ?? ''}`} aria-hidden="true">
+    <div
+        className={`pointer-events-none select-none z-[60] drop-shadow-[0_20px_45px_rgba(16,185,129,0.45)] ${className ?? ''}`}
+        aria-hidden="true"
+    >
         <style>{`
             @keyframes completion-stamp-pop {
                 0% {
@@ -539,14 +542,14 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
     if (variant === 'hero') {
         return (
             <div className={containerClasses}>
-                <div className="relative w-full max-w-4xl overflow-hidden rounded-3xl border-[6px] border-orange-300/70 bg-brand-primary p-6 text-white shadow-2xl sm:p-8">
-                    <div className="pointer-events-none absolute inset-0 opacity-70">
+                <div className="relative w-full max-w-4xl rounded-3xl border-[6px] border-orange-300/70 bg-brand-primary p-6 text-white shadow-2xl sm:p-8">
+                    <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-3xl opacity-70">
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.18),_transparent_65%)]" />
                         <div className="absolute -bottom-32 right-0 h-64 w-64 rounded-full bg-gradient-to-br from-white/20 via-amber-200/30 to-orange-300/30 blur-3xl" />
                     </div>
-                    <div className="relative flex flex-col gap-6">
+                    <div className="relative z-10 flex flex-col gap-6">
                         {isOrderCompleted && (
-                            <CompletionStamp className="absolute -top-14 -right-6 z-20 sm:-top-16 sm:-right-10 lg:-top-16 lg:-right-14" />
+                            <CompletionStamp className="absolute -top-16 -right-8 sm:-top-[4.5rem] sm:-right-12 lg:-top-20 lg:-right-16" />
                         )}
                         <div className="flex flex-col items-center gap-2 text-center">
                             <h2 className="text-3xl font-bold text-center text-white sm:text-4xl">
@@ -795,7 +798,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
 
                         {/* Tampon PEDIDO LISTO pour commande prête */}
                         {isOrderCompleted && (
-                            <CompletionStamp className="absolute -top-12 -right-4 z-20 sm:-top-14 sm:-right-8" />
+                            <CompletionStamp className="absolute -top-14 -right-6 sm:-top-[4.25rem] sm:-right-10" />
                         )}
 
                         {(hasClientDetails || order.receipt_url) && (
@@ -1270,7 +1273,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                 
                 <div className={detailContainerClasses}>
                     {/* Tampon PEDIDO LISTO */}
-                    {isOrderCompleted && <CompletionStamp className="absolute -top-12 -right-6 z-20 sm:-top-14 sm:-right-8" />}
+                    {isOrderCompleted && <CompletionStamp className="absolute -top-14 -right-8 sm:-top-[4.25rem] sm:-right-10" />}
                     <h3 className={`mt-10 text-xl font-bold ${variant === 'hero' ? 'text-white' : 'text-gray-800'}`}>Résumé de la commande</h3>
 
                     {isTakeawayOrder && hasClientDetails && (
