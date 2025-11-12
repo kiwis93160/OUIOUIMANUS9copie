@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { api } from '../services/api';
 import { Order } from '../types';
-import { Check, CheckCircle, ChefHat, FileText, PackageCheck, User, MapPin, Receipt, Phone, Tag, TruckIcon, Percent, Gift } from 'lucide-react';
+import { CheckCircle, ChefHat, FileText, PackageCheck, User, MapPin, Receipt, Phone, Tag, TruckIcon, Percent, Gift } from 'lucide-react';
 import { formatCurrencyCOP } from '../utils/formatIntegerAmount';
 import {
     clearActiveCustomerOrder,
@@ -61,15 +61,12 @@ const CompletionStamp: React.FC<{ className?: string }> = ({ className }) => (
             <div className="absolute inset-1 rounded-full border-2 border-emerald-300/50" />
             <div className="absolute inset-0 rounded-full border border-white/30 opacity-50 mix-blend-screen" />
             <div className="relative flex h-full w-full items-center justify-center rounded-full border-[6px] border-emerald-400/80 bg-gradient-to-br from-emerald-500/30 via-emerald-500/20 to-teal-400/25 shadow-[0_18px_45px_rgba(16,185,129,0.35)] backdrop-blur">
-                <div className="absolute inset-[14%] rounded-full border-2 border-dashed border-emerald-300/70" />
+                <div className="absolute inset-[10%] rounded-full border-2 border-dashed border-emerald-300/70" />
                 <div className="absolute inset-[22%] rounded-full border border-emerald-400/40" />
                 <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.45),transparent_55%)] opacity-40" />
-                <div className="relative flex flex-col items-center justify-center text-center text-emerald-50 drop-shadow-[0_4px_12px_rgba(15,118,110,0.45)]">
-                    <div className="mb-1 flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/20 shadow-inner shadow-emerald-600/30">
-                        <Check className="h-5 w-5 text-emerald-100" strokeWidth={3} />
-                    </div>
-                    <span className="text-xs sm:text-sm font-black uppercase tracking-[0.35em] text-emerald-100">Pedido</span>
-                    <span className="text-lg sm:text-xl font-black uppercase tracking-[0.3em] text-emerald-50">Listo</span>
+                <div className="relative flex flex-col items-center justify-center gap-1 text-center text-emerald-50 drop-shadow-[0_4px_12px_rgba(15,118,110,0.45)]">
+                    <span className="text-sm sm:text-base font-black uppercase tracking-[0.32em] text-emerald-100">Pedido</span>
+                    <span className="text-xl sm:text-2xl font-black uppercase tracking-[0.28em] text-emerald-50">Listo</span>
                 </div>
             </div>
         </div>
