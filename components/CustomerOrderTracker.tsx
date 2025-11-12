@@ -796,10 +796,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                             </div>
                         </div>
 
-                        {/* Tampon PEDIDO LISTO pour commande prête */}
-                        {isOrderCompleted && (
-                            <CompletionStamp className="absolute -top-14 -right-6 sm:-top-[4.25rem] sm:-right-10" />
-                        )}
+                        {/* Tampon PEDIDO LISTO rendu au niveau du conteneur principal pour éviter les doublons */}
 
                         {(hasClientDetails || order.receipt_url) && (
                             <div className="grid gap-4 sm:grid-cols-2 items-stretch">
