@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { AlertTriangle, CheckCircle2, Copy, Loader2, Upload } from 'lucide-react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { AlertTriangle, CheckCircle2, ChevronDown, Copy, Loader2, Upload } from 'lucide-react';
 import Modal from '../components/Modal';
 import SitePreviewCanvas, { resolveZoneFromElement } from '../components/SitePreviewCanvas';
 import useSiteContent from '../hooks/useSiteContent';
@@ -1652,8 +1652,24 @@ const SiteCustomization: React.FC = () => {
   const [bestSellerProducts, setBestSellerProducts] = useState<Product[]>([]);
   const [bestSellerLoading, setBestSellerLoading] = useState<boolean>(false);
   const [bestSellerError, setBestSellerError] = useState<string | null>(null);
-  const [editorElement, setEditorElement] = useState<EditableElementKey | null>(null);
   const [isLibraryOpen, setIsLibraryOpen] = useState<boolean>(false);
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {};
+    CUSTOMIZATION_SECTIONS.forEach(section => {
+      initial[section.id] = true;
+    });
+    return initial;
+  });
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {};
+    CUSTOMIZATION_SECTIONS.forEach(section => {
+      section.groups.forEach(group => {
+        initial[`${section.id}:${group.id}`] = true;
+      });
+    });
+    return initial;
+  });
+  const fieldRefs = useRef(new Map<EditableElementKey, HTMLDivElement | null>());
 
   useLayoutEffect(() => {
     if (typeof document === 'undefined') {
@@ -1747,17 +1763,32 @@ const SiteCustomization: React.FC = () => {
     return map;
   }, []);
 
-  const registerFieldRef = useCallback<FieldRegistration>(() => undefined, []);
-
-  const focusElement = useCallback<FocusElementHandler>(element => {
-    setActiveElement(element);
-    try {
-      const zone = resolveZoneFromElement(element);
-      setActiveZone(zone);
-    } catch (err) {
-      console.error(err);
+  const registerFieldRef = useCallback<FieldRegistration>((element, node) => {
+    if (node) {
+      fieldRefs.current.set(element, node);
+    } else {
+      fieldRefs.current.delete(element);
     }
   }, []);
+
+  const focusElement = useCallback<FocusElementHandler>(
+    element => {
+      setActiveElement(element);
+      try {
+        const zone = resolveZoneFromElement(element);
+        setActiveZone(zone);
+      } catch (err) {
+        console.error(err);
+      }
+      const meta = fieldMetaByElement.get(element);
+      if (meta) {
+        setExpandedSections(prev => ({ ...prev, [meta.section.id]: true }));
+        const groupKey = `${meta.section.id}:${meta.group.id}`;
+        setExpandedGroups(prev => ({ ...prev, [groupKey]: true }));
+      }
+    },
+    [fieldMetaByElement],
+  );
 
   const handlePreviewEdit = useCallback(
     (
@@ -1770,13 +1801,8 @@ const SiteCustomization: React.FC = () => {
     ) => {
       focusElement(element);
       setActiveZone(meta.zone);
-      if (!fieldMetaByElement.has(element)) {
-        console.warn(`Aucun formulaire de personnalisation trouvé pour l'élément "${element}".`);
-        return;
-      }
-      setEditorElement(element);
     },
-    [fieldMetaByElement, focusElement, setActiveZone],
+    [focusElement],
   );
 
   const handleSave = async () => {
@@ -1804,61 +1830,59 @@ const SiteCustomization: React.FC = () => {
     if (!draft) {
       return base;
     }
-    const custom = draft.assets.library
+    const library = draft.assets?.library ?? [];
+    const custom = library
       .filter(asset => asset.type === 'font')
       .map(asset => sanitizeFontFamilyName(asset.name));
     return Array.from(new Set([...base, ...custom]));
   }, [draft]);
 
-  const activeFieldMeta = useMemo(() => {
-    if (!editorElement) {
-      return null;
-    }
-    return fieldMetaByElement.get(editorElement) ?? null;
-  }, [editorElement, fieldMetaByElement]);
+  const activeFieldMeta = activeElement ? fieldMetaByElement.get(activeElement) ?? null : null;
+  const activeSectionId = activeFieldMeta?.section.id ?? null;
+  const activeGroupKey = activeFieldMeta
+    ? `${activeFieldMeta.section.id}:${activeFieldMeta.group.id}`
+    : null;
 
-  const activeElementLabel = useMemo(() => {
-    if (!editorElement) {
-      return '';
-    }
-    const fallback = fieldMetaByElement.get(editorElement)?.field.label ?? editorElement;
-    return ELEMENT_LABELS[editorElement] ?? fallback;
-  }, [editorElement, fieldMetaByElement]);
+  const toggleSection = useCallback((sectionId: string) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [sectionId]: !(prev[sectionId] ?? false),
+    }));
+  }, []);
 
-  const closeEditor = useCallback(() => {
-    setEditorElement(null);
-    setActiveElement(null);
-    setActiveZone(null);
-  }, [setActiveElement, setActiveZone, setEditorElement]);
+  const toggleGroup = useCallback((sectionId: string, groupId: string) => {
+    const key = `${sectionId}:${groupId}`;
+    setExpandedGroups(prev => ({
+      ...prev,
+      [key]: !(prev[key] ?? false),
+    }));
+  }, []);
 
   useEffect(() => {
     if (activeTab !== 'custom') {
-      closeEditor();
+      setActiveElement(null);
+      setActiveZone(null);
     }
-  }, [activeTab, closeEditor]);
+  }, [activeTab]);
 
   useEffect(() => {
-    if (!editorElement) {
+    if (!activeElement) {
       return;
     }
-    if (!activeFieldMeta) {
-      closeEditor();
+    const node = fieldRefs.current.get(activeElement);
+    if (!node) {
       return;
     }
-    if (typeof window === 'undefined') {
-      return;
-    }
-    const timeout = window.setTimeout(() => {
-      const container = document.querySelector<HTMLDivElement>('[data-element-editor-modal="true"]');
-      const focusable = container?.querySelector<HTMLElement>(
-        'input, textarea, [contenteditable="true"], select',
-      );
-      focusable?.focus({ preventScroll: true });
-    }, 80);
-    return () => {
-      window.clearTimeout(timeout);
+    const scrollIntoView = () => {
+      node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      node.focus({ preventScroll: true });
     };
-  }, [activeFieldMeta, closeEditor, editorElement]);
+    if (typeof window !== 'undefined' && 'requestAnimationFrame' in window) {
+      window.requestAnimationFrame(scrollIntoView);
+    } else {
+      scrollIntoView();
+    }
+  }, [activeElement, expandedGroups, expandedSections]);
 
   const renderField = useCallback(
     (field: CustomizationField) => {
@@ -2031,14 +2055,93 @@ const SiteCustomization: React.FC = () => {
             </div>
           </div>
         ) : (
-          <div className="space-y-6">
-            {bestSellerError && (
-              <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
-                <AlertTriangle className="h-5 w-5" aria-hidden="true" />
-                <p>{bestSellerError}</p>
-              </div>
-            )}
-            <div className="mx-auto w-full max-w-7xl">
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,420px)_1fr] xl:grid-cols-[minmax(0,480px)_1fr]">
+            <div className="space-y-6">
+              {CUSTOMIZATION_SECTIONS.map(section => {
+                const isOpen = expandedSections[section.id] ?? false;
+                const isActiveSection = activeSectionId === section.id;
+                return (
+                  <section
+                    key={section.id}
+                    className={`rounded-3xl border bg-white shadow-sm transition ${
+                      isActiveSection
+                        ? 'border-brand-primary/70 ring-2 ring-brand-primary/10'
+                        : 'border-slate-200'
+                    }`}
+                    data-customization-section={section.id}
+                  >
+                    <button
+                      type="button"
+                      className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
+                      onClick={() => toggleSection(section.id)}
+                    >
+                      <div>
+                        <h2 className="text-lg font-semibold text-slate-900">{section.title}</h2>
+                        {section.description && (
+                          <p className="mt-1 text-sm text-slate-500">{section.description}</p>
+                        )}
+                      </div>
+                      <ChevronDown
+                        className={`h-5 w-5 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                        aria-hidden="true"
+                      />
+                    </button>
+                    {isOpen && (
+                      <div className="space-y-4 border-t border-slate-200 p-6 pt-4">
+                        {section.groups.map(group => {
+                          const groupKey = `${section.id}:${group.id}`;
+                          const isGroupOpen = expandedGroups[groupKey] ?? false;
+                          const isActiveGroup = activeGroupKey === groupKey;
+                          return (
+                            <div
+                              key={`${section.id}-${group.id}`}
+                              className={`rounded-2xl border bg-slate-50 transition ${
+                                isActiveGroup
+                                  ? 'border-brand-primary/60 ring-1 ring-brand-primary/10'
+                                  : 'border-slate-200'
+                              }`}
+                              data-customization-group={groupKey}
+                            >
+                              <button
+                                type="button"
+                                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
+                                onClick={() => toggleGroup(section.id, group.id)}
+                              >
+                                <div>
+                                  <p className="text-sm font-semibold text-slate-800">{group.title}</p>
+                                  {group.description && (
+                                    <p className="mt-1 text-xs text-slate-500">{group.description}</p>
+                                  )}
+                                </div>
+                                <ChevronDown
+                                  className={`h-4 w-4 text-slate-400 transition-transform ${
+                                    isGroupOpen ? 'rotate-180' : ''
+                                  }`}
+                                  aria-hidden="true"
+                                />
+                              </button>
+                              {isGroupOpen && (
+                                <div className="space-y-4 border-t border-slate-200 bg-white p-4 sm:p-5">
+                                  {group.fields.map(field => renderField(field))}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </section>
+                );
+              })}
+            </div>
+
+            <div className="space-y-6">
+              {bestSellerError && (
+                <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
+                  <AlertTriangle className="h-5 w-5" aria-hidden="true" />
+                  <p>{bestSellerError}</p>
+                </div>
+              )}
               <div className="rounded-[2.75rem] border border-slate-200 bg-white p-4 shadow-inner sm:p-6 lg:p-8">
                 <SitePreviewCanvas
                   content={draft}
@@ -2047,44 +2150,16 @@ const SiteCustomization: React.FC = () => {
                   activeZone={activeZone}
                 />
               </div>
+              {bestSellerLoading && (
+                <div className="flex items-center justify-center gap-2 text-sm text-slate-500">
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                  Chargement des produits populaires…
+                </div>
+              )}
             </div>
-            {bestSellerLoading && (
-              <div className="flex items-center justify-center gap-2 text-sm text-slate-500">
-                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                Chargement des produits populaires…
-              </div>
-            )}
           </div>
         )}
       </div>
-
-      <Modal
-        isOpen={Boolean(editorElement && activeFieldMeta)}
-        onClose={closeEditor}
-        title={
-          activeElementLabel
-            ? `Personnaliser ${activeElementLabel}`
-            : 'Personnalisation'
-        }
-        size="lg"
-      >
-        {activeFieldMeta ? (
-          <div className="space-y-5" data-element-editor-modal="true">
-            <div className="rounded-2xl bg-slate-100/70 p-4 text-sm text-slate-600">
-              <p className="text-sm font-semibold text-slate-900">
-                {activeFieldMeta.section.title}
-              </p>
-              <p className="text-xs text-slate-500">{activeFieldMeta.group.title}</p>
-              {activeFieldMeta.group.description && (
-                <p className="mt-2 text-xs text-slate-500">{activeFieldMeta.group.description}</p>
-              )}
-            </div>
-            {renderField(activeFieldMeta.field)}
-          </div>
-        ) : (
-          <p className="text-sm text-slate-500">Sélectionnez un élément à personnaliser.</p>
-        )}
-      </Modal>
 
       <Modal
         isOpen={isLibraryOpen}
