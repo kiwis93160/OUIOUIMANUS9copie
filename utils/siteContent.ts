@@ -613,7 +613,7 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     title: 'Encuéntranos',
     addressLabel: 'Dirección',
     address: 'Cra. 53 #75-98\nBarranquilla, Atlántico\nColombie',
-    cityLabel: 'Email',
+    cityLabel: 'Contact',
     city: 'hola@ouiouipos.co',
     hoursLabel: 'Horarios',
     hours: 'Lunes a domingo · 11h00 - 23h00',

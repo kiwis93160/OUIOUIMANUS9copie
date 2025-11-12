@@ -147,7 +147,7 @@ const BASE_ELEMENT_LABELS: Partial<Record<EditableElementKey, string>> = {
   'findUs.addressLabel': "Libellé de l'adresse (Encuéntranos)",
   'findUs.address': 'Adresse (Encuéntranos)',
   'findUs.cityLabel': "Libellé de contact",
-  'findUs.city': 'Email (Encuéntranos)',
+  'findUs.city': 'Contact (Encuéntranos)',
   'findUs.hoursLabel': 'Libellé des horaires',
   'findUs.hours': 'Horaires',
   'findUs.mapLabel': 'Libellé du lien carte',
