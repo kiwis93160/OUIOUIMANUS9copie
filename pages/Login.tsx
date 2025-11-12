@@ -26,8 +26,6 @@ import { withAppendedQueryParam } from '../utils/url';
 import { formatScheduleWindow, isWithinSchedule, minutesUntilNextChange } from '../utils/timeWindow';
 import { isWithinWeeklySchedule, formatWeeklySchedule } from '../utils/weeklyScheduleUtils';
 import useOnlineOrderingSchedules from '../hooks/useOnlineOrderingSchedules';
-import GoogleReviewsPreview from '../components/GoogleReviewsPreview';
-import { GOOGLE_REVIEW_SUMMARY } from '../constants/googleReviews';
 
 const DEFAULT_BRAND_LOGO = '/logo-brand.svg';
 
@@ -408,6 +406,8 @@ const Login: React.FC = () => {
       : 'about:blank';
   const hasMapLocation = hasCustomMapUrl || encodedFindUsQuery.length > 0;
   const findUsMapTitle = findUsMapQuery.length > 0 ? findUsMapQuery : findUs.title;
+  const googleReviewEmbedUrl =
+    'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3976.058002872856!2d-74.8184659!3d11.004013!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8ef42be1b67d1a59%3A0x3d31292d89237cb3!2sOuiOuiTacos!5e0!3m2!1ses!2sco!4v1700000000000!5m2!1ses!2sco';
   const whatsappTestNumber = '0681161642';
   const whatsappInternationalNumber = `33${whatsappTestNumber.replace(/^0/, '')}`;
   const whatsappUrl = `https://wa.me/${whatsappInternationalNumber}`;
@@ -949,12 +949,16 @@ const Login: React.FC = () => {
                     </a>
                   ) : null}
                 </div>
-                <GoogleReviewsPreview
-                  summary={GOOGLE_REVIEW_SUMMARY}
-                  className="mt-6"
-                  headerStyle={getElementTextStyle('findUs.mapLabel')}
-                  bodyTextStyle={findUsBodyTextStyle}
-                />
+                <div className="mt-6 overflow-hidden rounded-3xl border border-white/70 bg-white/75 shadow-[0_20px_45px_-28px_rgba(15,23,42,0.55)]">
+                  <iframe
+                    title="Opiniones oficiales de Google de OuiOuiTacos Barranquilla"
+                    src={googleReviewEmbedUrl}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    className="h-[380px] w-full border-0"
+                    allowFullScreen
+                  />
+                </div>
               </div>
             </div>
           </div>
