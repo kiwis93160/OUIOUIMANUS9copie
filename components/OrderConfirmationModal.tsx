@@ -90,18 +90,6 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
     messageParts.push('');
     messageParts.push(`Total antes de promociones: ${formatCurrencyCOP(subtotalBeforePromotions)}`);
 
-    if (order.shipping_cost !== undefined) {
-      if (order.shipping_cost > 0) {
-        messageParts.push(`Costo de envío: ${formatCurrencyCOP(order.shipping_cost)}`);
-      } else if (order.applied_promotions?.some(p => isFreeShippingType(p.type))) {
-        messageParts.push('Costo de envío: Gratis');
-      }
-    }
-
-    if (totalDiscount > 0) {
-      messageParts.push(`Descuento total: -${formatCurrencyCOP(totalDiscount)}`);
-    }
-
     if (hasPromotions) {
       messageParts.push('Promociones aplicadas:');
       order.applied_promotions?.forEach(promo => {
@@ -109,6 +97,16 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
       });
     } else {
       messageParts.push('Promociones aplicadas: Ninguna');
+    }
+
+    messageParts.push(`Descuento total: -${formatCurrencyCOP(totalDiscount)}`);
+
+    if (order.shipping_cost !== undefined) {
+      if (order.shipping_cost > 0) {
+        messageParts.push(`Costo de envío: ${formatCurrencyCOP(order.shipping_cost)}`);
+      } else if (order.applied_promotions?.some(p => isFreeShippingType(p.type))) {
+        messageParts.push('Costo de envío: Gratis');
+      }
     }
 
     messageParts.push(`Total a pagar: ${formatCurrencyCOP(order.total)}`);
@@ -162,12 +160,6 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
                   <span>{formatCurrencyCOP(order.subtotal)}</span>
                 </div>
               )}
-              {order.total_discount && order.total_discount > 0 && (
-                <div className="flex justify-between items-center text-green-600">
-                  <span>Réduction totale:</span>
-                  <span>- {formatCurrencyCOP(order.total_discount)}</span>
-                </div>
-              )}
               {order.applied_promotions && order.applied_promotions.length > 0 && (
                 <div className="mt-2">
                   <p className="text-sm font-semibold text-green-700">Promotions appliquées:</p>
@@ -177,6 +169,12 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
                       <span>- {formatCurrencyCOP(promo.discount_amount)}</span>
                     </div>
                   ))}
+                </div>
+              )}
+              {order.total_discount && order.total_discount > 0 && (
+                <div className="flex justify-between items-center text-green-600">
+                  <span>Réduction totale:</span>
+                  <span>- {formatCurrencyCOP(order.total_discount)}</span>
                 </div>
               )}
               {order.shipping_cost !== undefined && order.shipping_cost > 0 && (
