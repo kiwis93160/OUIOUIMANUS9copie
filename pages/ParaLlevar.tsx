@@ -264,6 +264,29 @@ const ParaLlevar: React.FC = () => {
         return weeklySchedule[dayKey];
     }, [now, weeklySchedule]);
 
+    const scheduleStatusLabel = useMemo(() => {
+        if (siteContentLoading || scheduleLoading) {
+            return 'Chargement des horaires...';
+        }
+
+        if (!todaySchedule) {
+            return "Aujourd'hui: Horaires non configurés";
+        }
+
+        if (todaySchedule.closed) {
+            return "Aujourd'hui: Fermé";
+        }
+
+        const startTime = todaySchedule.startTime?.trim();
+        const endTime = todaySchedule.endTime?.trim();
+
+        if (!startTime || !endTime) {
+            return "Aujourd'hui: Horaires non disponibles";
+        }
+
+        return `Aujourd'hui: ${startTime} - ${endTime}`;
+    }, [scheduleLoading, siteContentLoading, todaySchedule]);
+
     const handleScheduleSubmit = useCallback(async () => {
         if (!editingSchedule) {
             return;
@@ -349,7 +372,7 @@ const ParaLlevar: React.FC = () => {
                         <div>
                             <h2 className="text-base font-semibold text-gray-900">Disponibilité de la commande en ligne</h2>
                             <p className="text-sm text-gray-500">
-                                {siteContentLoading ? 'Chargement des horaires...' : todaySchedule.closed ? "Aujourd'hui: Fermé" : `Aujourd'hui: ${todaySchedule.startTime} - ${todaySchedule.endTime}`}
+                                {scheduleStatusLabel}
                             </p>
                         </div>
                     </div>
