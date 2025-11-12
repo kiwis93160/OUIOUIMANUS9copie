@@ -838,8 +838,53 @@ const Login: React.FC = () => {
               findUs.title,
             )}
 
-            <div className="mx-auto mt-10 grid w-full max-w-6xl gap-8 md:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
-              <div className="grid gap-6">
+            <div className="mx-auto mt-10 flex w-full max-w-6xl flex-col gap-8">
+              <div className="flex h-full w-full flex-col justify-between rounded-[36px] border border-white/70 bg-white/75 p-6 shadow-[0_28px_70px_-32px_rgba(15,23,42,0.55)] backdrop-blur">
+                <div className="relative aspect-[13/8] w-full overflow-hidden rounded-3xl bg-white">
+                  {hasMapLocation ? (
+                    <iframe
+                      title={`Carte Google Maps pour ${findUsMapTitle}`}
+                      src={findUsMapEmbedUrl}
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      className="h-full w-full border-0"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-gray-100 px-8 text-center">
+                      <p className="text-lg text-gray-500" style={findUsBodyTextStyle}>
+                        La localisation de notre restaurant sera bientôt disponible.
+                      </p>
+                    </div>
+                  )}
+                </div>
+                <div className="mt-6 flex justify-center">
+                  {hasMapLocation ? (
+                    <a
+                      href={findUsMapUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex w-full items-center justify-center gap-3 rounded-full bg-orange-500 px-6 py-3 text-base font-semibold text-white shadow-lg transition hover:bg-orange-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
+                      style={getElementBodyTextStyle('findUs.mapLabel')}
+                    >
+                      <MapPin className="h-6 w-6 text-white" />
+                      {renderRichTextElement(
+                        'findUs.mapLabel',
+                        'span',
+                        {
+                          className: 'text-base font-semibold',
+                        },
+                        findUs.mapLabel,
+                      )}
+                    </a>
+                  ) : null}
+                </div>
+                <div className="mt-6 overflow-hidden rounded-3xl border border-white/70 bg-white/75 shadow-[0_20px_45px_-28px_rgba(15,23,42,0.55)]">
+                  <div id="shapo-widget-e4f400ac5f6fd4edb521" className="h-[380px] w-full" />
+                </div>
+              </div>
+
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 <article className="h-full rounded-[24px] border border-white/70 bg-white/75 p-4 text-left shadow-[0_24px_48px_-30px_rgba(15,23,42,0.5)] backdrop-blur">
                   <div className="flex items-start gap-3">
                     <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-orange-500 text-white">
@@ -930,51 +975,6 @@ const Login: React.FC = () => {
                     </div>
                   </div>
                 </article>
-              </div>
-
-              <div className="flex h-full w-full flex-col justify-between rounded-[36px] border border-white/70 bg-white/75 p-6 shadow-[0_28px_70px_-32px_rgba(15,23,42,0.55)] backdrop-blur">
-                <div className="relative aspect-[13/8] w-full overflow-hidden rounded-3xl bg-white">
-                  {hasMapLocation ? (
-                    <iframe
-                      title={`Carte Google Maps pour ${findUsMapTitle}`}
-                      src={findUsMapEmbedUrl}
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      className="h-full w-full border-0"
-                      allowFullScreen
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-gray-100 px-8 text-center">
-                      <p className="text-lg text-gray-500" style={findUsBodyTextStyle}>
-                        La localisation de notre restaurant sera bientôt disponible.
-                      </p>
-                    </div>
-                  )}
-                </div>
-                <div className="mt-6 flex justify-center">
-                  {hasMapLocation ? (
-                    <a
-                      href={findUsMapUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex w-full items-center justify-center gap-3 rounded-full bg-orange-500 px-6 py-3 text-base font-semibold text-white shadow-lg transition hover:bg-orange-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
-                      style={getElementBodyTextStyle('findUs.mapLabel')}
-                    >
-                      <MapPin className="h-6 w-6 text-white" />
-                      {renderRichTextElement(
-                        'findUs.mapLabel',
-                        'span',
-                        {
-                          className: 'text-base font-semibold',
-                        },
-                        findUs.mapLabel,
-                      )}
-                    </a>
-                  ) : null}
-                </div>
-                <div className="mt-6 overflow-hidden rounded-3xl border border-white/70 bg-white/75 shadow-[0_20px_45px_-28px_rgba(15,23,42,0.55)]">
-                  <div id="shapo-widget-e4f400ac5f6fd4edb521" className="h-[380px] w-full" />
-                </div>
               </div>
             </div>
           </div>
