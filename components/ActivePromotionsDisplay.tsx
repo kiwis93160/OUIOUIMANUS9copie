@@ -88,8 +88,8 @@ const ActivePromotionsDisplay: React.FC = () => {
 
   return (
     <div className="mb-4 space-y-2">
-      <h3 className="text-lg font-bold text-gray-900 flex items-center drop-shadow-md">
-        <Gift className="mr-2" size={22} />
+      <h3 className="inline-flex items-center gap-2 rounded-full border border-white/60 bg-white/70 px-4 py-2 text-sm font-semibold text-gray-900/90 backdrop-blur-md drop-shadow-md">
+        <Gift size={20} />
         Promociones Activas
       </h3>
       <div className="space-y-2">
@@ -136,16 +136,16 @@ const ActivePromotionsDisplay: React.FC = () => {
               }}
             >
               <div
-                className="flex items-center justify-center w-12 h-12 flex-shrink-0"
+                className="flex h-12 w-12 flex-shrink-0 items-center justify-center"
                 style={{
                   backgroundColor: bgColor,
-                  color: promo.visuals?.badge_color || '#FFFFFF',
+                  color: '#FFFFFF',
                 }}
               >
                 {getPromotionIcon(promo)}
               </div>
               <div className="flex-1 px-3 py-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-                <p className="font-bold text-gray-900 text-sm drop-shadow-sm">{promo.name}</p>
+                <p className="font-bold text-white text-sm drop-shadow-sm">{promo.name}</p>
                 <p className="text-xs text-gray-700 truncate sm:ml-2">{getPromotionDescription(promo)}</p>
               </div>
             </div>
