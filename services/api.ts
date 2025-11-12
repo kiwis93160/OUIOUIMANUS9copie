@@ -487,6 +487,11 @@ const mapOrderRow = (row: SupabaseOrderRow): Order => {
   return order;
 };
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+const isValidUuid = (value: unknown): value is string =>
+  typeof value === 'string' && UUID_REGEX.test(value);
+
 const computeOrderFinancialSnapshot = (order: Order) => {
   const grossPerItem = order.items.map(item => Math.max(0, item.prix_unitaire) * Math.max(0, item.quantite));
   const grossSubtotal = grossPerItem.reduce((sum, value) => sum + value, 0);
@@ -2659,8 +2664,10 @@ export const api = {
 
     // Insérer les items de la commande
     const insertedItems: OrderItem[] = [];
-    if (order.items && order.items.length > 0) {
-      const itemsPayload = order.items.map(item => ({
+    const orderItems = Array.isArray(order.items) ? order.items : [];
+    const itemsWithValidProduct = orderItems.filter(item => isValidUuid(item.produitRef));
+    if (itemsWithValidProduct.length > 0) {
+      const itemsPayload = itemsWithValidProduct.map(item => ({
         order_id: insertedOrder.id,
         produit_id: item.produitRef,
         nom_produit: item.nom_produit,
@@ -2676,7 +2683,43 @@ export const api = {
       insertedItems.push(...items.map(mapOrderItemRow));
     }
 
+    const supplementalItems = orderItems
+      .filter(item => !isValidUuid(item.produitRef))
+      .map<OrderItem>(item => ({
+        id: item.id ?? `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        produitRef: item.produitRef,
+        nom_produit: item.nom_produit,
+        prix_unitaire: item.prix_unitaire,
+        quantite: item.quantite,
+        excluded_ingredients: item.excluded_ingredients ?? [],
+        commentaire: item.commentaire ?? '',
+        estado: item.estado ?? 'en_attente',
+        date_envoi: item.date_envoi,
+      }));
+
+    const orderedItems: OrderItem[] = [];
+    const insertedQueue = [...insertedItems];
+    for (const originalItem of orderItems) {
+      if (isValidUuid(originalItem.produitRef)) {
+        const nextInserted = insertedQueue.shift();
+        if (nextInserted) {
+          orderedItems.push(nextInserted);
+        }
+      } else {
+        const supplemental = supplementalItems.shift();
+        if (supplemental) {
+          orderedItems.push(supplemental);
+        }
+      }
+    }
+
+    if (orderedItems.length === 0 && insertedItems.length > 0) {
+      orderedItems.push(...insertedItems);
+    }
+
     // Construire l'objet Order final directement à partir des données insérées
+    const finalItems = orderedItems.length > 0 ? orderedItems : insertedItems;
+
     const finalOrder: Order = {
       id: insertedOrder.id,
       type: insertedOrder.type,
@@ -2690,7 +2733,7 @@ export const api = {
       date_listo_cuisine: toTimestamp(insertedOrder.date_listo_cuisine),
       date_servido: toTimestamp(insertedOrder.date_servido),
       payment_status: insertedOrder.payment_status,
-      items: insertedItems,
+      items: finalItems,
       total: toNumber(insertedOrder.total) ?? 0,
       profit: toNumber(insertedOrder.profit),
       payment_method: insertedOrder.payment_method ?? undefined,
@@ -2700,6 +2743,7 @@ export const api = {
       total_discount: toNumber(insertedOrder.total_discount),
       promo_code: insertedOrder.promo_code ?? undefined,
       applied_promotions: insertedOrder.applied_promotions ? (typeof insertedOrder.applied_promotions === 'string' ? JSON.parse(insertedOrder.applied_promotions) : insertedOrder.applied_promotions) : undefined,
+      shipping_cost: typeof order.shipping_cost === 'number' ? order.shipping_cost : undefined,
     };
 
     if (insertedOrder.client_nom || insertedOrder.client_telephone || insertedOrder.client_adresse) {
