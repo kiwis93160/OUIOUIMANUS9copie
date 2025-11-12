@@ -166,14 +166,28 @@ const AddEditIngredientModal: React.FC<{ isOpen: boolean; onClose: () => void; o
         unite: ingredient?.unite || 'g',
         stock_minimum: ingredient?.stock_minimum || 0,
     });
+    const [averagePrice, setAveragePrice] = useState(() => ingredient ? convertPriceFromStorageToBase(ingredient.unite, ingredient.prix_unitaire) : 0);
     const [isSubmitting, setSubmitting] = useState(false);
+
+    useEffect(() => {
+        setFormData({
+            nom: ingredient?.nom || '',
+            unite: ingredient?.unite || 'g',
+            stock_minimum: ingredient?.stock_minimum || 0,
+        });
+        setAveragePrice(ingredient ? convertPriceFromStorageToBase(ingredient.unite, ingredient.prix_unitaire) : 0);
+    }, [ingredient, mode, isOpen]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSubmitting(true);
         try {
             if (mode === 'edit' && ingredient) {
-                await api.updateIngredient(ingredient.id, formData);
+                const updates = {
+                    ...formData,
+                    prix_unitaire: convertPriceFromBaseToStorage(formData.unite, Math.max(0, averagePrice)),
+                };
+                await api.updateIngredient(ingredient.id, updates);
             } else {
                 await api.createIngredient(formData);
             }
@@ -207,6 +221,24 @@ const AddEditIngredientModal: React.FC<{ isOpen: boolean; onClose: () => void; o
                     <label htmlFor="stock_minimum" className="block text-sm font-medium text-gray-700">Stock Minimum</label>
                     <input type="number" id="stock_minimum" min="0" value={formData.stock_minimum} onChange={e => setFormData({...formData, stock_minimum: parseFloat(e.target.value)})} required className="mt-1 ui-input"/>
                 </div>
+                {mode === 'edit' && (
+                    <div>
+                        <label htmlFor="average_price" className="block text-sm font-medium text-gray-700">Prix unitaire moyen ({getPriceDisplayUnitLabel(formData.unite)})</label>
+                        <input
+                            type="number"
+                            id="average_price"
+                            min="0"
+                            step="0.01"
+                            value={averagePrice}
+                            onChange={e => {
+                                const value = parseFloat(e.target.value);
+                                setAveragePrice(Number.isNaN(value) ? 0 : Math.max(0, value));
+                            }}
+                            className="mt-1 ui-input"
+                        />
+                        <p className="mt-1 text-xs text-gray-500">Ce prix représente le coût moyen actuel par {getPriceDisplayUnitLabel(formData.unite)}.</p>
+                    </div>
+                )}
                 <div className="flex flex-col sm:flex-row gap-3 pt-4">
                     <button type="button" onClick={onClose} className="w-full ui-btn-secondary py-3">Annuler</button>
                     <button type="submit" disabled={isSubmitting} className="w-full ui-btn-primary py-3 disabled:opacity-60">{isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}</button>
