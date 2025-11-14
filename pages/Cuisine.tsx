@@ -87,6 +87,26 @@ const KitchenTicketCard: React.FC<{ order: KitchenTicketOrder; onReady: (orderId
     const displayName = order.table_nom || `Para llevar #${order.id.slice(-4)}`;
     const nameClass = computeNameSizeClass(displayName);
 
+    const { borderClasses, quantityBackgroundClass } = (() => {
+        switch (urgencyStyles.level) {
+            case 'critical':
+                return {
+                    borderClasses: 'border-4 border-status-danger-hover',
+                    quantityBackgroundClass: 'bg-status-danger-hover',
+                };
+            case 'warning':
+                return {
+                    borderClasses: 'border-4 border-yellow-500',
+                    quantityBackgroundClass: 'bg-yellow-500',
+                };
+            default:
+                return {
+                    borderClasses: 'border-4 border-brand-dark',
+                    quantityBackgroundClass: 'bg-brand-dark',
+                };
+        }
+    })();
+
     return (
         <div className={`relative flex h-full flex-col overflow-hidden rounded-2xl ${urgencyTone.cardBorder} text-gray-900 transition-colors duration-300 ${urgencyStyles.background}`}>
             <span aria-hidden className={`absolute inset-y-0 left-0 w-1 ${urgencyStyles.accent}`} />

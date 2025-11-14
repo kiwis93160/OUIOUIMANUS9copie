@@ -26,6 +26,26 @@ const TakeawayCard: React.FC<{ order: Order, onValidate?: (orderId: string) => v
     const hasAppliedPromotions = (order.applied_promotions?.length ?? 0) > 0;
     const showPromotionDetails = hasAppliedPromotions;
 
+    const { borderClasses, quantityBackgroundClass } = (() => {
+        switch (urgencyStyles.level) {
+            case 'critical':
+                return {
+                    borderClasses: 'border-4 border-status-danger-hover',
+                    quantityBackgroundClass: 'bg-status-danger-hover',
+                };
+            case 'warning':
+                return {
+                    borderClasses: 'border-4 border-yellow-500',
+                    quantityBackgroundClass: 'bg-yellow-500',
+                };
+            default:
+                return {
+                    borderClasses: 'border-4 border-brand-dark',
+                    quantityBackgroundClass: 'bg-brand-dark',
+                };
+        }
+    })();
+
     return (
         <div className="relative">
             <div className={`relative flex h-full flex-col overflow-hidden rounded-2xl ${urgencyTone.cardBorder} text-gray-900 transition-colors duration-300 ${urgencyStyles.background}`}>
