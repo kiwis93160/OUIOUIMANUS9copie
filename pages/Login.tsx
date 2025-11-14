@@ -10,6 +10,7 @@ import { clearActiveCustomerOrder, getActiveCustomerOrder } from '../services/cu
 import { formatCurrencyCOP } from '../utils/formatIntegerAmount';
 import useSiteContent from '../hooks/useSiteContent';
 import useCustomFonts from '../hooks/useCustomFonts';
+import ShapoWidget from '../components/ShapoWidget';
 import {
   createBackgroundStyle,
   createBodyTextStyle,
@@ -185,30 +186,6 @@ const Login: React.FC = () => {
     }
   }, [siteContent]);
 
-  useEffect(() => {
-    const scriptId = 'shapo-embed-js';
-
-    const initializeWidget = () => {
-      const shapoGlobal = (window as typeof window & { Shapo?: { widgets?: { init?: () => void } } }).Shapo;
-      shapoGlobal?.widgets?.init?.();
-    };
-
-    const existingScript = document.getElementById(scriptId) as HTMLScriptElement | null;
-    if (!existingScript) {
-      const script = document.createElement('script');
-      script.id = scriptId;
-      script.src = 'https://cdn.shapo.io/js/embed.js';
-      script.defer = true;
-      script.addEventListener('load', initializeWidget);
-      document.body.appendChild(script);
-
-      return () => {
-        script.removeEventListener('load', initializeWidget);
-      };
-    }
-
-    initializeWidget();
-  }, []);
   const safeContent = content ?? DEFAULT_SITE_CONTENT;
   useCustomFonts(safeContent.assets.library);
 
@@ -888,7 +865,10 @@ const Login: React.FC = () => {
                 </div>
                 <div className="flex w-full items-stretch rounded-[36px] border border-white/70 bg-white/75 p-6 shadow-[0_28px_70px_-32px_rgba(15,23,42,0.55)] backdrop-blur lg:flex-[2]">
                   <div className="h-full w-full overflow-hidden rounded-3xl border border-white/70 bg-white/75 shadow-[0_20px_45px_-28px_rgba(15,23,42,0.55)]">
-                    <div id="shapo-widget-e4f400ac5f6fd4edb521" className="h-[380px] w-full" />
+                    <ShapoWidget
+                      className="h-[380px] w-full border-0"
+                      title="Widget d'avis clients Shapo"
+                    />
                   </div>
                 </div>
               </div>
