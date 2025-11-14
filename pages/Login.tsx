@@ -593,7 +593,12 @@ const Login: React.FC = () => {
                    
         <section id="accueil" className="section section-hero" style={{ ...heroBackgroundStyle, ...heroTextStyle }}>
           {activeOrderId ? (
-            <CustomerOrderTracker orderId={activeOrderId} onNewOrderClick={handleNewOrder} variant="hero" />
+            <CustomerOrderTracker
+              orderId={activeOrderId}
+              onNewOrderClick={handleNewOrder}
+              variant="hero"
+              supportPhoneNumber={onlineOrdering.supportPhoneNumber}
+            />
           ) : (
             <div className="hero-content" style={heroTextStyle}>
               {renderRichTextElement(

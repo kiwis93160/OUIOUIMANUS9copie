@@ -15,6 +15,11 @@ type TrackerProgressStyle = React.CSSProperties & {
     '--tracker-progress-target': string;
 };
 
+const FALLBACK_SUPPORT_PHONE_DIGITS = '573238090562';
+const FALLBACK_SUPPORT_PHONE_DISPLAY = '+57 323 809 0562';
+
+const sanitizePhoneDigits = (value: string): string => value.replace(/[^\d]/g, '');
+
 const isFreeShippingType = (type?: string | null) => (type ?? '').toLowerCase() === 'free_shipping';
 
 const saveOrderToHistory = (order: Order) => {
@@ -77,9 +82,15 @@ interface CustomerOrderTrackerProps {
   orderId: string;
   onNewOrderClick: () => void;
   variant?: 'page' | 'hero';
+  supportPhoneNumber?: string;
 }
 
-const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, onNewOrderClick, variant = 'page' }) => {
+const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
+  orderId,
+  onNewOrderClick,
+  variant = 'page',
+  supportPhoneNumber,
+}) => {
     const [order, setOrder] = useState<Order | null>(null);
     const [loading, setLoading] = useState(true);
     const [isReceiptModalOpen, setReceiptModalOpen] = useState(false);
@@ -87,6 +98,11 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
     const [isReceiptPreviewError, setReceiptPreviewError] = useState(false);
 
     const receiptUrl = order?.receipt_url ?? '';
+    const normalizedSupportPhone = (supportPhoneNumber ?? '').trim();
+    const supportDigits = sanitizePhoneDigits(normalizedSupportPhone);
+    const resolvedSupportDigits = supportDigits || FALLBACK_SUPPORT_PHONE_DIGITS;
+    const resolvedSupportDisplay = normalizedSupportPhone || FALLBACK_SUPPORT_PHONE_DISPLAY;
+    const supportWhatsappHref = `https://wa.me/${resolvedSupportDigits}`;
     const sanitizedReceiptUrl = receiptUrl.split('?')[0]?.toLowerCase() ?? '';
     const isReceiptPdf = sanitizedReceiptUrl.endsWith('.pdf');
     const canDisplayReceiptImage = Boolean(receiptUrl) && !isReceiptPdf && !isReceiptPreviewError;
@@ -829,13 +845,13 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({ orderId, on
                                         {/* Numéro du restaurant cliquable */}
                                         <div className="mt-4 pt-3 border-t border-white/10">
                                             <p className="text-xs font-bold uppercase tracking-wider text-white/50 mb-2">Besoin d'aide ?</p>
-                                            <a href="https://wa.me/573238090562" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-white/90 hover:text-emerald-300 transition-colors group">
+                                            <a href={supportWhatsappHref} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-white/90 hover:text-emerald-300 transition-colors group">
                                                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/20 group-hover:bg-emerald-500/40 transition-colors">
                                                     <Phone size={16} className="text-emerald-300" />
                                                 </div>
                                                 <div>
                                                     <p className="text-xs text-white/60">Appelez le restaurant</p>
-                                                    <p className="text-sm font-bold text-white">+57 323 809 0562</p>
+                                                    <p className="text-sm font-bold text-white">{resolvedSupportDisplay}</p>
                                                 </div>
                                             </a>
                                         </div>

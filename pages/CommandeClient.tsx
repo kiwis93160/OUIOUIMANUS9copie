@@ -1017,6 +1017,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                 <OrderConfirmationModal
                     isOpen={confirmOpen}
                     order={submittedOrder}
+                    whatsappNumber={safeContent.onlineOrdering.confirmationWhatsappNumber}
                     onClose={() => {
                         setConfirmOpen(false);
                         setCart([]);

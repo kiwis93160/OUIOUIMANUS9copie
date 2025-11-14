@@ -11,11 +11,13 @@ interface OrderConfirmationModalProps {
 }
 
 const isFreeShippingType = (type?: string | null) => (type ?? '').toLowerCase() === 'free_shipping';
+const DEFAULT_WHATSAPP_NUMBER = '573238090562';
+const sanitizeWhatsappNumber = (value: string): string => value.replace(/[^\d]/g, '');
 
 const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
   isOpen,
   order,
-  whatsappNumber = '573238090562' // Default number
+  whatsappNumber = DEFAULT_WHATSAPP_NUMBER // Default number
 }) => {
   const navigate = useNavigate();
 
@@ -121,7 +123,8 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
 
   const handleWhatsAppClick = () => {
     const message = generateWhatsAppMessage();
-    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${message}`;
+    const normalizedWhatsapp = sanitizeWhatsappNumber(whatsappNumber) || DEFAULT_WHATSAPP_NUMBER;
+    const whatsappUrl = `https://wa.me/${normalizedWhatsapp}?text=${message}`;
     window.open(whatsappUrl, '_blank');
 
     // Redirect customer to the public home page where the tracker is displayed
