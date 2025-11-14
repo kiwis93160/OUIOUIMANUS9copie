@@ -2035,16 +2035,6 @@ const SiteCustomization: React.FC = () => {
     return Array.from(new Set([...base, ...custom]));
   }, [draft]);
 
-  const activeFieldMeta = floatingEditor
-    ? fieldMetaByElement.get(floatingEditor.element) ?? null
-    : null;
-  const inlineEditorContent = activeFieldMeta ? renderFieldEditor(activeFieldMeta.field) : null;
-
-  const closeFloatingEditor = useCallback(() => {
-    setFloatingEditor(null);
-    setActiveZone(null);
-  }, []);
-
   const renderFieldEditor = useCallback(
     (field: CustomizationField) => {
       if (!draft) {
@@ -2087,6 +2077,16 @@ const SiteCustomization: React.FC = () => {
     },
     [appendAssetToDraft, applyDraftUpdate, draft, fontOptions],
   );
+
+  const activeFieldMeta = floatingEditor
+    ? fieldMetaByElement.get(floatingEditor.element) ?? null
+    : null;
+  const inlineEditorContent = activeFieldMeta ? renderFieldEditor(activeFieldMeta.field) : null;
+
+  const closeFloatingEditor = useCallback(() => {
+    setFloatingEditor(null);
+    setActiveZone(null);
+  }, []);
 
   const handleLibraryUpload = useCallback(
     async (file: File) => {
