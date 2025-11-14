@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Clock } from 'lucide-react';
 import { formatMillisecondsToMinutesSeconds } from '../utils/time';
+import { getOrderUrgencyToneClasses } from '../utils/orderUrgency';
 
 interface OrderTimerProps {
   startTime: number;
@@ -26,20 +27,14 @@ const OrderTimer: React.FC<OrderTimerProps> = ({
     return () => clearInterval(interval);
   }, [startTime]);
 
-  const minutes = Math.floor(elapsed / 60000);
   const timerString = formatMillisecondsToMinutesSeconds(elapsed);
   const accessibleLabel = label ? `${label.trim()} ${timerString}` : `Tiempo transcurrido ${timerString}`;
-
-  const getTimerColor = () => {
-    if (minutes >= 20) return 'bg-red-500 text-white shadow-lg';
-    if (minutes >= 10) return 'bg-yellow-400 text-black shadow-md';
-    return 'bg-brand-primary text-brand-secondary shadow-md ring-1 ring-black/5';
-  };
+  const toneClasses = getOrderUrgencyToneClasses(startTime);
 
   const containerClasses = [
     variant === 'chip'
       ? `inline-flex items-center gap-3 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.25em] text-white shadow-lg shadow-slate-900/10 ring-1 ring-inset ring-white/30 ${accentClassName ?? 'bg-brand-primary'}`
-      : `flex items-center gap-2 px-3 py-1.5 rounded-full text-lg font-bold border-2 border-white ${getTimerColor()}`,
+      : `flex items-center gap-2 px-3 py-1.5 rounded-full text-lg font-bold ${accentClassName ?? toneClasses.timer}`,
     className,
   ]
     .filter(Boolean)
