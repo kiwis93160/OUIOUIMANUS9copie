@@ -4,7 +4,6 @@ import { api } from '../services/api';
 import { DailyReport, RoleLogin } from '../types';
 import { Users, ShoppingCart, DollarSign, Package, AlertTriangle, MessageSquare, LogIn } from 'lucide-react';
 import { formatCurrencyCOP } from '../utils/formatIntegerAmount';
-import { buildWhatsAppUrl } from '../utils/whatsapp';
 
 const ReportStat: React.FC<{ icon: React.ReactNode; label: string; value: React.ReactNode }> = ({ icon, label, value }) => (
     <div className="flex flex-col items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50/80 p-4 shadow-sm sm:flex-row sm:items-center">
@@ -107,13 +106,13 @@ const ReportModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpe
           });
         }
     
-        return parts.join('\n');
+        return encodeURIComponent(parts.join('\n'));
       };
 
     const handleSendToWhatsApp = () => {
         if (!report) return;
         const message = formatReportForWhatsApp(report);
-        const whatsappUrl = buildWhatsAppUrl({ message });
+        const whatsappUrl = `https://wa.me/?text=${message}`;
         window.open(whatsappUrl, '_blank');
         onClose();
     };
