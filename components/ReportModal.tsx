@@ -163,7 +163,7 @@ const ReportModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpe
                                         <>
                                             {report.clientsDuJour}
                                             <span className="mt-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                                                Salle : {report.clientsSurPlace ?? 0} • En ligne : {report.clientsEnLigne ?? 0}
+                                                Sala: {report.clientsSurPlace ?? 0} • En línea: {report.clientsEnLigne ?? 0}
                                             </span>
                                         </>
                                     }
@@ -192,7 +192,7 @@ const ReportModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpe
                                             <p className="mt-1 text-xl font-bold">{formatCurrencyCOP(billedTotalBeforePromotions)}</p>
                                         </div>
                                         <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-emerald-700 shadow-sm">
-                                            <p className="text-xs font-semibold uppercase tracking-wide">Promotions appliquées</p>
+                                            <p className="text-xs font-semibold uppercase tracking-wide">Promociones aplicadas</p>
                                             <p className="mt-1 text-xl font-bold">{formatCurrencyCOP(report.totalPromotionsApplied ?? 0)}</p>
                                         </div>
                                     </div>

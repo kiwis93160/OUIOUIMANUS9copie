@@ -28,24 +28,24 @@ const PERMISSION_LEVELS: Array<{
 }> = [
   {
     value: 'editor',
-    label: 'Éditeur',
-    headerDescription: 'Gestion complète',
-    helper: 'Créer, modifier et valider le contenu.',
-    tooltip: 'Autorise toutes les actions, y compris la modification et la validation des données.',
+    label: 'Editor',
+    headerDescription: 'Gestión completa',
+    helper: 'Crear, editar y validar el contenido.',
+    tooltip: 'Permite todas las acciones, incluida la edición y validación de datos.',
   },
   {
     value: 'readonly',
-    label: 'Lecture seule',
-    headerDescription: 'Consultation',
-    helper: 'Visualiser les informations sans modifier.',
-    tooltip: 'Permet uniquement de consulter les informations sans pouvoir les modifier.',
+    label: 'Solo lectura',
+    headerDescription: 'Consulta',
+    helper: 'Ver la información sin modificarla.',
+    tooltip: 'Solo permite consultar la información sin posibilidad de editarla.',
   },
   {
     value: 'none',
-    label: 'Aucun',
-    headerDescription: 'Accès bloqué',
-    helper: 'Masquer totalement la section.',
-    tooltip: 'Bloque complètement l’accès à la section ou à la fonctionnalité.',
+    label: 'Sin acceso',
+    headerDescription: 'Acceso bloqueado',
+    helper: 'Oculta por completo la sección.',
+    tooltip: 'Bloquea totalmente la sección o funcionalidad.',
   },
 ];
 
@@ -67,14 +67,14 @@ const PermissionMatrix: React.FC<PermissionMatrixProps> = ({
     const navKeys = navOrder.filter(key => permissionKeys.includes(key));
     const customKeys = permissionKeys
       .filter(key => !navSet.has(key))
-      .sort((a, b) => getPermissionLabel(a).localeCompare(getPermissionLabel(b), 'fr'));
+      .sort((a, b) => getPermissionLabel(a).localeCompare(getPermissionLabel(b), 'es'));
 
     const computedSections: PermissionSection[] = [];
 
     if (navKeys.length > 0) {
       computedSections.push({
         id: 'navigation',
-        title: 'Navigation principale',
+        title: 'Navegación principal',
         keys: navKeys,
       });
     }
@@ -82,7 +82,7 @@ const PermissionMatrix: React.FC<PermissionMatrixProps> = ({
     if (customKeys.length > 0) {
       computedSections.push({
         id: 'custom',
-        title: 'Permissions personnalisées',
+        title: 'Permisos personalizados',
         keys: customKeys,
       });
     }
@@ -102,7 +102,7 @@ const PermissionMatrix: React.FC<PermissionMatrixProps> = ({
   if (permissionKeys.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-gray-300 bg-gray-50 px-4 py-6 text-center text-sm font-medium text-gray-900">
-        Aucune permission disponible pour ce rôle pour le moment.
+        No hay permisos disponibles para este rol por el momento.
       </div>
     );
   }
@@ -114,25 +114,25 @@ const PermissionMatrix: React.FC<PermissionMatrixProps> = ({
           type="button"
           className="permission-action-button"
           onClick={() => applyBulkChange('editor')}
-          title="Autoriser toutes les sections en mode édition."
+          title="Autoriza todas las secciones en modo edición."
         >
-          Tout autoriser
+          Autorizar todo
         </button>
         <button
           type="button"
           className="permission-action-button"
           onClick={() => applyBulkChange('readonly')}
-          title="Basculer toutes les sections en lecture seule."
+          title="Pone todas las secciones en solo lectura."
         >
-          Lecture seule partout
+          Solo lectura en todo
         </button>
         <button
           type="button"
           className="permission-action-button is-danger"
           onClick={() => applyBulkChange('none')}
-          title="Révoquer toutes les permissions."
+          title="Revoca todos los permisos."
         >
-          Tout bloquer
+          Bloquear todo
         </button>
       </div>
 
@@ -141,7 +141,7 @@ const PermissionMatrix: React.FC<PermissionMatrixProps> = ({
           <div className="min-w-full">
             <div className="grid grid-cols-[minmax(220px,2fr)_repeat(3,minmax(140px,1fr))]">
               <div className="border-b border-gray-200 bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-900">
-                Section / permission
+                Sección / permiso
               </div>
               {PERMISSION_LEVELS.map(level => (
                 <div
@@ -173,7 +173,7 @@ const PermissionMatrix: React.FC<PermissionMatrixProps> = ({
                                 type="button"
                                 onClick={() => onRemoveCustomPermission(key)}
                                 className="text-gray-700 transition-colors hover:text-red-600"
-                                title="Supprimer cette permission personnalisée"
+                                title="Eliminar este permiso personalizado"
                               >
                                 <Trash2 className="h-4 w-4" />
                               </button>

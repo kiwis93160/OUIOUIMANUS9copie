@@ -65,8 +65,8 @@ const MainStatCard: React.FC<{
                     <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">{title}</p>
                     <p className="mt-2 text-2xl font-bold text-gray-900 sm:text-3xl">{value}</p>
                     {showPreviousSection ? (
-                        <p className="mt-2 text-sm text-gray-600">
-                            Période précédente : <span className="font-semibold text-gray-800">{previousValue}</span>
+                    <p className="mt-2 text-sm text-gray-600">
+                            Periodo anterior: <span className="font-semibold text-gray-800">{previousValue}</span>
                             {comparisonValue ? (
                                 <span className={`ml-2 font-semibold ${comparisonClass}`}>
                                     {comparisonSign}
@@ -76,8 +76,8 @@ const MainStatCard: React.FC<{
                         </p>
                     ) : (
                         <p className={`mt-1 text-sm font-semibold ${comparisonClass}`}>
-                            {comparisonValue ? `${comparisonSign}${comparisonValue}%` : 'N/A'}
-                            <span className="ml-1 text-xs font-medium text-gray-500 sm:text-sm">vs période précédente</span>
+                            {comparisonValue ? `${comparisonSign}${comparisonValue}%` : 'N/D'}
+                            <span className="ml-1 text-xs font-medium text-gray-500 sm:text-sm">vs. periodo anterior</span>
                         </p>
                     )}
                 </div>
@@ -220,72 +220,72 @@ const Dashboard: React.FC = () => {
             {/* Bloc 1 : Indicateurs financiers */}
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
                 <MainStatCard
-                    title={`Chiffre d'affaires (${stats.periodLabel})`}
+                    title={`Ingresos (${stats.periodLabel})`}
                     value={formatCurrencyCOP(stats.ventesPeriode)}
                     icon={<DollarSign size={24} />}
                     comparison={revenueTrend}
                     previousValue={formatCurrencyCOP(previousRevenueTotal)}
                 />
                 <MainStatCard
-                    title="Bénéfice net"
+                    title="Beneficio neto"
                     value={formatCurrencyCOP(stats.beneficePeriode)}
                     icon={<TrendingUp size={24} />}
                     comparison={beneficeTrend}
                     previousValue={formatCurrencyCOP(stats.beneficePeriodePrecedente)}
                 />
                 <MainStatCard
-                    title="Marge bénéficiaire"
+                    title="Margen de beneficio"
                     value={profitMargin !== null ? `${formatDecimal(profitMargin)}%` : '0%'}
                     icon={<Percent size={24} />}
                     comparison={previousProfitMargin !== null ? profitMarginTrend : null}
                     previousValue={previousProfitMargin !== null ? `${formatDecimal(previousProfitMargin)}%` : 'N/A'}
                 />
                 <MainStatCard
-                    title="Commandes traitées"
+                    title="Pedidos procesados"
                     value={formatIntegerAmount(ordersCount)}
                     icon={<ShoppingBag size={24} />}
                     comparison={ordersTrend}
-                    helper={`≈ ${formatDecimal(averageOrdersPerDay)} commandes / jour`}
+                    helper={`≈ ${formatDecimal(averageOrdersPerDay)} pedidos / día`}
                 />
             </div>
 
             {/* Bloc 2 : Clients et panier */}
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
                 <MainStatCard
-                    title="Ticket moyen"
+                    title="Ticket promedio"
                     value={formatCurrencyCOP(stats.panierMoyen)}
                     icon={<Receipt size={24} />}
                     comparison={panierTrend}
                     helper={
                         ordersCount > 0
-                            ? `Basé sur ${formatIntegerAmount(ordersCount)} commandes`
-                            : 'Aucune commande sur la période'
+                            ? `Basado en ${formatIntegerAmount(ordersCount)} pedidos`
+                            : 'Ningún pedido en el periodo'
                     }
                 />
                 <MainStatCard
-                    title="Revenu par client"
+                    title="Ingresos por cliente"
                     value={formatCurrencyCOP(revenuePerClient)}
                     icon={<UserCheck size={24} />}
                     comparison={revenuePerClientTrend}
                     helper={
                         stats.clientsPeriode > 0
-                            ? `${formatIntegerAmount(stats.clientsPeriode)} clients servis`
-                            : 'Aucun client sur la période'
+                            ? `${formatIntegerAmount(stats.clientsPeriode)} clientes atendidos`
+                            : 'Ningún cliente en el periodo'
                     }
                 />
                 <MainStatCard
-                    title={`Clients (${stats.periodLabel})`}
+                    title={`Clientes (${stats.periodLabel})`}
                     value={formatIntegerAmount(stats.clientsPeriode)}
                     icon={<Users size={24} />}
                     comparison={clientsTrend}
-                    helper={`≈ ${formatDecimal(averageClientsPerDay)} clients / jour`}
+                    helper={`≈ ${formatDecimal(averageClientsPerDay)} clientes / día`}
                 />
                 <MainStatCard
-                    title="Revenu moyen quotidien"
+                    title="Ingresos diarios promedio"
                     value={formatCurrencyCOP(averageDailyRevenue)}
                     icon={<CalendarDays size={24} />}
                     comparison={averageDailyRevenueTrend}
-                    helper={`Total période : ${formatCurrencyCOP(stats.ventesPeriode)}`}
+                    helper={`Total del periodo: ${formatCurrencyCOP(stats.ventesPeriode)}`}
                 />
             </div>
 

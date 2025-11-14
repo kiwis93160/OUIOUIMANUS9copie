@@ -162,7 +162,7 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
 
         <div className="p-6 text-center">
           <div className="p-6 text-left">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">Détails de la commande:</h3>
+            <h3 className="text-lg font-bold text-gray-800 mb-4">Detalles del pedido:</h3>
             <div className="space-y-2">
               {order.items.filter(item => !item.nom_produit?.toLowerCase().includes('domicilio')).map((item, index) => (
                 <div key={index} className="flex justify-between items-center text-gray-700">
@@ -172,13 +172,13 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
               ))}
               {order.subtotal !== undefined && (
                 <div className="flex justify-between items-center text-gray-700 border-t pt-2 mt-2">
-                  <span>Sous-total:</span>
+                  <span>Subtotal:</span>
                   <span>{formatCurrencyCOP(order.subtotal)}</span>
                 </div>
               )}
               {order.applied_promotions && order.applied_promotions.length > 0 && (
                 <div className="mt-2">
-                  <p className="text-sm font-semibold text-green-700">Promotions appliquées:</p>
+                  <p className="text-sm font-semibold text-green-700">Promociones aplicadas:</p>
                   {order.applied_promotions.map((promo, index) => (
                     <div key={index} className="flex justify-between items-center text-xs text-green-600 ml-2">
                       <span>- {promo.name}</span>
@@ -189,19 +189,19 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
               )}
               {order.total_discount && order.total_discount > 0 && (
                 <div className="flex justify-between items-center text-green-600">
-                  <span>Réduction totale:</span>
+                  <span>Descuento total:</span>
                   <span>- {formatCurrencyCOP(order.total_discount)}</span>
                 </div>
               )}
               {order.shipping_cost !== undefined && order.shipping_cost > 0 && (
                 <div className="flex justify-between items-center text-gray-700">
-                  <span>Frais de livraison:</span>
+                  <span>Costo de envío:</span>
                   <span>{formatCurrencyCOP(order.shipping_cost)}</span>
                 </div>
               )}
               {order.shipping_cost === 0 && order.applied_promotions?.some(p => isFreeShippingType(p.type)) && (
                 <div className="flex justify-between items-center text-green-600">
-                  <span>Livraison gratuite:</span>
+                  <span>Envío gratis:</span>
                   <span>{formatCurrencyCOP(0)}</span>
                 </div>
               )}

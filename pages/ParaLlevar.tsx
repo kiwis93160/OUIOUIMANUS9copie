@@ -305,25 +305,25 @@ const ParaLlevar: React.FC = () => {
 
     const scheduleStatusLabel = useMemo(() => {
         if (siteContentLoading || scheduleLoading) {
-            return 'Chargement des horaires...';
+            return 'Cargando horarios...';
         }
 
         if (!todaySchedule) {
-            return "Aujourd'hui: Horaires non configurés";
+            return 'Hoy: Horarios no configurados';
         }
 
         if (todaySchedule.closed) {
-            return "Aujourd'hui: Fermé";
+            return 'Hoy: Cerrado';
         }
 
         const startTime = todaySchedule.startTime?.trim();
         const endTime = todaySchedule.endTime?.trim();
 
         if (!startTime || !endTime) {
-            return "Aujourd'hui: Horaires non disponibles";
+            return 'Hoy: Horarios no disponibles';
         }
 
-        return `Aujourd'hui: ${startTime} - ${endTime}`;
+        return `Hoy: ${startTime} - ${endTime}`;
     }, [scheduleLoading, siteContentLoading, todaySchedule]);
 
     const handleScheduleSubmit = useCallback(async () => {
@@ -349,11 +349,11 @@ const ParaLlevar: React.FC = () => {
                 updateSchedule(editingSchedule),
                 updateContent(nextContent),
             ]);
-            setScheduleFeedback({ message: 'Horaires et numéros mis à jour avec succès.', tone: 'success' });
+            setScheduleFeedback({ message: 'Horarios y números actualizados con éxito.', tone: 'success' });
             setIsScheduleModalOpen(false);
         } catch (error) {
             console.error('Failed to update online ordering schedule', error);
-            const message = error instanceof Error ? error.message : 'Impossible de mettre à jour les paramètres.';
+            const message = error instanceof Error ? error.message : 'No fue posible actualizar la configuración.';
             setScheduleFeedback({ message, tone: 'error' });
         } finally {
             setSavingSchedule(false);
@@ -423,7 +423,7 @@ const ParaLlevar: React.FC = () => {
                             <Clock size={22} />
                         </div>
                         <div>
-                            <h2 className="text-base font-semibold text-gray-900">Disponibilité de la commande en ligne</h2>
+                            <h2 className="text-base font-semibold text-gray-900">Disponibilidad de pedidos en línea</h2>
                             <p className="text-sm text-gray-500">
                                 {scheduleStatusLabel}
                             </p>
@@ -438,7 +438,7 @@ const ParaLlevar: React.FC = () => {
                             }`}
                         >
                             <span className={`h-2 w-2 rounded-full ${isCurrentlyOnline ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-                            {isCurrentlyOnline ? 'Ouvert' : 'Fermé'}
+                            {isCurrentlyOnline ? 'Abierto' : 'Cerrado'}
                         </span>
                         <button
                             onClick={() => setIsScheduleModalOpen(true)}
@@ -460,23 +460,23 @@ const ParaLlevar: React.FC = () => {
                 )}
                 <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Numéro affiché sur le tracker</p>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Número mostrado en el tracker</p>
                         <p className="mt-1 text-lg font-semibold text-gray-900">
-                            {supportPhoneNumber ? supportPhoneNumber : 'Non configuré'}
+                            {supportPhoneNumber ? supportPhoneNumber : 'Sin configurar'}
                         </p>
-                        <p className="text-xs text-gray-500 mt-1">Ce numéro apparaît dans le suivi client pour contacter le restaurant.</p>
+                        <p className="text-xs text-gray-500 mt-1">Este número aparece en el seguimiento del cliente para contactar al restaurante.</p>
                     </div>
                     <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Numéro pour les résumés WhatsApp</p>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Número para resúmenes de WhatsApp</p>
                         <p className="mt-1 text-lg font-semibold text-gray-900">
-                            {whatsappResumeNumber ? whatsappResumeNumber : 'Non configuré'}
+                            {whatsappResumeNumber ? whatsappResumeNumber : 'Sin configurar'}
                         </p>
-                        <p className="text-xs text-gray-500 mt-1">Utilisé lors de l'envoi automatique du récapitulatif après validation client.</p>
+                        <p className="text-xs text-gray-500 mt-1">Se usa para enviar automáticamente el resumen cuando el cliente confirma.</p>
                     </div>
                 </div>
             </div>
             
-            <Modal isOpen={isScheduleModalOpen} onClose={() => setIsScheduleModalOpen(false)} title="Configuration des horaires" size="xs">
+            <Modal isOpen={isScheduleModalOpen} onClose={() => setIsScheduleModalOpen(false)} title="Configuración de horarios" size="xs">
                 <div className="space-y-1.5">
                     {daysOfWeek.map(({ key, label }) => (
                         <div key={key} className="rounded border border-gray-200 bg-gray-50 p-1.5">
@@ -492,13 +492,13 @@ const ParaLlevar: React.FC = () => {
                                         })}
                                         className="h-3 w-3 rounded border-gray-300 text-blue-600 focus:ring-1 focus:ring-blue-500"
                                     />
-                                    <span className="text-[10px] text-gray-700">Fermé</span>
+                                    <span className="text-[10px] text-gray-700">Cerrado</span>
                                 </label>
                             </div>
                             {editingSchedule && !editingSchedule[key].closed && (
                                 <div className="flex gap-1.5">
                                     <label className="flex flex-col gap-0.5 flex-1">
-                                        <span className="text-[9px] font-medium text-gray-600">Ouverture</span>
+                                        <span className="text-[9px] font-medium text-gray-600">Apertura</span>
                                         <input
                                             type="time"
                                             value={editingSchedule[key].startTime}
@@ -510,7 +510,7 @@ const ParaLlevar: React.FC = () => {
                                         />
                                     </label>
                                     <label className="flex flex-col gap-0.5 flex-1">
-                                        <span className="text-[9px] font-medium text-gray-600">Fermeture</span>
+                                        <span className="text-[9px] font-medium text-gray-600">Cierre</span>
                                         <input
                                             type="time"
                                             value={editingSchedule[key].endTime}
@@ -526,28 +526,28 @@ const ParaLlevar: React.FC = () => {
                         </div>
                     ))}
                     <div className="space-y-3 rounded border border-gray-200 bg-white/60 p-3">
-                        <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-500">Coordonnées</h4>
+                        <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-500">Datos de contacto</h4>
                         <label className="flex flex-col gap-1">
-                            <span className="text-[11px] font-medium text-gray-600">Numéro affiché dans le tracker</span>
+                            <span className="text-[11px] font-medium text-gray-600">Número mostrado en el tracker</span>
                             <input
                                 type="tel"
                                 value={editingSupportPhone}
                                 onChange={(e) => setEditingSupportPhone(e.target.value)}
                                 className="w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/30"
-                                placeholder="Ex: +57 323 809 0562"
+                                placeholder="Ej.: +57 323 809 0562"
                             />
-                            <span className="text-[10px] text-gray-500">Affiché au client dans le suivi de commande.</span>
+                            <span className="text-[10px] text-gray-500">Visible para el cliente en el seguimiento del pedido.</span>
                         </label>
                         <label className="flex flex-col gap-1">
-                            <span className="text-[11px] font-medium text-gray-600">Numéro des résumés WhatsApp</span>
+                            <span className="text-[11px] font-medium text-gray-600">Número para resúmenes de WhatsApp</span>
                             <input
                                 type="tel"
                                 value={editingWhatsappPhone}
                                 onChange={(e) => setEditingWhatsappPhone(e.target.value)}
                                 className="w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/30"
-                                placeholder="Ex: 573238090562"
+                                placeholder="Ej.: 573238090562"
                             />
-                            <span className="text-[10px] text-gray-500">Utilisé lorsque le client envoie son récapitulatif de commande.</span>
+                            <span className="text-[10px] text-gray-500">Se utiliza cuando el cliente envía su resumen de pedido.</span>
                         </label>
                     </div>
                     <div className="flex justify-end gap-1.5 pt-2 border-t border-gray-200">
@@ -556,7 +556,7 @@ const ParaLlevar: React.FC = () => {
                             className="rounded border border-gray-300 bg-white px-2.5 py-1 text-[11px] font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
                             type="button"
                         >
-                            Annuler
+                            Cancelar
                         </button>
                         <button
                             onClick={handleScheduleSubmit}
@@ -564,7 +564,7 @@ const ParaLlevar: React.FC = () => {
                             className="rounded bg-blue-600 px-2.5 py-1 text-[11px] font-semibold text-white shadow transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
                             type="button"
                         >
-                            {savingSchedule ? 'Enregistrement...' : 'Enregistrer'}
+                            {savingSchedule ? 'Guardando...' : 'Guardar'}
                         </button>
                     </div>
                 </div>

@@ -310,14 +310,14 @@ const Promotions: React.FC = () => {
                   <td colSpan={7} className="px-4 py-8 text-center">
                     <div className="flex justify-center items-center">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"></div>
-                      <span className="ml-2">Chargement...</span>
+                      <span className="ml-2">Cargando...</span>
                     </div>
                   </td>
                 </tr>
               ) : filteredPromotions.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
-                    Aucune promotion trouvée
+                    No se encontraron promociones
                   </td>
                 </tr>
               ) : (

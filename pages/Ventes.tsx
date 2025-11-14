@@ -394,7 +394,7 @@ const Ventes: React.FC = () => {
           successMessage = 'Table créée avec succès.';
         } else {
           if (!selectedTable) {
-            const message = 'Aucune table sélectionnée pour la mise à jour.';
+            const message = 'No se seleccionó ninguna mesa para actualizar.';
             setActionError(message);
             throw new Error(message);
           }

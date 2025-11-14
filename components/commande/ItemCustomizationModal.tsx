@@ -65,13 +65,13 @@ const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
                     <p className="text-gray-200 text-sm">{product.description}</p>
                 )}
                 <div>
-                    <label className="block text-sm font-medium text-gray-200">Commentaire</label>
+                    <label className="block text-sm font-medium text-gray-200">Comentario</label>
                     <textarea
                         value={comment}
                         onChange={(event) => setComment(event.target.value)}
                         rows={2}
                         className="mt-1 block w-full rounded-md border border-gray-600 bg-gray-900/60 py-2 px-3 text-sm text-gray-100 focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary"
-                        placeholder="Allergies, instructions spécifiques…"
+                        placeholder="Alergias, instrucciones específicas..."
                     />
                 </div>
                 <div className="flex items-center justify-between">
@@ -80,7 +80,7 @@ const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
                             type="button"
                             onClick={handleDecrease}
                             className="p-2 rounded-full bg-gray-800 text-gray-100 hover:bg-gray-700"
-                            aria-label="Diminuer la quantité"
+                            aria-label="Disminuir la cantidad"
                         >
                             <Minus size={18} />
                         </button>
@@ -89,7 +89,7 @@ const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
                             type="button"
                             onClick={handleIncrease}
                             className="p-2 rounded-full bg-gray-800 text-gray-100 hover:bg-gray-700"
-                            aria-label="Augmenter la quantité"
+                            aria-label="Aumentar la cantidad"
                         >
                             <Plus size={18} />
                         </button>
@@ -99,7 +99,7 @@ const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
                         onClick={handleSave}
                         className="rounded-lg bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-2 px-6 font-semibold text-white shadow-md transition-all duration-300 hover:from-orange-600 hover:via-orange-700 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-orange-400/70 focus:ring-offset-2"
                     >
-                        Ajouter ({formatCurrencyCOP(product.prix_vente * quantity)})
+                        Agregar ({formatCurrencyCOP(product.prix_vente * quantity)})
                     </button>
                 </div>
             </div>

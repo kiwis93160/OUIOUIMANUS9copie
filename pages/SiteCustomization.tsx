@@ -1857,7 +1857,7 @@ const MediaLibraryList: React.FC<MediaLibraryListProps> = ({ title, assets, onCo
     return (
       <div>
         <h3 className="text-sm font-semibold text-slate-700">{title}</h3>
-        <p className="mt-2 text-sm text-slate-500">Aucun média pour le moment.</p>
+        <p className="mt-2 text-sm text-slate-500">No hay medios por el momento.</p>
       </div>
     );
   }

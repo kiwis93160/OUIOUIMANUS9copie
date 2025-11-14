@@ -207,7 +207,7 @@ const Modal: React.FC<ModalProps> = ({
             type="button"
             onClick={onClose}
             className="rounded-full p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
-            aria-label="Fermer la fenêtre modale"
+            aria-label="Cerrar la ventana modal"
           >
             <X size={20} />
           </button>

@@ -50,20 +50,20 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
     return (
         <div className={`ui-card flex flex-col ${className ?? ''}`}>
             <div className="p-4 border-b">
-                <h2 className="text-2xl font-semibold text-brand-secondary">Commande</h2>
+                <h2 className="text-2xl font-semibold text-brand-secondary">Pedido</h2>
             </div>
             <div className="flex-1 space-y-3 overflow-y-auto p-4">
                 {totalItemsCount === 0 ? (
-                    <p className="text-gray-500">La commande est vide.</p>
+                    <p className="text-gray-500">El pedido está vacío.</p>
                 ) : (
                     <>
                         <div className="space-y-3">
                             <div className="flex flex-wrap items-center justify-between gap-2">
-                                <h3 className="text-lg font-semibold text-brand-secondary">Articles à envoyer</h3>
+                                <h3 className="text-lg font-semibold text-brand-secondary">Artículos por enviar</h3>
                                 <span className="text-sm text-gray-500">{categorizedItems.pending.length}</span>
                             </div>
                             {categorizedItems.pending.length === 0 ? (
-                                <p className="text-sm text-gray-500">Aucun article en attente.</p>
+                                <p className="text-sm text-gray-500">No hay artículos pendientes.</p>
                             ) : (
                                 categorizedItems.pending.map(({ item, index }) => (
                                     <div key={item.id} className="p-3 rounded-lg bg-yellow-100">
@@ -97,7 +97,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                                         {editingCommentId === item.id || item.commentaire ? (
                                             <input
                                                 type="text"
-                                                placeholder="Ajouter un commentaire..."
+                                                placeholder="Agregar un comentario..."
                                                 value={item.commentaire ?? ''}
                                                 onChange={(event) => onCommentChange(index, event.target.value)}
                                                 onBlur={() => onPersistComment(index)}
@@ -109,7 +109,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                                                 onClick={() => onStartEditingComment(item.id)}
                                                 className="mt-2 text-xs text-blue-600 hover:underline flex items-center gap-1"
                                             >
-                                                <MessageSquare size={12} /> Ajouter un commentaire
+                                                <MessageSquare size={12} /> Agregar un comentario
                                             </button>
                                         )}
                                     </div>
@@ -120,7 +120,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                         {categorizedItems.sent.length > 0 && (
                             <div className="space-y-3 border-t border-gray-700 pt-6">
                                 <div className="flex flex-wrap items-center justify-between gap-2">
-                                    <h3 className="text-lg font-semibold text-brand-secondary">Envoyés en cuisine</h3>
+                                    <h3 className="text-lg font-semibold text-brand-secondary">Enviados a cocina</h3>
                                     <span className="text-sm text-gray-500">{categorizedItems.sent.length}</span>
                                 </div>
                                 {categorizedItems.sent.map(({ item }) => (
@@ -154,24 +154,24 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
             <div className="space-y-4 border-t p-4">
                 <div className="space-y-2">
                     <div className="flex flex-wrap items-center justify-between gap-2 text-gray-700">
-                        <span>Sous-total</span>
+                        <span>Subtotal</span>
                         <span>{formatCurrencyCOP(order.subtotal ?? 0)}</span>
                     </div>
                     {order.total_discount && order.total_discount > 0 && (
                         <div className="flex flex-wrap items-center justify-between gap-2 text-green-600">
-                            <span>Réduction totale</span>
+                            <span>Descuento total</span>
                             <span>- {formatCurrencyCOP(order.total_discount)}</span>
                         </div>
                     )}
                     {order.shipping_cost !== undefined && order.shipping_cost > 0 && (
                         <div className="flex flex-wrap items-center justify-between gap-2 text-gray-700">
-                            <span>Frais de livraison</span>
+                            <span>Costo de envío</span>
                             <span>{formatCurrencyCOP(order.shipping_cost)}</span>
                         </div>
                     )}
                     {order.shipping_cost === 0 && order.applied_promotions?.some(p => isFreeShippingType(p.type)) && (
                         <div className="flex flex-wrap items-center justify-between gap-2 text-green-600">
-                            <span>Livraison gratuite</span>
+                            <span>Envío gratis</span>
                             <span>{formatCurrencyCOP(0)}</span>
                         </div>
                     )}
@@ -195,7 +195,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                         className="ui-btn-accent flex-1 justify-center py-3 disabled:opacity-60"
                     >
                         <Send size={20} />
-                        <span>{isSending ? 'Synchronisation…' : 'Envoyer en Cuisine'}</span>
+                        <span>{isSending ? 'Sincronizando...' : 'Enviar a cocina'}</span>
                     </button>
                     <button
                         onClick={onOpenPayment}
@@ -203,7 +203,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                         className="ui-btn-success flex-1 justify-center py-3 disabled:opacity-60"
                     >
                         <DollarSign size={20} />
-                        <span>Payer</span>
+                        <span>Cobrar</span>
                     </button>
                 </div>
             </div>
