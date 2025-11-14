@@ -95,6 +95,18 @@ export const createElementTextStyle = (
   if (elementStyle?.backgroundColor && elementStyle.backgroundColor.trim().length > 0) {
     style.backgroundColor = elementStyle.backgroundColor;
   }
+  if (elementStyle?.fontWeight && elementStyle.fontWeight.trim().length > 0) {
+    style.fontWeight = elementStyle.fontWeight;
+  }
+  if (elementStyle?.fontStyle && elementStyle.fontStyle.trim().length > 0) {
+    style.fontStyle = elementStyle.fontStyle;
+  }
+  if (elementStyle?.textShadow && elementStyle.textShadow.trim().length > 0) {
+    style.textShadow = elementStyle.textShadow;
+  }
+  if (elementStyle?.textAlign && elementStyle.textAlign.trim().length > 0) {
+    style.textAlign = elementStyle.textAlign as CSSProperties['textAlign'];
+  }
 
   return style;
 };

@@ -268,6 +268,10 @@ const sanitizeElementStyle = (style: ElementStyle | undefined | null): ElementSt
   const fontFamily = sanitizeElementStyleValue(style.fontFamily ?? null);
   const fontSize = sanitizeElementStyleValue(style.fontSize ?? null);
   const backgroundColor = sanitizeElementStyleValue(style.backgroundColor ?? null);
+  const fontWeight = sanitizeElementStyleValue(style.fontWeight ?? null);
+  const fontStyle = sanitizeElementStyleValue(style.fontStyle ?? null);
+  const textShadow = sanitizeElementStyleValue(style.textShadow ?? null);
+  const textAlign = sanitizeElementStyleValue(style.textAlign ?? null);
 
   const sanitized: ElementStyle = {};
 
@@ -282,6 +286,18 @@ const sanitizeElementStyle = (style: ElementStyle | undefined | null): ElementSt
   }
   if (backgroundColor) {
     sanitized.backgroundColor = backgroundColor;
+  }
+  if (fontWeight) {
+    sanitized.fontWeight = fontWeight;
+  }
+  if (fontStyle) {
+    sanitized.fontStyle = fontStyle;
+  }
+  if (textShadow) {
+    sanitized.textShadow = textShadow;
+  }
+  if (textAlign) {
+    sanitized.textAlign = textAlign;
   }
 
   return Object.keys(sanitized).length > 0 ? sanitized : null;
