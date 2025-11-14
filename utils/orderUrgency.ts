@@ -24,14 +24,18 @@ export interface OrderUrgencyToneClasses {
   quantityBackground: string;
   /** Raw background class so other components can copy the tone. */
   timerBackground: string;
+  /** Hex colour that matches the timer background for inline styles. */
+  toneHex: string;
 }
 
 const createToneClasses = ({
   backgroundClass,
+  backgroundHex,
   textClass,
   shadowClass = 'shadow-sm',
 }: {
   backgroundClass: string;
+  backgroundHex: string;
   textClass: string;
   shadowClass?: string;
 }): Omit<OrderUrgencyToneClasses, 'level'> => {
@@ -42,13 +46,14 @@ const createToneClasses = ({
     cardBorder: `border-4 ${borderColourClass}`,
     quantityBackground: backgroundClass,
     timerBackground: backgroundClass,
+    toneHex: backgroundHex,
   };
 };
 
 const URGENCY_TONE_CLASS_MAP: Record<OrderUrgencyLevel, Omit<OrderUrgencyToneClasses, 'level'>> = {
-  critical: createToneClasses({ backgroundClass: 'bg-red-600', textClass: 'text-white' }),
-  warning: createToneClasses({ backgroundClass: 'bg-yellow-400', textClass: 'text-gray-900' }),
-  normal: createToneClasses({ backgroundClass: 'bg-brand-accent-hover', textClass: 'text-white', shadowClass: 'shadow-none' }),
+  critical: createToneClasses({ backgroundClass: 'bg-red-600', backgroundHex: '#dc2626', textClass: 'text-white' }),
+  warning: createToneClasses({ backgroundClass: 'bg-yellow-400', backgroundHex: '#facc15', textClass: 'text-gray-900' }),
+  normal: createToneClasses({ backgroundClass: 'bg-brand-accent-hover', backgroundHex: '#1d4ed8', textClass: 'text-white', shadowClass: 'shadow-none' }),
 };
 
 const URGENCY_STYLE_MAP: Record<OrderUrgencyLevel, Omit<OrderUrgencyStyles, 'level'>> = {

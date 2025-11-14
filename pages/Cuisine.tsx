@@ -28,6 +28,8 @@ const KitchenTicketCard: React.FC<{ order: KitchenTicketOrder; onReady: (orderId
     const timerStart = order.date_envoi_cuisine || Date.now();
     const urgencyStyles = getOrderUrgencyStyles(timerStart);
     const urgencyTone = getOrderUrgencyToneClasses(timerStart);
+    const toneBorderStyle = useMemo<React.CSSProperties>(() => ({ borderColor: urgencyTone.toneHex }), [urgencyTone.toneHex]);
+    const toneFillStyle = useMemo<React.CSSProperties>(() => ({ backgroundColor: urgencyTone.toneHex }), [urgencyTone.toneHex]);
     const groupedItems = useMemo(() => {
         type GroupedItem = {
             key: string;
@@ -108,8 +110,8 @@ const KitchenTicketCard: React.FC<{ order: KitchenTicketOrder; onReady: (orderId
     })();
 
     return (
-        <div className={`relative flex h-full flex-col overflow-hidden rounded-2xl ${urgencyTone.cardBorder} text-gray-900 transition-colors duration-300 ${urgencyStyles.background}`}>
-            <span aria-hidden className={`absolute inset-y-0 left-0 w-1 ${urgencyStyles.accent}`} />
+        <div className={`relative flex h-full flex-col overflow-hidden rounded-2xl ${urgencyTone.cardBorder} text-gray-900 transition-colors duration-300 ${urgencyStyles.background}`} style={toneBorderStyle}>
+            <span aria-hidden className={`absolute inset-y-0 left-0 w-1 ${urgencyTone.timerBackground}`} style={toneFillStyle} />
             <header className="border-b border-gray-200 px-5 pt-3 pb-2">
                 <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
                     <div className="min-w-0 space-y-0.5">
@@ -139,7 +141,7 @@ const KitchenTicketCard: React.FC<{ order: KitchenTicketOrder; onReady: (orderId
                                             <li key={item.key} className="flex items-stretch rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 shadow-sm overflow-hidden min-h-[3.5rem]">
                                                 <div className="flex flex-1 items-center justify-between gap-3 pr-3">
                                                     <div className="flex flex-1 items-center">
-                                                        <span className={`flex self-stretch w-12 shrink-0 items-center justify-center text-xl font-bold text-white shadow-md ${urgencyTone.quantityBackground} rounded-l-lg`}>
+                                                        <span className={`flex self-stretch w-12 shrink-0 items-center justify-center text-xl font-bold text-white shadow-md ${urgencyTone.quantityBackground} rounded-l-lg`} style={toneFillStyle}>
                                                             {item.quantite}
                                                         </span>
                                                         <span className="font-semibold text-gray-900 text-[clamp(1.1rem,2.1vw,1.3rem)] leading-snug break-words text-balance whitespace-normal [hyphens:auto] px-3 py-3">
