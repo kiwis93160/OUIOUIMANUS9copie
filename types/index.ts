@@ -139,6 +139,10 @@ export interface ElementStyle {
   fontSize?: string;
   textColor?: string;
   backgroundColor?: string;
+  fontWeight?: string;
+  fontStyle?: string;
+  textShadow?: string;
+  textAlign?: string;
 }
 
 export type ElementStyles = Partial<Record<EditableElementKey, ElementStyle>>;

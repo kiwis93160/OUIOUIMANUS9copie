@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { AlertTriangle, CheckCircle2, Copy, Loader2, Upload } from 'lucide-react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { AlertTriangle, CheckCircle2, Copy, Loader2, Upload, X } from 'lucide-react';
 import Modal from '../components/Modal';
 import SitePreviewCanvas, { resolveZoneFromElement } from '../components/SitePreviewCanvas';
 import useSiteContent from '../hooks/useSiteContent';
@@ -125,13 +125,6 @@ const BASE_ELEMENT_LABELS: Partial<Record<EditableElementKey, string>> = {
 const ELEMENT_LABELS: Partial<Record<EditableElementKey, string>> = {
   ...BASE_ELEMENT_LABELS,
 };
-
-const TABS = [
-  { id: 'preview', label: 'Aperçu' },
-  { id: 'custom', label: 'Personnalisation' },
-] as const;
-
-type TabId = (typeof TABS)[number]['id'];
 
 type DraftUpdater = (current: SiteContent) => SiteContent;
 
@@ -259,6 +252,18 @@ const applyElementStyleOverrides = (
   }
   if (overrides.backgroundColor && overrides.backgroundColor.trim().length > 0) {
     sanitized.backgroundColor = overrides.backgroundColor.trim();
+  }
+  if (overrides.fontWeight && overrides.fontWeight.trim().length > 0) {
+    sanitized.fontWeight = overrides.fontWeight.trim();
+  }
+  if (overrides.fontStyle && overrides.fontStyle.trim().length > 0) {
+    sanitized.fontStyle = overrides.fontStyle.trim();
+  }
+  if (overrides.textShadow && overrides.textShadow.trim().length > 0) {
+    sanitized.textShadow = overrides.textShadow.trim();
+  }
+  if (overrides.textAlign && overrides.textAlign.trim().length > 0) {
+    sanitized.textAlign = overrides.textAlign.trim();
   }
 
   const nextStyles = { ...content.elementStyles };
@@ -814,10 +819,6 @@ const CUSTOMIZATION_SECTIONS: CustomizationSection[] = [
   },
 ];
 
-type FieldRegistration = (element: EditableElementKey, node: HTMLDivElement | null) => void;
-
-type FocusElementHandler = (element: EditableElementKey) => void;
-
 type ApplyUpdater = (updater: DraftUpdater) => void;
 
 type AssetAppender = (asset: CustomizationAsset) => void;
@@ -827,57 +828,168 @@ type FieldMeta = {
   group: CustomizationGroup;
   field: CustomizationField;
 };
+type RectSnapshot = {
+  top: number;
+  left: number;
+  right: number;
+  bottom: number;
+  width: number;
+  height: number;
+};
 
-interface FieldWrapperProps {
+interface FloatingEditorState {
   element: EditableElementKey;
-  label: string;
+  anchor: RectSnapshot | null;
+  boundary: RectSnapshot | null;
+}
+
+const snapshotRect = (rect: DOMRect | DOMRectReadOnly | null): RectSnapshot | null => {
+  if (!rect) {
+    return null;
+  }
+  return {
+    top: rect.top,
+    left: rect.left,
+    right: rect.right,
+    bottom: rect.bottom,
+    width: rect.width,
+    height: rect.height,
+  };
+};
+
+interface FloatingEditorPanelProps {
+  title: string;
   description?: string;
-  isActive: boolean;
-  register: FieldRegistration;
-  onFocus: FocusElementHandler;
+  anchor: RectSnapshot | null;
+  boundary: RectSnapshot | null;
+  onClose: () => void;
   children: React.ReactNode;
 }
 
-const FieldWrapper: React.FC<FieldWrapperProps> = ({
-  element,
-  label,
+const FloatingEditorPanel: React.FC<FloatingEditorPanelProps> = ({
+  title,
   description,
-  isActive,
-  register,
-  onFocus,
+  anchor,
+  boundary,
+  onClose,
   children,
 }) => {
-  const setRef = useCallback(
-    (node: HTMLDivElement | null) => {
-      register(element, node);
-    },
-    [element, register],
-  );
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+  const [placement, setPlacement] = useState<'above' | 'below'>('above');
+
+  const updatePosition = useCallback(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    const node = panelRef.current;
+    if (!node) {
+      return;
+    }
+    const panelRect = node.getBoundingClientRect();
+    const fallbackBoundary: RectSnapshot =
+      boundary ?? {
+        top: 16,
+        left: 16,
+        right: window.innerWidth - 16,
+        bottom: window.innerHeight - 16,
+        width: Math.max(window.innerWidth - 32, panelRect.width),
+        height: Math.max(window.innerHeight - 32, panelRect.height),
+      };
+    const fallbackTarget: RectSnapshot =
+      anchor ?? {
+        top: fallbackBoundary.top + fallbackBoundary.height / 2,
+        bottom: fallbackBoundary.top + fallbackBoundary.height / 2,
+        left: fallbackBoundary.left + fallbackBoundary.width / 2,
+        right: fallbackBoundary.left + fallbackBoundary.width / 2,
+        width: 0,
+        height: 0,
+      };
+
+    const centerX = fallbackTarget.left + fallbackTarget.width / 2;
+    const minLeft = fallbackBoundary.left + 8;
+    const maxLeft = fallbackBoundary.right - panelRect.width - 8;
+    const safeMaxLeft = maxLeft < minLeft ? minLeft : maxLeft;
+    const nextLeft = Math.min(Math.max(centerX - panelRect.width / 2, minLeft), safeMaxLeft);
+
+    let nextTop = fallbackTarget.top - panelRect.height - 12;
+    let nextPlacement: 'above' | 'below' = 'above';
+    const minTop = fallbackBoundary.top + 8;
+    if (nextTop < minTop) {
+      nextTop = fallbackTarget.bottom + 12;
+      nextPlacement = 'below';
+      if (nextTop + panelRect.height > fallbackBoundary.bottom - 8) {
+        nextTop = fallbackBoundary.bottom - panelRect.height - 8;
+      }
+    }
+
+    setPlacement(nextPlacement);
+    setPosition({
+      top: Math.max(minTop, nextTop),
+      left: nextLeft,
+    });
+  }, [anchor, boundary]);
+
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    updatePosition();
+  }, [updatePosition, children]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    const handle = () => updatePosition();
+    window.addEventListener('resize', handle);
+    window.addEventListener('scroll', handle, true);
+    return () => {
+      window.removeEventListener('resize', handle);
+      window.removeEventListener('scroll', handle, true);
+    };
+  }, [updatePosition]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+    if (typeof document !== 'undefined') {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+    return () => undefined;
+  }, [onClose]);
 
   return (
-    <div
-      ref={setRef}
-      className={`group relative rounded-3xl border p-6 transition shadow-sm focus-within:ring-2 focus-within:ring-brand-primary/60 ${
-        isActive
-          ? 'border-brand-primary/80 ring-1 ring-brand-primary/40'
-          : 'border-slate-200 hover:border-slate-300'
-      }`}
-      tabIndex={-1}
-      onFocusCapture={() => onFocus(element)}
-      onMouseEnter={() => onFocus(element)}
-    >
-      <div className="mb-4 flex items-start justify-between gap-4">
-        <div>
-          <h3 className="text-base font-semibold text-slate-900">{label}</h3>
-          {description && <p className="mt-1 text-sm text-slate-500">{description}</p>}
+    <div className="floating-editor fixed inset-0 z-50" role="dialog" aria-modal="true">
+      <div className="absolute inset-0 bg-slate-900/10" onClick={onClose} />
+      <div
+        ref={panelRef}
+        className="pointer-events-auto w-full max-w-xl rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl"
+        style={{ position: 'fixed', top: position.top, left: position.left }}
+      >
+        <div className="mb-4 flex items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-brand-primary">
+              Édition {placement === 'above' ? 'au-dessus' : 'au-dessous'} de l’élément
+            </p>
+            <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
+            {description && <p className="mt-1 text-sm text-slate-500">{description}</p>}
+          </div>
+          <button
+            type="button"
+            className="rounded-full p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+            onClick={onClose}
+            aria-label="Fermer l’éditeur"
+          >
+            <X className="h-5 w-5" aria-hidden="true" />
+          </button>
         </div>
-        {isActive && (
-          <span className="rounded-full bg-brand-primary/10 px-3 py-1 text-xs font-medium text-brand-primary">
-            Sélectionné
-          </span>
-        )}
+        <div className="max-h-[70vh] space-y-4 overflow-y-auto pr-1">{children}</div>
       </div>
-      <div className="space-y-4">{children}</div>
     </div>
   );
 };
@@ -916,6 +1028,10 @@ const TextFieldEditorContent: React.FC<TextFieldEditorContentProps> = ({
   const [fontSize, setFontSize] = useState<string>(elementStyle.fontSize ?? '');
   const [textColor, setTextColor] = useState<string>(elementStyle.textColor ?? '');
   const [backgroundColor, setBackgroundColor] = useState<string>(elementStyle.backgroundColor ?? '');
+  const [fontWeight, setFontWeight] = useState<string>(elementStyle.fontWeight ?? '');
+  const [fontStyleValue, setFontStyleValue] = useState<string>(elementStyle.fontStyle ?? '');
+  const [textShadow, setTextShadow] = useState<string>(elementStyle.textShadow ?? '');
+  const [textAlign, setTextAlign] = useState<string>(elementStyle.textAlign ?? '');
   const [fontUploadError, setFontUploadError] = useState<string | null>(null);
   const [uploadingFont, setUploadingFont] = useState<boolean>(false);
 
@@ -927,7 +1043,22 @@ const TextFieldEditorContent: React.FC<TextFieldEditorContentProps> = ({
     setFontSize(elementStyle.fontSize ?? '');
     setTextColor(elementStyle.textColor ?? '');
     setBackgroundColor(elementStyle.backgroundColor ?? '');
-  }, [initialPlain, initialRichText, elementStyle.fontFamily, elementStyle.fontSize, elementStyle.textColor, elementStyle.backgroundColor]);
+    setFontWeight(elementStyle.fontWeight ?? '');
+    setFontStyleValue(elementStyle.fontStyle ?? '');
+    setTextShadow(elementStyle.textShadow ?? '');
+    setTextAlign(elementStyle.textAlign ?? '');
+  }, [
+    initialPlain,
+    initialRichText,
+    elementStyle.fontFamily,
+    elementStyle.fontSize,
+    elementStyle.textColor,
+    elementStyle.backgroundColor,
+    elementStyle.fontWeight,
+    elementStyle.fontStyle,
+    elementStyle.textShadow,
+    elementStyle.textAlign,
+  ]);
 
   const handleApply = useCallback(() => {
     const sanitized = plainText;
@@ -940,17 +1071,40 @@ const TextFieldEditorContent: React.FC<TextFieldEditorContentProps> = ({
           fontSize,
           textColor,
           backgroundColor,
+          fontWeight,
+          fontStyle: fontStyleValue,
+          textShadow,
+          textAlign,
         });
       }
       return current;
     });
-  }, [backgroundColor, element, fontFamily, fontSize, isRichTextOpen, onApply, plainText, richText, showStyleOptions, textColor]);
+  }, [
+    backgroundColor,
+    element,
+    fontFamily,
+    fontSize,
+    fontStyleValue,
+    fontWeight,
+    isRichTextOpen,
+    onApply,
+    plainText,
+    richText,
+    showStyleOptions,
+    textAlign,
+    textColor,
+    textShadow,
+  ]);
 
   const handleResetStyle = useCallback(() => {
     setFontFamily('');
     setFontSize('');
     setTextColor('');
     setBackgroundColor('');
+    setFontWeight('');
+    setFontStyleValue('');
+    setTextShadow('');
+    setTextAlign('');
     onApply(current => {
       applyElementStyleOverrides(current, element, {});
       return current;
@@ -991,6 +1145,11 @@ const TextFieldEditorContent: React.FC<TextFieldEditorContentProps> = ({
       event.target.value = '';
     }
   };
+
+  const trimmedWeight = fontWeight.trim().toLowerCase();
+  const trimmedFontStyle = fontStyleValue.trim().toLowerCase();
+  const isBoldActive = trimmedWeight.length > 0 && trimmedWeight !== 'normal';
+  const isItalicActive = trimmedFontStyle === 'italic';
 
   return (
     <div className="space-y-5">
@@ -1060,6 +1219,33 @@ const TextFieldEditorContent: React.FC<TextFieldEditorContentProps> = ({
             <button type="button" className="text-sm font-medium text-brand-primary" onClick={handleResetStyle}>
               Réinitialiser
             </button>
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-medium uppercase tracking-wide text-slate-500">
+              Styles rapides
+            </label>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                className={`ui-btn-secondary flex items-center gap-2 text-sm ${
+                  isBoldActive ? 'border-brand-primary text-brand-primary' : ''
+                }`}
+                onClick={() => setFontWeight(isBoldActive ? '' : '700')}
+                aria-pressed={isBoldActive}
+              >
+                <span className="font-semibold">Gras</span>
+              </button>
+              <button
+                type="button"
+                className={`ui-btn-secondary flex items-center gap-2 text-sm ${
+                  isItalicActive ? 'border-brand-primary text-brand-primary' : ''
+                }`}
+                onClick={() => setFontStyleValue(isItalicActive ? '' : 'italic')}
+                aria-pressed={isItalicActive}
+              >
+                <span className="italic">Italique</span>
+              </button>
+            </div>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
@@ -1164,6 +1350,38 @@ const TextFieldEditorContent: React.FC<TextFieldEditorContentProps> = ({
               </div>
             </div>
           </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <label className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                Alignement
+              </label>
+              <select
+                className="ui-input w-full"
+                value={textAlign}
+                onChange={event => setTextAlign(event.target.value)}
+              >
+                <option value="">Hérité de la section</option>
+                <option value="left">Aligné à gauche</option>
+                <option value="center">Centré</option>
+                <option value="right">Aligné à droite</option>
+                <option value="justify">Justifié</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                Ombre du texte
+              </label>
+              <input
+                className="ui-input w-full"
+                value={textShadow}
+                onChange={event => setTextShadow(event.target.value)}
+                placeholder="0px 2px 4px rgba(0,0,0,0.25)"
+              />
+              <p className="text-xs text-slate-500">
+                Utilisez la notation CSS pour appliquer une ombre personnalisée.
+              </p>
+            </div>
+          </div>
         </div>
       )}
 
@@ -1176,6 +1394,10 @@ const TextFieldEditorContent: React.FC<TextFieldEditorContentProps> = ({
           setFontSize(elementStyle.fontSize ?? '');
           setTextColor(elementStyle.textColor ?? '');
           setBackgroundColor(elementStyle.backgroundColor ?? '');
+          setFontWeight(elementStyle.fontWeight ?? '');
+          setFontStyleValue(elementStyle.fontStyle ?? '');
+          setTextShadow(elementStyle.textShadow ?? '');
+          setTextAlign(elementStyle.textAlign ?? '');
         }}>
           Réinitialiser les modifications
         </button>
@@ -1643,16 +1865,14 @@ const SiteCustomization: React.FC = () => {
   const [draft, setDraft] = useState<SiteContent | null>(() =>
     content ? cloneSiteContent(content) : null,
   );
-  const [activeElement, setActiveElement] = useState<EditableElementKey | null>(null);
   const [activeZone, setActiveZone] = useState<EditableZoneKey | null>(null);
-  const [activeTab, setActiveTab] = useState<TabId>('custom');
+  const [floatingEditor, setFloatingEditor] = useState<FloatingEditorState | null>(null);
   const [saving, setSaving] = useState<boolean>(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState<string | null>(null);
   const [bestSellerProducts, setBestSellerProducts] = useState<Product[]>([]);
   const [bestSellerLoading, setBestSellerLoading] = useState<boolean>(false);
   const [bestSellerError, setBestSellerError] = useState<string | null>(null);
-  const [editorElement, setEditorElement] = useState<EditableElementKey | null>(null);
   const [isLibraryOpen, setIsLibraryOpen] = useState<boolean>(false);
 
   useLayoutEffect(() => {
@@ -1747,18 +1967,6 @@ const SiteCustomization: React.FC = () => {
     return map;
   }, []);
 
-  const registerFieldRef = useCallback<FieldRegistration>(() => undefined, []);
-
-  const focusElement = useCallback<FocusElementHandler>(element => {
-    setActiveElement(element);
-    try {
-      const zone = resolveZoneFromElement(element);
-      setActiveZone(zone);
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
-
   const handlePreviewEdit = useCallback(
     (
       element: EditableElementKey,
@@ -1768,15 +1976,14 @@ const SiteCustomization: React.FC = () => {
         boundary: DOMRect | DOMRectReadOnly | null;
       },
     ) => {
-      focusElement(element);
       setActiveZone(meta.zone);
-      if (!fieldMetaByElement.has(element)) {
-        console.warn(`Aucun formulaire de personnalisation trouvé pour l'élément "${element}".`);
-        return;
-      }
-      setEditorElement(element);
+      setFloatingEditor({
+        element,
+        anchor: snapshotRect(meta.anchor),
+        boundary: snapshotRect(meta.boundary),
+      });
     },
-    [fieldMetaByElement, focusElement, setActiveZone],
+    [],
   );
 
   const handleSave = async () => {
@@ -1804,122 +2011,65 @@ const SiteCustomization: React.FC = () => {
     if (!draft) {
       return base;
     }
-    const custom = draft.assets.library
+    const library = draft.assets?.library ?? [];
+    const custom = library
       .filter(asset => asset.type === 'font')
       .map(asset => sanitizeFontFamilyName(asset.name));
     return Array.from(new Set([...base, ...custom]));
   }, [draft]);
 
-  const activeFieldMeta = useMemo(() => {
-    if (!editorElement) {
-      return null;
-    }
-    return fieldMetaByElement.get(editorElement) ?? null;
-  }, [editorElement, fieldMetaByElement]);
-
-  const activeElementLabel = useMemo(() => {
-    if (!editorElement) {
-      return '';
-    }
-    const fallback = fieldMetaByElement.get(editorElement)?.field.label ?? editorElement;
-    return ELEMENT_LABELS[editorElement] ?? fallback;
-  }, [editorElement, fieldMetaByElement]);
-
-  const closeEditor = useCallback(() => {
-    setEditorElement(null);
-    setActiveElement(null);
-    setActiveZone(null);
-  }, [setActiveElement, setActiveZone, setEditorElement]);
-
-  useEffect(() => {
-    if (activeTab !== 'custom') {
-      closeEditor();
-    }
-  }, [activeTab, closeEditor]);
-
-  useEffect(() => {
-    if (!editorElement) {
-      return;
-    }
-    if (!activeFieldMeta) {
-      closeEditor();
-      return;
-    }
-    if (typeof window === 'undefined') {
-      return;
-    }
-    const timeout = window.setTimeout(() => {
-      const container = document.querySelector<HTMLDivElement>('[data-element-editor-modal="true"]');
-      const focusable = container?.querySelector<HTMLElement>(
-        'input, textarea, [contenteditable="true"], select',
-      );
-      focusable?.focus({ preventScroll: true });
-    }, 80);
-    return () => {
-      window.clearTimeout(timeout);
-    };
-  }, [activeFieldMeta, closeEditor, editorElement]);
-
-  const renderField = useCallback(
+  const renderFieldEditor = useCallback(
     (field: CustomizationField) => {
       if (!draft) {
         return null;
       }
-      const commonProps = {
-        key: field.id,
-        element: field.element,
-        label: field.label,
-        description: field.description,
-        isActive: activeElement === field.element,
-        register: registerFieldRef,
-        onFocus: focusElement,
-      };
-
       if (field.type === 'text') {
         return (
-          <FieldWrapper {...commonProps}>
-            <TextFieldEditorContent
-              element={field.element}
-              draft={draft}
-              onApply={applyDraftUpdate}
-              fontOptions={fontOptions}
-              onAssetAdded={appendAssetToDraft}
-              multiline={field.multiline}
-              allowRichText={field.allowRichText}
-              showStyleOptions={field.showStyleOptions ?? TEXT_ELEMENT_KEYS.has(field.element)}
-              placeholder={field.placeholder}
-            />
-          </FieldWrapper>
+          <TextFieldEditorContent
+            element={field.element}
+            draft={draft}
+            onApply={applyDraftUpdate}
+            fontOptions={fontOptions}
+            onAssetAdded={appendAssetToDraft}
+            multiline={field.multiline}
+            allowRichText={field.allowRichText}
+            showStyleOptions={field.showStyleOptions ?? TEXT_ELEMENT_KEYS.has(field.element)}
+            placeholder={field.placeholder}
+          />
         );
       }
-
       if (field.type === 'image') {
         return (
-          <FieldWrapper {...commonProps}>
-            <ImageFieldEditorContent
-              element={field.element}
-              draft={draft}
-              onApply={applyDraftUpdate}
-              onAssetAdded={appendAssetToDraft}
-              placeholder={field.placeholder}
-            />
-          </FieldWrapper>
-        );
-      }
-
-      return (
-        <FieldWrapper {...commonProps}>
-          <BackgroundFieldEditorContent
+          <ImageFieldEditorContent
             element={field.element}
             draft={draft}
             onApply={applyDraftUpdate}
             onAssetAdded={appendAssetToDraft}
+            placeholder={field.placeholder}
           />
-        </FieldWrapper>
+        );
+      }
+      return (
+        <BackgroundFieldEditorContent
+          element={field.element}
+          draft={draft}
+          onApply={applyDraftUpdate}
+          onAssetAdded={appendAssetToDraft}
+        />
       );
     },
-    [activeElement, appendAssetToDraft, applyDraftUpdate, draft, focusElement, fontOptions, registerFieldRef],
+    [appendAssetToDraft, applyDraftUpdate, draft, fontOptions],
   );
+
+  const activeFieldMeta = floatingEditor
+    ? fieldMetaByElement.get(floatingEditor.element) ?? null
+    : null;
+  const inlineEditorContent = activeFieldMeta ? renderFieldEditor(activeFieldMeta.field) : null;
+
+  const closeFloatingEditor = useCallback(() => {
+    setFloatingEditor(null);
+    setActiveZone(null);
+  }, []);
 
   const handleLibraryUpload = useCallback(
     async (file: File) => {
@@ -2000,91 +2150,53 @@ const SiteCustomization: React.FC = () => {
         </div>
       )}
 
-      <nav className="flex w-full items-center gap-2 overflow-x-auto rounded-full bg-slate-100 p-1">
-        {TABS.map(tab => (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 rounded-full px-4 py-2 text-sm font-medium transition ${
-              activeTab === tab.id
-                ? 'bg-white text-slate-900 shadow'
-                : 'text-slate-500 hover:text-slate-700'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </nav>
-
-      <div>
-        {activeTab === 'preview' ? (
-          <div className="mx-auto w-full max-w-6xl">
-            <div className="rounded-[2.5rem] border border-slate-200 bg-white p-6">
-              <SitePreviewCanvas
-                content={draft}
-                bestSellerProducts={bestSellerProducts}
-                onEdit={() => undefined}
-                activeZone={null}
-                showEditButtons={false}
-              />
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {bestSellerError && (
-              <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
-                <AlertTriangle className="h-5 w-5" aria-hidden="true" />
-                <p>{bestSellerError}</p>
-              </div>
-            )}
-            <div className="mx-auto w-full max-w-7xl">
-              <div className="rounded-[2.75rem] border border-slate-200 bg-white p-4 shadow-inner sm:p-6 lg:p-8">
-                <SitePreviewCanvas
-                  content={draft}
-                  bestSellerProducts={bestSellerProducts}
-                  onEdit={(element, meta) => handlePreviewEdit(element, meta)}
-                  activeZone={activeZone}
-                />
-              </div>
-            </div>
-            {bestSellerLoading && (
-              <div className="flex items-center justify-center gap-2 text-sm text-slate-500">
-                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                Chargement des produits populaires…
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      <Modal
-        isOpen={Boolean(editorElement && activeFieldMeta)}
-        onClose={closeEditor}
-        title={
-          activeElementLabel
-            ? `Personnaliser ${activeElementLabel}`
-            : 'Personnalisation'
-        }
-        size="lg"
-      >
-        {activeFieldMeta ? (
-          <div className="space-y-5" data-element-editor-modal="true">
-            <div className="rounded-2xl bg-slate-100/70 p-4 text-sm text-slate-600">
-              <p className="text-sm font-semibold text-slate-900">
-                {activeFieldMeta.section.title}
+      <section className="space-y-6">
+        <div className="rounded-[2.75rem] border border-slate-200 bg-white p-4 shadow-inner sm:p-6 lg:p-8">
+          <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-slate-900">Prévisualisation interactive</h2>
+              <p className="text-sm text-slate-500">
+                Survolez la page et cliquez sur le crayon de n’importe quel élément pour ouvrir son éditeur flottant.
               </p>
-              <p className="text-xs text-slate-500">{activeFieldMeta.group.title}</p>
-              {activeFieldMeta.group.description && (
-                <p className="mt-2 text-xs text-slate-500">{activeFieldMeta.group.description}</p>
-              )}
             </div>
-            {renderField(activeFieldMeta.field)}
+            <div className="rounded-full bg-slate-100 px-4 py-1 text-xs font-medium uppercase tracking-wide text-slate-500">
+              Édition localisée
+            </div>
           </div>
-        ) : (
-          <p className="text-sm text-slate-500">Sélectionnez un élément à personnaliser.</p>
+          <SitePreviewCanvas
+            content={draft}
+            bestSellerProducts={bestSellerProducts}
+            onEdit={(element, meta) => handlePreviewEdit(element, meta)}
+            activeZone={activeZone}
+          />
+        </div>
+
+        {bestSellerError && (
+          <div className="flex items-start gap-3 rounded-3xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
+            <AlertTriangle className="h-5 w-5" aria-hidden="true" />
+            <p>{bestSellerError}</p>
+          </div>
         )}
-      </Modal>
+
+        {bestSellerLoading && (
+          <div className="flex items-center justify-center gap-2 text-sm text-slate-500">
+            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+            Chargement des produits populaires…
+          </div>
+        )}
+      </section>
+
+      {floatingEditor && activeFieldMeta && inlineEditorContent && (
+        <FloatingEditorPanel
+          title={activeFieldMeta.field.label}
+          description={activeFieldMeta.field.description}
+          anchor={floatingEditor.anchor}
+          boundary={floatingEditor.boundary}
+          onClose={closeFloatingEditor}
+        >
+          {inlineEditorContent}
+        </FloatingEditorPanel>
+      )}
 
       <Modal
         isOpen={isLibraryOpen}
