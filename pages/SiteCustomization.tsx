@@ -1909,6 +1909,23 @@ const SiteCustomization: React.FC = () => {
   const [bestSellerLoading, setBestSellerLoading] = useState<boolean>(false);
   const [bestSellerError, setBestSellerError] = useState<string | null>(null);
   const [isLibraryOpen, setIsLibraryOpen] = useState<boolean>(false);
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {};
+    CUSTOMIZATION_SECTIONS.forEach(section => {
+      initial[section.id] = true;
+    });
+    return initial;
+  });
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {};
+    CUSTOMIZATION_SECTIONS.forEach(section => {
+      section.groups.forEach(group => {
+        initial[`${section.id}:${group.id}`] = true;
+      });
+    });
+    return initial;
+  });
+  const fieldRefs = useRef(new Map<EditableElementKey, HTMLDivElement | null>());
 
   useLayoutEffect(() => {
     if (typeof document === 'undefined') {
