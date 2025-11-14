@@ -198,6 +198,8 @@ export interface OnlineOrderingSettings {
   schedule: OnlineOrderingSchedule;
   closedTitle: string;
   closedSubtitle: string;
+  supportPhoneNumber: string;
+  confirmationWhatsappNumber: string;
 }
 
 export interface SiteContent {
@@ -260,7 +262,6 @@ export interface SiteContent {
     style: SectionStyle;
   };
   onlineOrdering: OnlineOrderingSettings;
-  whatsappNumber?: string;
   elementStyles: ElementStyles;
   elementRichText: ElementRichText;
   assets: SiteAssets;

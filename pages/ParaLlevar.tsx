@@ -6,9 +6,8 @@ import Modal from '../components/Modal';
 import OrderTimer from '../components/OrderTimer';
 import { getOrderUrgencyStyles } from '../utils/orderUrgency';
 import { formatCurrencyCOP } from '../utils/formatIntegerAmount';
-import useSiteContent from '../hooks/useSiteContent';
+import useSiteContent, { DEFAULT_SITE_CONTENT } from '../hooks/useSiteContent';
 import useOnlineOrderingSchedules from '../hooks/useOnlineOrderingSchedules';
-import { formatScheduleWindow, isWithinSchedule } from '../utils/timeWindow';
 import { isWithinWeeklySchedule } from '../utils/weeklyScheduleUtils';
 
 
@@ -217,7 +216,7 @@ const ParaLlevar: React.FC = () => {
     const [readyOrders, setReadyOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
     const [processingOrderId, setProcessingOrderId] = useState<string | null>(null);
-    const { content: siteContent, loading: siteContentLoading } = useSiteContent();
+    const { content: siteContent, loading: siteContentLoading, updateContent } = useSiteContent();
     const { schedule: weeklySchedule, updateSchedule, loading: scheduleLoading } = useOnlineOrderingSchedules();
     const [savingSchedule, setSavingSchedule] = useState(false);
     const [scheduleFeedback, setScheduleFeedback] = useState<{ message: string; tone: 'success' | 'error' } | null>(null);
@@ -246,12 +245,29 @@ const ParaLlevar: React.FC = () => {
     ];
 
     const [editingSchedule, setEditingSchedule] = useState<WeeklySchedule | null>(null);
+    const [editingSupportPhone, setEditingSupportPhone] = useState('');
+    const [editingWhatsappPhone, setEditingWhatsappPhone] = useState('');
 
     useEffect(() => {
         if (weeklySchedule && !editingSchedule) {
             setEditingSchedule(weeklySchedule);
         }
     }, [weeklySchedule, editingSchedule]);
+
+    useEffect(() => {
+        if (!siteContent) {
+            setEditingSupportPhone(DEFAULT_SITE_CONTENT.onlineOrdering.supportPhoneNumber);
+            setEditingWhatsappPhone(DEFAULT_SITE_CONTENT.onlineOrdering.confirmationWhatsappNumber);
+            return;
+        }
+
+        setEditingSupportPhone(siteContent.onlineOrdering.supportPhoneNumber ?? '');
+        setEditingWhatsappPhone(siteContent.onlineOrdering.confirmationWhatsappNumber ?? '');
+    }, [siteContent]);
+
+    const resolvedContent = siteContent ?? DEFAULT_SITE_CONTENT;
+    const supportPhoneNumber = resolvedContent.onlineOrdering.supportPhoneNumber?.trim();
+    const whatsappResumeNumber = resolvedContent.onlineOrdering.confirmationWhatsappNumber?.trim();
 
     const isCurrentlyOnline = useMemo(() => {
         return isWithinWeeklySchedule(weeklySchedule, now);
@@ -295,17 +311,31 @@ const ParaLlevar: React.FC = () => {
         setSavingSchedule(true);
         setScheduleFeedback(null);
         try {
-            await updateSchedule(editingSchedule);
-            setScheduleFeedback({ message: 'Horaires mis à jour avec succès.', tone: 'success' });
+            const trimmedSupport = editingSupportPhone.trim();
+            const trimmedWhatsapp = editingWhatsappPhone.trim();
+            const nextContent = {
+                ...resolvedContent,
+                onlineOrdering: {
+                    ...resolvedContent.onlineOrdering,
+                    supportPhoneNumber: trimmedSupport,
+                    confirmationWhatsappNumber: trimmedWhatsapp,
+                },
+            };
+
+            await Promise.all([
+                updateSchedule(editingSchedule),
+                updateContent(nextContent),
+            ]);
+            setScheduleFeedback({ message: 'Horaires et numéros mis à jour avec succès.', tone: 'success' });
             setIsScheduleModalOpen(false);
         } catch (error) {
             console.error('Failed to update online ordering schedule', error);
-            const message = error instanceof Error ? error.message : 'Impossible de mettre à jour les horaires.';
+            const message = error instanceof Error ? error.message : 'Impossible de mettre à jour les paramètres.';
             setScheduleFeedback({ message, tone: 'error' });
         } finally {
             setSavingSchedule(false);
         }
-    }, [editingSchedule, updateSchedule]);
+    }, [editingSchedule, editingSupportPhone, editingWhatsappPhone, resolvedContent, updateContent, updateSchedule]);
 
     const fetchOrders = useCallback(async () => {
         // Don't set loading to true on refetches for a smoother experience
@@ -405,6 +435,22 @@ const ParaLlevar: React.FC = () => {
                         {scheduleFeedback.message}
                     </p>
                 )}
+                <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Numéro affiché sur le tracker</p>
+                        <p className="mt-1 text-lg font-semibold text-gray-900">
+                            {supportPhoneNumber ? supportPhoneNumber : 'Non configuré'}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">Ce numéro apparaît dans le suivi client pour contacter le restaurant.</p>
+                    </div>
+                    <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Numéro pour les résumés WhatsApp</p>
+                        <p className="mt-1 text-lg font-semibold text-gray-900">
+                            {whatsappResumeNumber ? whatsappResumeNumber : 'Non configuré'}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">Utilisé lors de l'envoi automatique du récapitulatif après validation client.</p>
+                    </div>
+                </div>
             </div>
             
             <Modal isOpen={isScheduleModalOpen} onClose={() => setIsScheduleModalOpen(false)} title="Configuration des horaires" size="xs">
@@ -456,6 +502,31 @@ const ParaLlevar: React.FC = () => {
                             )}
                         </div>
                     ))}
+                    <div className="space-y-3 rounded border border-gray-200 bg-white/60 p-3">
+                        <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-500">Coordonnées</h4>
+                        <label className="flex flex-col gap-1">
+                            <span className="text-[11px] font-medium text-gray-600">Numéro affiché dans le tracker</span>
+                            <input
+                                type="tel"
+                                value={editingSupportPhone}
+                                onChange={(e) => setEditingSupportPhone(e.target.value)}
+                                className="w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/30"
+                                placeholder="Ex: +57 323 809 0562"
+                            />
+                            <span className="text-[10px] text-gray-500">Affiché au client dans le suivi de commande.</span>
+                        </label>
+                        <label className="flex flex-col gap-1">
+                            <span className="text-[11px] font-medium text-gray-600">Numéro des résumés WhatsApp</span>
+                            <input
+                                type="tel"
+                                value={editingWhatsappPhone}
+                                onChange={(e) => setEditingWhatsappPhone(e.target.value)}
+                                className="w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/30"
+                                placeholder="Ex: 573238090562"
+                            />
+                            <span className="text-[10px] text-gray-500">Utilisé lorsque le client envoie son récapitulatif de commande.</span>
+                        </label>
+                    </div>
                     <div className="flex justify-end gap-1.5 pt-2 border-t border-gray-200">
                         <button
                             onClick={() => setIsScheduleModalOpen(false)}

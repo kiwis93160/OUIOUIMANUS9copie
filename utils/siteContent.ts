@@ -649,6 +649,8 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     },
     closedTitle: 'Commandes en ligne indisponibles',
     closedSubtitle: 'Revenez durant nos horaires de service pour commander vos plats préférés.',
+    supportPhoneNumber: '+57 323 809 0562',
+    confirmationWhatsappNumber: '573238090562',
   },
   elementStyles: DEFAULT_ELEMENT_STYLES,
   elementRichText: DEFAULT_ELEMENT_RICH_TEXT,
@@ -736,6 +738,11 @@ const resolveOnlineOrderingSettings = (
   },
   closedTitle: resolveString(settings?.closedTitle ?? null, fallback.closedTitle),
   closedSubtitle: resolveString(settings?.closedSubtitle ?? null, fallback.closedSubtitle),
+  supportPhoneNumber: resolveString(settings?.supportPhoneNumber ?? null, fallback.supportPhoneNumber),
+  confirmationWhatsappNumber: resolveString(
+    settings?.confirmationWhatsappNumber ?? null,
+    fallback.confirmationWhatsappNumber,
+  ),
 });
 
 export const sanitizeSiteContentInput = (content: SiteContent): SiteContent => ({
@@ -804,6 +811,8 @@ export const sanitizeSiteContentInput = (content: SiteContent): SiteContent => (
     },
     closedTitle: trimOrEmpty(content.onlineOrdering.closedTitle),
     closedSubtitle: trimOrEmpty(content.onlineOrdering.closedSubtitle),
+    supportPhoneNumber: trimOrEmpty(content.onlineOrdering.supportPhoneNumber),
+    confirmationWhatsappNumber: trimOrEmpty(content.onlineOrdering.confirmationWhatsappNumber),
   },
   elementStyles: sanitizeElementStyles(content.elementStyles, DEFAULT_ELEMENT_STYLES),
   elementRichText: sanitizeElementRichText(content.elementRichText, DEFAULT_ELEMENT_RICH_TEXT),
