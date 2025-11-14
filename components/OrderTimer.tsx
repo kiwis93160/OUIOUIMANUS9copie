@@ -31,6 +31,7 @@ const OrderTimer: React.FC<OrderTimerProps> = ({
   const accessibleLabel = label ? `${label.trim()} ${timerString}` : `Tiempo transcurrido ${timerString}`;
   const toneClasses = getOrderUrgencyToneClasses(startTime);
 
+  const shouldMirrorCardTone = !accentClassName && variant === 'default';
   const containerClasses = [
     variant === 'chip'
       ? `inline-flex items-center gap-3 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.25em] text-white shadow-lg shadow-slate-900/10 ring-1 ring-inset ring-white/30 ${accentClassName ?? 'bg-brand-primary'}`
@@ -40,9 +41,17 @@ const OrderTimer: React.FC<OrderTimerProps> = ({
     .filter(Boolean)
     .join(' ');
 
+  const timerToneStyle = shouldMirrorCardTone
+    ? ({
+        backgroundColor: toneClasses.toneHex,
+        borderColor: toneClasses.toneHex,
+      } as React.CSSProperties)
+    : undefined;
+
   return (
     <div
       className={containerClasses}
+      style={timerToneStyle}
       role="timer"
       aria-live="polite"
       aria-label={accessibleLabel}
