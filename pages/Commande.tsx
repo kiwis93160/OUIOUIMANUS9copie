@@ -583,7 +583,7 @@ const Commande: React.FC = () => {
             navigate('/ventes');
         } catch (error) {
             console.error("Failed to send order to kitchen", error);
-            alert("Erreur lors de l'envoi en cuisine.");
+            alert('Error al enviar a cocina.');
         } finally {
             setIsSendingToKitchen(false);
         }
@@ -621,7 +621,7 @@ const Commande: React.FC = () => {
             navigate('/ventes');
         } catch (error) {
             console.error("Failed to finalize order", error);
-            alert("Erreur lors de la finalisation de la commande. Veuillez réessayer.");
+            alert('Error al finalizar el pedido. Inténtalo de nuevo.');
         }
     };
     
@@ -692,7 +692,7 @@ const Commande: React.FC = () => {
     const hasPendingItems = useMemo(() => categorizedItems.pending.length > 0, [categorizedItems]);
 
     if (loading) return <div className="text-center p-10 text-gray-800">Chargement de la commande...</div>;
-    if (!order) return <div className="text-center p-10 text-red-500">Commande non trouvée.</div>;
+    if (!order) return <div className="text-center p-10 text-red-500">Pedido no encontrado.</div>;
 
     return (
         <>
@@ -761,7 +761,7 @@ const Commande: React.FC = () => {
             onClose={() => setExitConfirmOpen(false)}
             title="Quitter sans envoyer ?"
         >
-            <p className="text-gray-700">Vous avez des articles non envoyés en cuisine. Si vous quittez, ils seront annulés. Voulez-vous continuer ?</p>
+            <p className="text-gray-700">Tienes artículos sin enviar a cocina. Si sales ahora se cancelarán. ¿Deseas continuar?</p>
             <div className="flex justify-end gap-4 mt-6">
                 <button onClick={() => setExitConfirmOpen(false)} className="ui-btn-secondary">
                     Non, rester

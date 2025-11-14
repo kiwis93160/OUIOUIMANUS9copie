@@ -487,7 +487,7 @@ const ResumeVentes: React.FC = () => {
 
             <section className="rounded-xl bg-white p-4 shadow-md">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                    <h2 className="text-lg font-semibold text-gray-800">Filtres d'analyse</h2>
+                    <h2 className="text-lg font-semibold text-gray-800">Filtros de análisis</h2>
                     <div className="flex flex-wrap items-center gap-2">
                         <button
                             type="button"
@@ -495,7 +495,7 @@ const ResumeVentes: React.FC = () => {
                             className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
                         >
                             <FilterX size={16} />
-                            Réinitialiser
+                            Reiniciar
                         </button>
                         <button
                             type="button"
@@ -510,7 +510,7 @@ const ResumeVentes: React.FC = () => {
 
                 <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                     <div className="flex flex-col">
-                        <label className="text-sm font-medium text-gray-700">Date de début</label>
+                        <label className="text-sm font-medium text-gray-700">Fecha inicial</label>
                         <input
                             type="date"
                             name="startDate"
@@ -520,7 +520,7 @@ const ResumeVentes: React.FC = () => {
                         />
                     </div>
                     <div className="flex flex-col">
-                        <label className="text-sm font-medium text-gray-700">Date de fin</label>
+                        <label className="text-sm font-medium text-gray-700">Fecha final</label>
                         <input
                             type="date"
                             name="endDate"
@@ -530,42 +530,42 @@ const ResumeVentes: React.FC = () => {
                         />
                     </div>
                     <div className="flex flex-col">
-                        <label className="text-sm font-medium text-gray-700">Type de commande</label>
+                        <label className="text-sm font-medium text-gray-700">Tipo de pedido</label>
                         <select
                             name="orderType"
                             value={filters.orderType}
                             onChange={handleFilterChange}
                             className="mt-1 rounded-md border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-brand-primary focus:outline-none focus:ring-brand-primary"
                         >
-                            <option value="all">Tous les types</option>
+                            <option value="all">Todos los tipos</option>
                             <option value="sur_place">En el local</option>
                             <option value="a_emporter">Para llevar</option>
                             <option value="pedir_en_linea">Pedido en línea</option>
                         </select>
                     </div>
                     <div className="flex flex-col">
-                        <label className="text-sm font-medium text-gray-700">Méthode de paiement</label>
+                        <label className="text-sm font-medium text-gray-700">Método de pago</label>
                         <select
                             name="paymentMethod"
                             value={filters.paymentMethod}
                             onChange={handleFilterChange}
                             className="mt-1 rounded-md border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-brand-primary focus:outline-none focus:ring-brand-primary"
                         >
-                            <option value="all">Toutes</option>
+                            <option value="all">Todas</option>
                             <option value="efectivo">Efectivo</option>
                             <option value="transferencia">Transferencia</option>
                             <option value="tarjeta">Tarjeta</option>
                         </select>
                     </div>
                     <div className="flex flex-col">
-                        <label className="text-sm font-medium text-gray-700">Catégorie</label>
+                        <label className="text-sm font-medium text-gray-700">Categoría</label>
                         <select
                             name="categoryId"
                             value={filters.categoryId}
                             onChange={handleFilterChange}
                             className="mt-1 rounded-md border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-brand-primary focus:outline-none focus:ring-brand-primary"
                         >
-                            <option value="">Toutes</option>
+                            <option value="">Todas</option>
                             {categoryOptions.map((category) => (
                                 <option key={category.id} value={category.id}>
                                     {category.nom}
@@ -574,14 +574,14 @@ const ResumeVentes: React.FC = () => {
                         </select>
                     </div>
                     <div className="flex flex-col">
-                        <label className="text-sm font-medium text-gray-700">Produit</label>
+                        <label className="text-sm font-medium text-gray-700">Producto</label>
                         <select
                             name="productId"
                             value={filters.productId}
                             onChange={handleFilterChange}
                             className="mt-1 rounded-md border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-brand-primary focus:outline-none focus:ring-brand-primary"
                         >
-                            <option value="">Tous les produits</option>
+                            <option value="">Todos los productos</option>
                             {productOptions.map((product) => (
                                 <option key={product.id} value={product.id}>
                                     {product.nom_produit}
@@ -597,50 +597,50 @@ const ResumeVentes: React.FC = () => {
                     <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm font-medium text-gray-500">Chiffre d'affaires</p>
+                                <p className="text-sm font-medium text-gray-500">Ingresos</p>
                                 <p className="mt-1 text-2xl font-bold text-gray-900">{formatCurrencyCOP(totals.totalRevenue)}</p>
                             </div>
                             <div className="rounded-full bg-brand-primary/10 p-3 text-brand-primary">
                                 <TrendingUp size={20} />
                             </div>
                         </div>
-                        <p className="mt-3 text-xs text-gray-500">Basé sur les articles correspondant aux filtres appliqués.</p>
+                        <p className="mt-3 text-xs text-gray-500">Basado en los artículos que coinciden con los filtros aplicados.</p>
                     </div>
                     <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm font-medium text-gray-500">Bénéfice</p>
+                                <p className="text-sm font-medium text-gray-500">Beneficio</p>
                                 <p className="mt-1 text-2xl font-bold text-gray-900">{formatCurrencyCOP(totals.totalProfit)}</p>
                             </div>
                             <div className="rounded-full bg-emerald-500/10 p-3 text-emerald-600">
                                 <PiggyBank size={20} />
                             </div>
                         </div>
-                        <p className="mt-3 text-xs text-gray-500">Marge moyenne : {formatDecimal(totals.profitMargin)}%</p>
+                        <p className="mt-3 text-xs text-gray-500">Margen promedio: {formatDecimal(totals.profitMargin)}%</p>
                     </div>
                     <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm font-medium text-gray-500">Commandes</p>
+                                <p className="text-sm font-medium text-gray-500">Pedidos</p>
                                 <p className="mt-1 text-2xl font-bold text-gray-900">{formatInteger(totals.orderCount)}</p>
                             </div>
                             <div className="rounded-full bg-indigo-500/10 p-3 text-indigo-600">
                                 <Package size={20} />
                             </div>
                         </div>
-                        <p className="mt-3 text-xs text-gray-500">Panier moyen : {formatCurrencyCOP(totals.averageOrderValue)}</p>
+                        <p className="mt-3 text-xs text-gray-500">Ticket promedio: {formatCurrencyCOP(totals.averageOrderValue)}</p>
                     </div>
                     <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm font-medium text-gray-500">Articles vendus</p>
+                                <p className="text-sm font-medium text-gray-500">Artículos vendidos</p>
                                 <p className="mt-1 text-2xl font-bold text-gray-900">{formatInteger(totals.totalQuantity)}</p>
                             </div>
                             <div className="rounded-full bg-amber-500/10 p-3 text-amber-600">
                                 <Layers size={20} />
                             </div>
                         </div>
-                        <p className="mt-3 text-xs text-gray-500">Moyenne par commande : {formatDecimal(totals.averageItemsPerOrder)}</p>
+                        <p className="mt-3 text-xs text-gray-500">Promedio por pedido: {formatDecimal(totals.averageItemsPerOrder)}</p>
                     </div>
                 </div>
             </section>
@@ -648,23 +648,23 @@ const ResumeVentes: React.FC = () => {
             <section className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <div className="rounded-xl bg-white p-4 shadow-md">
                     <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-semibold text-gray-800">Répartition par méthode de paiement</h3>
+                        <h3 className="text-lg font-semibold text-gray-800">Distribución por método de pago</h3>
                         <BarChart3 size={18} className="text-brand-primary" />
                     </div>
                     <div className="mt-4 overflow-x-auto">
                         <table className="w-full text-left">
                             <thead className="border-b text-xs uppercase text-gray-500">
                                 <tr>
-                                    <th className="p-2">Méthode</th>
-                                    <th className="p-2 text-right">Ventes</th>
-                                    <th className="p-2 text-right">Bénéfice</th>
-                                    <th className="p-2 text-right">Commandes</th>
+                                    <th className="p-2">Método</th>
+                                    <th className="p-2 text-right">Ventas</th>
+                                    <th className="p-2 text-right">Beneficio</th>
+                                    <th className="p-2 text-right">Pedidos</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {paymentBreakdown.length === 0 ? (
                                     <tr>
-                                        <td colSpan={4} className="p-4 text-center text-sm text-gray-500">Aucune donnée pour les filtres sélectionnés.</td>
+                                        <td colSpan={4} className="p-4 text-center text-sm text-gray-500">No hay datos para los filtros seleccionados.</td>
                                     </tr>
                                 ) : (
                                     paymentBreakdown.map((row) => (
@@ -683,23 +683,23 @@ const ResumeVentes: React.FC = () => {
 
                 <div className="rounded-xl bg-white p-4 shadow-md">
                     <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-semibold text-gray-800">Répartition par catégorie</h3>
+                        <h3 className="text-lg font-semibold text-gray-800">Distribución por categoría</h3>
                         <Layers size={18} className="text-brand-primary" />
                     </div>
                     <div className="mt-4 overflow-x-auto">
                         <table className="w-full text-left">
                             <thead className="border-b text-xs uppercase text-gray-500">
                                 <tr>
-                                    <th className="p-2">Catégorie</th>
-                                    <th className="p-2 text-right">Quantité</th>
-                                    <th className="p-2 text-right">Ventes</th>
-                                    <th className="p-2 text-right">Bénéfice</th>
+                                    <th className="p-2">Categoría</th>
+                                    <th className="p-2 text-right">Cantidad</th>
+                                    <th className="p-2 text-right">Ventas</th>
+                                    <th className="p-2 text-right">Beneficio</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {salesByCategory.length === 0 ? (
                                     <tr>
-                                        <td colSpan={4} className="p-4 text-center text-sm text-gray-500">Aucune donnée pour les filtres sélectionnés.</td>
+                                        <td colSpan={4} className="p-4 text-center text-sm text-gray-500">No hay datos para los filtros seleccionados.</td>
                                     </tr>
                                 ) : (
                                     salesByCategory.map((row) => (
@@ -719,24 +719,24 @@ const ResumeVentes: React.FC = () => {
 
             <section className="rounded-xl bg-white p-4 shadow-md">
                 <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-gray-800">Produits les plus performants</h3>
+                    <h3 className="text-lg font-semibold text-gray-800">Productos con mejor desempeño</h3>
                     <Package size={18} className="text-brand-primary" />
                 </div>
                 <div className="mt-4 overflow-x-auto">
                     <table className="w-full text-left">
                         <thead className="border-b text-xs uppercase text-gray-500">
                             <tr>
-                                <th className="p-2">Produit</th>
-                                <th className="p-2">Catégorie</th>
-                                <th className="p-2 text-right">Quantité</th>
-                                <th className="p-2 text-right">Ventes</th>
-                                <th className="p-2 text-right">Bénéfice</th>
+                                <th className="p-2">Producto</th>
+                                <th className="p-2">Categoría</th>
+                                <th className="p-2 text-right">Cantidad</th>
+                                <th className="p-2 text-right">Ventas</th>
+                                <th className="p-2 text-right">Beneficio</th>
                             </tr>
                         </thead>
                         <tbody>
                             {salesByProduct.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="p-4 text-center text-sm text-gray-500">Aucun produit trouvé pour les filtres sélectionnés.</td>
+                                    <td colSpan={5} className="p-4 text-center text-sm text-gray-500">No se encontraron productos para los filtros seleccionados.</td>
                                 </tr>
                             ) : (
                                 salesByProduct.map((product) => (
@@ -755,25 +755,25 @@ const ResumeVentes: React.FC = () => {
             </section>
 
             <section className="rounded-xl bg-white p-4 shadow-md">
-                <h3 className="text-lg font-semibold text-gray-800">Détails des commandes</h3>
+                <h3 className="text-lg font-semibold text-gray-800">Detalles de los pedidos</h3>
                 <div className="mt-4 overflow-x-auto">
                     <table className="w-full text-left">
                         <thead className="border-b text-xs uppercase text-gray-500">
                             <tr>
                                 <th className="w-12 p-3"></th>
                                 <th className="p-3">Date</th>
-                                <th className="p-3">Type</th>
-                                <th className="p-3">Table/Client</th>
-                                <th className="p-3 text-right">Articles</th>
-                                <th className="p-3 text-right">Ventes</th>
-                                <th className="p-3 text-right">Bénéfice</th>
-                                <th className="p-3">Paiement</th>
+                                <th className="p-3">Tipo</th>
+                                <th className="p-3">Mesa/Cliente</th>
+                                <th className="p-3 text-right">Artículos</th>
+                                <th className="p-3 text-right">Ventas</th>
+                                <th className="p-3 text-right">Beneficio</th>
+                                <th className="p-3">Pago</th>
                             </tr>
                         </thead>
                         <tbody>
                             {filteredOrders.length === 0 ? (
                                 <tr>
-                                    <td colSpan={8} className="p-6 text-center text-sm text-gray-500">Aucune commande ne correspond aux filtres sélectionnés.</td>
+                                    <td colSpan={8} className="p-6 text-center text-sm text-gray-500">No hay pedidos que coincidan con los filtros seleccionados.</td>
                                 </tr>
                             ) : (
                                 filteredOrders.map((order) => {
@@ -823,16 +823,16 @@ const ResumeVentes: React.FC = () => {
                                                 <tr className="bg-gray-50">
                                                     <td colSpan={8} className="p-4">
                                                         <div className="rounded-lg border border-gray-200 bg-white p-4">
-                                                            <h4 className="text-sm font-semibold text-gray-800">Articles inclus ({aggregate.items.length})</h4>
+                                                            <h4 className="text-sm font-semibold text-gray-800">Artículos incluidos ({aggregate.items.length})</h4>
                                                             <div className="mt-3 overflow-x-auto">
                                                                 <table className="w-full text-left">
                                                                     <thead className="border-b text-xs uppercase text-gray-500">
                                                                         <tr>
-                                                                            <th className="p-2">Produit</th>
-                                                                            <th className="p-2">Catégorie</th>
-                                                                            <th className="p-2 text-right">Quantité</th>
-                                                                            <th className="p-2 text-right">Ventes</th>
-                                                                            <th className="p-2 text-right">Bénéfice</th>
+                                                                            <th className="p-2">Producto</th>
+                                                                            <th className="p-2">Categoría</th>
+                                                                            <th className="p-2 text-right">Cantidad</th>
+                                                                            <th className="p-2 text-right">Ventas</th>
+                                                                            <th className="p-2 text-right">Beneficio</th>
                                                                         </tr>
                                                                     </thead>
                                                                     <tbody>

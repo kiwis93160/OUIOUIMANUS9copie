@@ -119,14 +119,14 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
 
     const receiptModalContent = useMemo(() => {
         if (!receiptUrl) {
-            return <p>Aucun justificatif fourni.</p>;
+            return <p>No se proporcionó ningún comprobante.</p>;
         }
 
         if (canDisplayReceiptImage) {
             return (
                 <img
                     src={receiptUrl}
-                    alt="Justificatif"
+                    alt="Comprobante"
                     className="h-auto w-full rounded-md"
                     onError={() => setReceiptPreviewError(true)}
                 />
@@ -142,17 +142,17 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                         className="h-[70vh] w-full rounded-xl border border-slate-200"
                     >
                         <p className="p-4 text-sm text-slate-600">
-                            Impossible d'afficher le PDF. Vous pouvez l'ouvrir dans un nouvel onglet ci-dessous.
+                            No es posible mostrar el PDF. Puedes abrirlo en una nueva pestaña más abajo.
                         </p>
                     </object>
                     <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
-                        <span>Si le PDF ne s'affiche pas, ouvrez-le dans un nouvel onglet.</span>
+                        <span>Si el PDF no aparece, ábrelo en una nueva pestaña.</span>
                         <button
                             type="button"
                             onClick={handleOpenReceiptInNewTab}
                             className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-700"
                         >
-                            <Receipt size={16} /> Ouvrir le document
+                            <Receipt size={16} /> Abrir el documento
                         </button>
                     </div>
                 </div>
@@ -165,25 +165,25 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                     <Receipt size={24} className="text-slate-500" />
                 </div>
                 <div className="space-y-1">
-                    <p className="text-base font-semibold text-slate-700">Prévisualisation indisponible</p>
-                    <p className="text-sm text-slate-500">Touchez le bouton ci-dessous pour afficher le justificatif.</p>
+                    <p className="text-base font-semibold text-slate-700">Vista previa no disponible</p>
+                    <p className="text-sm text-slate-500">Toca el botón de abajo para ver el comprobante.</p>
                 </div>
                 <button
                     type="button"
                     onClick={handleOpenReceiptInNewTab}
                     className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-700"
                 >
-                    <Receipt size={16} /> Ouvrir le document
+                    <Receipt size={16} /> Abrir el documento
                 </button>
             </div>
         );
     }, [receiptUrl, canDisplayReceiptImage, isReceiptPdf, handleOpenReceiptInNewTab, setReceiptPreviewError]);
 
     const steps = [
-        { name: 'Enviado', icon: FileText, description: 'Votre commande a été transmise avec succès', subtext: 'Nous vérifions votre commande' },
-        { name: 'Validado', icon: CheckCircle, description: 'Commande validée ! Préparation en cours...', subtext: 'Transmission à la cuisine' },
-        { name: 'En preparacion', icon: ChefHat, description: 'Nos chefs préparent votre commande avec soin', subtext: 'Votre commande sera bientôt prête' },
-        { name: 'Listo', icon: PackageCheck, description: 'La commande est prête pour la remise ou la livraison', subtext: 'Vous pouvez venir la récupérer' }
+        { name: 'Enviado', icon: FileText, description: 'Tu pedido se envió con éxito', subtext: 'Estamos verificando tu orden' },
+        { name: 'Validado', icon: CheckCircle, description: '¡Pedido validado! Preparación en curso...', subtext: 'Enviando a la cocina' },
+        { name: 'En preparacion', icon: ChefHat, description: 'Nuestros chefs preparan tu pedido con cuidado', subtext: 'Tu pedido estará listo pronto' },
+        { name: 'Listo', icon: PackageCheck, description: 'El pedido está listo para entrega o recogida', subtext: 'Puedes pasar a retirarlo' }
     ];
 
     const promotionColorSchemes = useMemo(
@@ -465,7 +465,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
     const detailContainerClasses = 'border-t pt-6 mt-6 space-y-4 relative md:w-1/2 md:mx-auto';
 
     if (loading) {
-        return <div className={containerClasses}>Chargement du suivi de commande...</div>;
+        return <div className={containerClasses}>Cargando el seguimiento del pedido...</div>;
     }
 
     if (!order) {
@@ -477,10 +477,10 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
         return (
             <div className={containerClasses}>
                 <div className={contentClasses}>
-                    <h2 className={`text-2xl font-bold mb-4 text-red-600`}>Commande non trouvée</h2>
-                    <p className={`text-gray-600 mb-6`}>Nous n'avons pas pu retrouver votre commande.</p>
+                    <h2 className={`text-2xl font-bold mb-4 text-red-600`}>Pedido no encontrado</h2>
+                    <p className={`text-gray-600 mb-6`}>No pudimos encontrar tu pedido.</p>
                     <button onClick={onNewOrderClick} className="bg-brand-primary text-brand-secondary font-bold py-3 px-6 rounded-lg hover:bg-yellow-400 transition">
-                        Passer une nouvelle commande
+                        Hacer un nuevo pedido
                     </button>
                 </div>
             </div>
@@ -566,7 +566,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                         )}
                         <div className="flex flex-col items-center gap-2 text-center">
                             <h2 className="text-3xl font-bold text-center text-white sm:text-4xl">
-                                Commande #{order.id.slice(-6)}
+                                Pedido #{order.id.slice(-6)}
                             </h2>
                             {isOrderCompleted ? null : queuePosition !== null && (
                                 <div className="inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-amber-500/35 to-orange-500/35 px-5 py-2.5 border border-amber-500/50 backdrop-blur-2xl shadow-inner shadow-amber-500/20">
@@ -576,11 +576,11 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                     <div>
                                         <p className="text-sm font-bold text-white">
                                             {queuePosition === 1 
-                                                ? "🎯 Vous êtes le prochain !" 
-                                                : `📋 ${queuePosition - 1} commande${queuePosition - 1 > 1 ? 's' : ''} avant vous`}
+                                                ? '🎯 ¡Eres el siguiente!'
+                                                : `📋 ${queuePosition - 1} pedido${queuePosition - 1 > 1 ? 's' : ''} delante de ti`}
                                         </p>
                                         <p className="text-xs text-white/70 mt-0.5">
-                                            Votre commande est en cours de préparation
+                                            Tu pedido se está preparando
                                         </p>
                                     </div>
                                 </div>
@@ -844,13 +844,13 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                         </div>
                                         {/* Numéro du restaurant cliquable */}
                                         <div className="mt-4 pt-3 border-t border-white/10">
-                                            <p className="text-xs font-bold uppercase tracking-wider text-white/50 mb-2">Besoin d'aide ?</p>
+                                            <p className="text-xs font-bold uppercase tracking-wider text-white/50 mb-2">¿Necesitas ayuda?</p>
                                             <a href={supportWhatsappHref} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-white/90 hover:text-emerald-300 transition-colors group">
                                                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/20 group-hover:bg-emerald-500/40 transition-colors">
                                                     <Phone size={16} className="text-emerald-300" />
                                                 </div>
                                                 <div>
-                                                    <p className="text-xs text-white/60">Appelez le restaurant</p>
+                                                    <p className="text-xs text-white/60">Llama al restaurante</p>
                                                     <p className="text-sm font-bold text-white">{resolvedSupportDisplay}</p>
                                                 </div>
                                             </a>
@@ -859,17 +859,17 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                 )}
                                 {order.receipt_url && (
                                     <div className="rounded-2xl bg-gradient-to-br from-slate-900/40 via-slate-900/30 to-slate-900/25 p-5 backdrop-blur-2xl border border-white/15 flex flex-col">
-                                            <p className="text-xs font-bold uppercase tracking-wider text-white/50 mb-3">Justificatif de paiement</p>
+                                            <p className="text-xs font-bold uppercase tracking-wider text-white/50 mb-3">Comprobante de pago</p>
                                             <button
                                                 type="button"
                                                 onClick={() => setReceiptModalOpen(true)}
                                             className="group relative flex w-full flex-1 min-h-[160px] overflow-hidden rounded-xl border border-white/20 bg-black/30 shadow-lg transition-transform hover:-translate-y-0.5 hover:shadow-amber-500/20 focus:outline-none focus:ring-2 focus:ring-white/50"
-                                                aria-label="Ouvrir le justificatif de paiement"
+                                                aria-label="Abrir el comprobante de pago"
                                             >
                                                 {canDisplayReceiptImage ? (
                                                     <img
                                                         src={order.receipt_url}
-                                                        alt="Aperçu du justificatif"
+                                                        alt="Vista previa del comprobante"
                                                         className="h-full w-full object-cover transition duration-500 ease-out group-hover:scale-105"
                                                         onError={() => setReceiptPreviewError(true)}
                                                     />
@@ -880,9 +880,9 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                         </div>
                                                         <div className="space-y-1">
                                                             <p className="text-sm font-semibold">
-                                                                {isReceiptPdf ? 'Justificatif au format PDF' : 'Prévisualisation indisponible'}
+                                                                {isReceiptPdf ? 'Comprobante en formato PDF' : 'Vista previa no disponible'}
                                                             </p>
-                                                            <p className="text-xs text-white/60">Touchez pour ouvrir le document</p>
+                                                            <p className="text-xs text-white/60">Toca para abrir el documento</p>
                                                         </div>
                                                     </div>
                                                 )}
@@ -890,7 +890,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                     <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition duration-300 group-hover:opacity-100">
                                                         <div className="flex flex-col items-center gap-2 text-white">
                                                             <Receipt size={24} />
-                                                            <span className="text-xs font-semibold">Voir le justificatif</span>
+                                                            <span className="text-xs font-semibold">Ver el comprobante</span>
                                                         </div>
                                                     </div>
                                                 )}
@@ -902,8 +902,8 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
 
                         <div className="rounded-2xl border border-white/25 bg-slate-900/35 p-6 backdrop-blur-2xl">
                             <div className="flex items-center justify-between mb-5">
-                                <h3 className="text-base font-bold uppercase tracking-wider text-white">Votre commande</h3>
-                                <span className="rounded-full bg-white/20 px-4 py-1.5 text-sm font-bold text-white shadow-sm">{itemsCount} {itemsCount > 1 ? 'articles' : 'article'}</span>
+                                <h3 className="text-base font-bold uppercase tracking-wider text-white">Tu pedido</h3>
+                                <span className="rounded-full bg-white/20 px-4 py-1.5 text-sm font-bold text-white shadow-sm">{itemsCount} {itemsCount > 1 ? 'artículos' : 'artículo'}</span>
                             </div>
                             <div className="space-y-3">
                                 {order.items && order.items.length > 0 ? (
@@ -950,7 +950,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                                     : 'border border-slate-200 bg-slate-50 text-slate-600'
                                                             }`}>
                                                                 <TruckIcon size={14} />
-                                                                {isFreeShipping ? 'Livraison offerte' : 'Livraison'}
+                                                                {isFreeShipping ? 'Entrega gratis' : 'Entrega'}
                                                             </div>
                                                         )}
                                                     </div>
@@ -975,7 +975,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                         );
                                     })
                                 ) : (
-                                    <p className="text-white/70">Aucun article enregistré pour cette commande.</p>
+                                    <p className="text-white/70">No hay artículos registrados para este pedido.</p>
                                 )}
                             </div>
 
@@ -989,7 +989,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                             <div className="mt-6 space-y-3 border-t border-white/20 pt-5">
                                 {totalDiscount > 0 && (
                                     <div className="flex items-center justify-between text-sm font-semibold text-emerald-300">
-                                        <span>Réductions totales</span>
+                                        <span>Descuentos totales</span>
                                         <span className="text-base font-bold">- {formatCurrencyCOP(totalDiscount)}</span>
                                     </div>
                                 )}
@@ -1018,7 +1018,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                 <Modal
                     isOpen={isReceiptModalOpen}
                     onClose={() => setReceiptModalOpen(false)}
-                    title="Justificatif de Paiement"
+                    title="Comprobante de pago"
                 >
                     {receiptModalContent}
                 </Modal>
@@ -1029,8 +1029,8 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
     return (
         <div className={containerClasses}>
             <div className={contentClasses}>
-                <h2 className={`text-3xl font-bold text-center mb-2 ${variant === 'hero' ? 'text-white' : 'text-gray-800'}`}>Suivi de votre commande</h2>
-                <p className={`text-center font-semibold mb-8 ${variant === 'hero' ? 'text-gray-300' : 'text-gray-500'}`}>Commande #{order.id.slice(-6)}</p>
+                <h2 className={`text-3xl font-bold text-center mb-2 ${variant === 'hero' ? 'text-white' : 'text-gray-800'}`}>Seguimiento de tu pedido</h2>
+                <p className={`text-center font-semibold mb-8 ${variant === 'hero' ? 'text-gray-300' : 'text-gray-500'}`}>Pedido #{order.id.slice(-6)}</p>
 
                 <div className="mb-8">
                     <div className="mb-6 tracker-progress-container tracker-progress-default">
@@ -1284,7 +1284,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                 <div className={detailContainerClasses}>
                     {/* Tampon PEDIDO LISTO */}
                     {isOrderCompleted && <CompletionStamp className="absolute -top-14 -right-8 sm:-top-[4.25rem] sm:-right-10" />}
-                    <h3 className={`mt-10 text-xl font-bold ${variant === 'hero' ? 'text-white' : 'text-gray-800'}`}>Résumé de la commande</h3>
+                    <h3 className={`mt-10 text-xl font-bold ${variant === 'hero' ? 'text-white' : 'text-gray-800'}`}>Resumen del pedido</h3>
 
                     {isTakeawayOrder && hasClientDetails && (
                         <div
@@ -1322,7 +1322,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                     onClick={() => setReceiptModalOpen(true)}
                                     className={`mt-4 inline-flex items-center gap-2 text-sm font-semibold underline-offset-2 hover:underline ${variant === 'hero' ? 'text-white' : 'text-blue-500'}`}
                                 >
-                                    <Receipt size={16} /> {isReceiptPdf ? 'Ouvrir le PDF du paiement' : 'Voir le justificatif'}
+                                    <Receipt size={16} /> {isReceiptPdf ? 'Abrir el PDF del pago' : 'Ver el comprobante'}
                                 </button>
                             )}
                         </div>
@@ -1369,7 +1369,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                             {item.nom_produit}
                                                         </p>
                                                         <p className={`text-xs font-medium uppercase tracking-wide ${variant === 'hero' ? 'text-white/60' : 'text-slate-500'}`}>
-                                                            {isFreeShipping ? 'Livraison offerte' : `${formatCurrencyCOP(item.prix_unitaire)} /u`}
+                                                            {isFreeShipping ? 'Entrega gratis' : `${formatCurrencyCOP(item.prix_unitaire)} /u`}
                                                         </p>
                                                     </div>
                                                     {itemDescription && (
@@ -1397,7 +1397,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                                     : 'border-slate-200 bg-slate-50 text-slate-600'
                                                         }`}>
                                                             <TruckIcon size={14} />
-                                                            {isFreeShipping ? 'Livraison offerte' : 'Livraison'}
+                                                            {isFreeShipping ? 'Entrega gratis' : 'Entrega'}
                                                         </div>
                                                     )}
                                                 </div>
@@ -1431,7 +1431,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                     </span>
                                                 ) : (
                                                     <span className={`text-xs font-medium ${variant === 'hero' ? 'text-emerald-200/80' : 'text-emerald-600/80'}`}>
-                                                        Livraison économisée
+                                                        Entrega ahorrada
                                                     </span>
                                                 )}
                                             </div>
@@ -1440,7 +1440,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                 );
                             })
                         ) : (
-                            <p className={`${variant === 'hero' ? 'text-gray-300' : 'text-gray-600'}`}>Aucun article enregistré pour cette commande.</p>
+                            <p className={`${variant === 'hero' ? 'text-gray-300' : 'text-gray-600'}`}>No hay artículos registrados para este pedido.</p>
                         )}
                     </div>
 
@@ -1452,7 +1452,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                 variant === 'hero' ? 'text-emerald-200' : 'text-emerald-700'
                             }`}
                         >
-                            <span>Réductions totales</span>
+                            <span>Descuentos totales</span>
                             <span>-{formatCurrencyCOP(totalDiscount)}</span>
                         </div>
                     )}
@@ -1494,7 +1494,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                 : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
                                         }`}
                                     >
-                                        <Receipt size={16} /> {isReceiptPdf ? 'Ouvrir le PDF' : 'Voir'}
+                                        <Receipt size={16} /> {isReceiptPdf ? 'Abrir el PDF' : 'Ver'}
                                     </button>
                                 </div>
                             )}
@@ -1512,7 +1512,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                     )}
                     <div className="flex flex-col space-y-4">
                         <p className={`text-sm ${variant === 'hero' ? 'text-gray-300' : 'text-gray-600'}`}>
-                            Le statut de votre commande est mis à jour automatiquement.
+                            El estado de tu pedido se actualiza automáticamente.
                         </p>
                         <button 
                             onClick={isOrderCompleted ? onNewOrderClick : undefined} 
@@ -1531,7 +1531,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
             <Modal
                 isOpen={isReceiptModalOpen}
                 onClose={() => setReceiptModalOpen(false)}
-                title="Justificatif de Paiement"
+                title="Comprobante de pago"
             >
                 {receiptModalContent}
             </Modal>

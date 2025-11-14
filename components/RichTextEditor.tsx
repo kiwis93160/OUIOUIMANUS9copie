@@ -159,7 +159,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             type="color"
             className="h-8 w-8 cursor-pointer rounded-full border border-slate-200"
             onChange={handleColorChange}
-            aria-label="Sélectionner une couleur de texte"
+            aria-label="Seleccionar un color de texto"
           />
         </label>
         <button

@@ -93,11 +93,11 @@ const PinInput = React.forwardRef<HTMLInputElement, PinInputProps>(({ pin, onPin
 
   const digitsMessage =
     pin.length === 0
-      ? `Aucun chiffre saisi. Vous pouvez entrer ${pinLength} chiffres.`
-      : `${pin.length} ${pin.length > 1 ? 'chiffres saisis' : 'chiffre saisi'} sur ${pinLength}.`;
+      ? `No se ha ingresado ningún número. Puedes escribir ${pinLength} dígitos.`
+      : `${pin.length} ${pin.length > 1 ? 'dígitos ingresados' : 'dígito ingresado'} de ${pinLength}.`;
 
   return (
-    <div className="pin-input" aria-label="Clavier numérique sécurisé">
+    <div className="pin-input" aria-label="Teclado numérico seguro">
       <input
         ref={ref}
         id="staff-pin-field"
@@ -109,7 +109,7 @@ const PinInput = React.forwardRef<HTMLInputElement, PinInputProps>(({ pin, onPin
         onChange={handleInputChange}
         onKeyDown={handleInputKeyDown}
         aria-describedby={describedBy}
-        aria-label={`Code PIN à ${pinLength} chiffres`}
+        aria-label={`Código PIN de ${pinLength} dígitos`}
         disabled={disabled}
         aria-disabled={disabled}
         aria-busy={disabled}
@@ -141,7 +141,7 @@ const PinInput = React.forwardRef<HTMLInputElement, PinInputProps>(({ pin, onPin
           0
         </button>
         <button type="button" onClick={handleDelete} className="pin-pad__button pin-pad__button--muted" disabled={disabled}>
-          DEL
+          BORRAR
         </button>
       </div>
     </div>
@@ -777,7 +777,7 @@ const Login: React.FC = () => {
               </div>
             ) : (
               <p className="section-text section-text--muted" style={menuBodyTextStyle}>
-                Aucun produit best seller n'est disponible pour le moment.
+                Ningún producto destacado está disponible por el momento.
               </p>
             )}
             <div className="section-actions">
@@ -826,7 +826,7 @@ const Login: React.FC = () => {
                   <div className="relative aspect-[13/8] w-full overflow-hidden rounded-3xl bg-white">
                     {hasMapLocation ? (
                       <iframe
-                        title={`Carte Google Maps pour ${findUsMapTitle}`}
+                        title={`Mapa de Google Maps para ${findUsMapTitle}`}
                         src={findUsMapEmbedUrl}
                         loading="lazy"
                         referrerPolicy="no-referrer-when-downgrade"
@@ -836,7 +836,7 @@ const Login: React.FC = () => {
                     ) : (
                       <div className="flex h-full w-full items-center justify-center bg-gray-100 px-8 text-center">
                         <p className="text-lg text-gray-500" style={findUsBodyTextStyle}>
-                          La localisation de notre restaurant sera bientôt disponible.
+                          La ubicación de nuestro restaurante estará disponible muy pronto.
                         </p>
                       </div>
                     )}
@@ -867,7 +867,7 @@ const Login: React.FC = () => {
                   <div className="h-full w-full overflow-hidden rounded-3xl border border-white/70 bg-white/75 shadow-[0_20px_45px_-28px_rgba(15,23,42,0.55)]">
                     <ShapoWidget
                       className="h-[380px] w-full border-0"
-                      title="Widget d'avis clients Shapo"
+                      title="Widget de opiniones de clientes Shapo"
                     />
                   </div>
                 </div>
@@ -955,7 +955,7 @@ const Login: React.FC = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-green-500 text-white transition hover:bg-green-600"
-                            aria-label="Nous écrire sur WhatsApp"
+                            aria-label="Escríbenos por WhatsApp"
                           >
                             <MessageCircle className="h-4 w-4" />
                           </a>

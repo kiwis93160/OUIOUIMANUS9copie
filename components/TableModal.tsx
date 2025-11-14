@@ -34,7 +34,7 @@ const TableModal: React.FC<TableModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const modalTitle = useMemo(
-    () => (mode === 'create' ? 'Ajouter une table' : 'Modifier la table'),
+    () => (mode === 'create' ? 'Agregar una mesa' : 'Editar la mesa'),
     [mode],
   );
 
@@ -75,16 +75,16 @@ const TableModal: React.FC<TableModalProps> = ({
     const trimmedCapacity = formState.capacite.trim();
 
     if (!trimmedName) {
-      errors.nom = 'Le nom est requis.';
+      errors.nom = 'El nombre es obligatorio.';
     }
 
     let capacityValue: number | null = null;
     if (!trimmedCapacity) {
-      errors.capacite = 'La capacité est requise.';
+      errors.capacite = 'La capacidad es obligatoria.';
     } else {
       const parsed = Number(trimmedCapacity);
       if (!Number.isInteger(parsed) || parsed <= 0) {
-        errors.capacite = 'La capacité doit être un entier positif.';
+        errors.capacite = 'La capacidad debe ser un número entero positivo.';
       } else {
         capacityValue = parsed;
       }
@@ -93,13 +93,13 @@ const TableModal: React.FC<TableModalProps> = ({
     if (showCouvertsField) {
       const trimmedCouverts = formState.couverts.trim();
       if (!trimmedCouverts) {
-        errors.couverts = 'Le nombre de couverts est requis.';
+        errors.couverts = 'El número de cubiertos es obligatorio.';
       } else {
         const parsed = Number(trimmedCouverts);
         if (!Number.isInteger(parsed) || parsed <= 0) {
-          errors.couverts = 'Les couverts doivent être un entier positif.';
+          errors.couverts = 'Los cubiertos deben ser un número entero positivo.';
         } else if (capacityValue !== null && parsed > capacityValue) {
-          errors.couverts = 'Les couverts ne peuvent pas dépasser la capacité.';
+          errors.couverts = 'Los cubiertos no pueden superar la capacidad.';
         }
       }
     }
@@ -137,7 +137,7 @@ const TableModal: React.FC<TableModalProps> = ({
       const message =
         error instanceof Error && error.message
           ? error.message
-          : 'Une erreur est survenue. Veuillez réessayer.';
+          : 'Ocurrió un error. Por favor, inténtalo de nuevo.';
       setSubmitError(message);
     } finally {
       setIsSubmitting(false);
@@ -155,7 +155,7 @@ const TableModal: React.FC<TableModalProps> = ({
 
         <div>
           <label htmlFor="table-name" className="block text-sm font-medium text-gray-700">
-            Nom de la table
+            Nombre de la mesa
           </label>
           <input
             id="table-name"
@@ -165,7 +165,7 @@ const TableModal: React.FC<TableModalProps> = ({
             value={formState.nom}
             onChange={handleChange}
             disabled={isSubmitting}
-            placeholder="Ex. Terrasse 1"
+            placeholder="Ej. Terraza 1"
             autoFocus
           />
           {fieldErrors.nom && <p className="mt-1 text-sm text-red-600">{fieldErrors.nom}</p>}
@@ -173,7 +173,7 @@ const TableModal: React.FC<TableModalProps> = ({
 
         <div>
           <label htmlFor="table-capacity" className="block text-sm font-medium text-gray-700">
-            Capacité (nombre de places)
+            Capacidad (número de puestos)
           </label>
           <input
             id="table-capacity"
@@ -184,16 +184,16 @@ const TableModal: React.FC<TableModalProps> = ({
             value={formState.capacite}
             onChange={handleChange}
             disabled={isSubmitting}
-            placeholder="Ex. 4"
+            placeholder="Ej. 4"
           />
           {fieldErrors.capacite && <p className="mt-1 text-sm text-red-600">{fieldErrors.capacite}</p>}
         </div>
 
         {showCouvertsField && (
           <div>
-            <label htmlFor="table-couverts" className="block text-sm font-medium text-gray-700">
-              Couverts (actuels)
-            </label>
+              <label htmlFor="table-couverts" className="block text-sm font-medium text-gray-700">
+                Cubiertos (actuales)
+              </label>
             <input
               id="table-couverts"
               name="couverts"
@@ -203,7 +203,7 @@ const TableModal: React.FC<TableModalProps> = ({
               value={formState.couverts}
               onChange={handleChange}
               disabled={isSubmitting}
-              placeholder="Ex. 2"
+              placeholder="Ej. 2"
             />
             {fieldErrors.couverts && <p className="mt-1 text-sm text-red-600">{fieldErrors.couverts}</p>}
           </div>
@@ -216,14 +216,14 @@ const TableModal: React.FC<TableModalProps> = ({
             className="w-full ui-btn-secondary py-3"
             disabled={isSubmitting}
           >
-            Annuler
+            Cancelar
           </button>
           <button
             type="submit"
             className="w-full ui-btn-primary py-3 disabled:opacity-60"
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Enregistrement...' : 'Enregistrer'}
+            {isSubmitting ? 'Guardando...' : 'Guardar'}
           </button>
         </div>
       </form>

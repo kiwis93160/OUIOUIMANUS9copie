@@ -11,22 +11,22 @@ interface PromotionDetailsModalProps {
 }
 
 const typeLabels: Record<string, string> = {
-  percentage: 'Pourcentage',
-  fixed_amount: 'Montant fixe',
-  promo_code: 'Code promo',
-  buy_x_get_y: '2x1 / Achetez X, obtenez Y',
-  free_product: 'Produit gratuit',
-  free_shipping: 'Livraison gratuite',
+  percentage: 'Porcentaje',
+  fixed_amount: 'Monto fijo',
+  promo_code: 'Código promocional',
+  buy_x_get_y: '2x1 / Compra X y recibe Y',
+  free_product: 'Producto gratis',
+  free_shipping: 'Envío gratis',
   combo: 'Combo',
-  threshold: 'Palier',
+  threshold: 'Umbral',
   happy_hour: 'Happy hour'
 };
 
 const statusLabels: Record<string, string> = {
-  active: 'Active',
-  inactive: 'Inactive',
-  scheduled: 'Programmée',
-  expired: 'Expirée'
+  active: 'Activa',
+  inactive: 'Inactiva',
+  scheduled: 'Programada',
+  expired: 'Expirada'
 };
 
 const statusColors: Record<string, string> = {
@@ -55,7 +55,7 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
       const data = await fetchPromotionUsages(promotion.id);
       setUsages(data);
     } catch (err) {
-      setError('Erreur lors du chargement des utilisations');
+      setError('Error al cargar los usos');
       console.error(err);
     } finally {
       setLoading(false);
@@ -64,7 +64,7 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return new Intl.DateTimeFormat('fr-FR', {
+    return new Intl.DateTimeFormat('es-CO', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
@@ -82,11 +82,11 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 px-4 py-6 backdrop-blur-sm">
       <div className="flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-black shadow-2xl">
         <div className="flex flex-col gap-3 border-b border-slate-200 bg-white px-6 py-5 text-black sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="text-xl font-semibold leading-snug sm:text-2xl">Détails de la promotion</h2>
+          <h2 className="text-xl font-semibold leading-snug sm:text-2xl">Detalles de la promoción</h2>
           <button
             onClick={onClose}
             className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-transparent text-black transition hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary"
-            aria-label="Fermer les détails de la promotion"
+            aria-label="Cerrar los detalles de la promoción"
           >
             <X size={22} />
           </button>
@@ -101,7 +101,7 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
             }`}
             onClick={() => setActiveTab('details')}
           >
-            Détails
+            Detalles
           </button>
           <button
             className={`rounded-full px-4 py-2 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-primary ${
@@ -111,7 +111,7 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
             }`}
             onClick={() => setActiveTab('usages')}
           >
-            Utilisations ({promotion.usage_count})
+            Usos ({promotion.usage_count})
           </button>
         </div>
 
@@ -130,7 +130,7 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
                     </div>
                   </div>
                   <div className="rounded-full border border-slate-200 bg-white/80 px-4 py-1.5 text-sm font-semibold text-black shadow-sm">
-                    Priorité : {promotion.priority}
+                    Prioridad: {promotion.priority}
                   </div>
                 </div>
               </div>
@@ -139,7 +139,7 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
                 <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5 shadow-sm">
                   <h4 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-black">
                     <Info size={16} />
-                    Informations générales
+                    Información general
                   </h4>
                   <dl className="space-y-2 text-sm text-black">
                     <div className="flex items-center justify-between">
@@ -147,15 +147,15 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
                       <dd className="rounded bg-white/80 px-2 py-0.5 font-mono text-black shadow-sm">{promotion.id}</dd>
                     </div>
                     <div className="flex items-center justify-between">
-                      <dt className="font-medium">Créée le</dt>
+                      <dt className="font-medium">Creada el</dt>
                       <dd>{formatDate(promotion.created_at)}</dd>
                     </div>
                     <div className="flex items-center justify-between">
-                      <dt className="font-medium">Mise à jour</dt>
+                      <dt className="font-medium">Actualizada</dt>
                       <dd>{formatDate(promotion.updated_at)}</dd>
                     </div>
                     <div className="flex items-center justify-between">
-                      <dt className="font-medium">Utilisations</dt>
+                      <dt className="font-medium">Usos</dt>
                       <dd>{promotion.usage_count}</dd>
                     </div>
                   </dl>
@@ -164,15 +164,15 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
                 <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5 shadow-sm">
                   <h4 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-black">
                     <Percent size={16} />
-                    Réduction
+                    Descuento
                   </h4>
                   <dl className="space-y-2 text-sm text-black">
                     <div className="flex items-center justify-between">
-                      <dt className="font-medium">Type</dt>
-                      <dd>{promotion.discount.type === 'percentage' ? 'Pourcentage' : 'Montant fixe'}</dd>
+                      <dt className="font-medium">Tipo</dt>
+                      <dd>{promotion.discount.type === 'percentage' ? 'Porcentaje' : 'Monto fijo'}</dd>
                     </div>
                     <div className="flex items-center justify-between">
-                      <dt className="font-medium">Valeur</dt>
+                      <dt className="font-medium">Valor</dt>
                       <dd className="font-semibold text-black">
                         {promotion.discount.value}
                         {promotion.discount.type === 'percentage' ? '%' : '€'}
@@ -180,16 +180,16 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
                     </div>
                     {promotion.discount.max_discount_amount && (
                       <div className="flex items-center justify-between">
-                        <dt className="font-medium">Maximum</dt>
+                        <dt className="font-medium">Máximo</dt>
                         <dd>{promotion.discount.max_discount_amount}€</dd>
                       </div>
                     )}
                     <div className="flex items-center justify-between">
-                      <dt className="font-medium">Application</dt>
+                      <dt className="font-medium">Aplicación</dt>
                       <dd>
-                        {promotion.discount.applies_to === 'total' && 'Total de la commande'}
-                        {promotion.discount.applies_to === 'products' && 'Produits spécifiques'}
-                        {promotion.discount.applies_to === 'shipping' && 'Frais de livraison'}
+                        {promotion.discount.applies_to === 'total' && 'Total del pedido'}
+                        {promotion.discount.applies_to === 'products' && 'Productos específicos'}
+                        {promotion.discount.applies_to === 'shipping' && 'Costo de envío'}
                       </dd>
                     </div>
                   </dl>
@@ -199,12 +199,12 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
               <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5 shadow-sm">
                 <h4 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-black">
                   <Calendar size={16} />
-                  Conditions
+                  Condiciones
                 </h4>
                 <dl className="grid grid-cols-1 gap-3 text-sm text-black md:grid-cols-2">
                   {promotion.conditions.promo_code && (
                     <div className="flex items-center justify-between">
-                      <dt className="font-medium">Code promo</dt>
+                      <dt className="font-medium">Código promocional</dt>
                       <dd className="rounded bg-white/80 px-2 py-0.5 font-mono text-black shadow-sm">
                         {promotion.conditions.promo_code}
                       </dd>
@@ -213,42 +213,42 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
 
                   {promotion.conditions.min_order_amount && (
                     <div className="flex items-center justify-between">
-                      <dt className="font-medium">Montant minimum</dt>
+                      <dt className="font-medium">Monto mínimo</dt>
                       <dd>{promotion.conditions.min_order_amount}€</dd>
                     </div>
                   )}
 
                   {promotion.conditions.max_order_amount && (
                     <div className="flex items-center justify-between">
-                      <dt className="font-medium">Montant maximum</dt>
+                      <dt className="font-medium">Monto máximo</dt>
                       <dd>{promotion.conditions.max_order_amount}€</dd>
                     </div>
                   )}
 
                   {promotion.conditions.start_date && (
                     <div className="flex items-center justify-between">
-                      <dt className="font-medium">Date de début</dt>
+                      <dt className="font-medium">Fecha de inicio</dt>
                       <dd>{formatDate(promotion.conditions.start_date)}</dd>
                     </div>
                   )}
 
                   {promotion.conditions.end_date && (
                     <div className="flex items-center justify-between">
-                      <dt className="font-medium">Date de fin</dt>
+                      <dt className="font-medium">Fecha de finalización</dt>
                       <dd>{formatDate(promotion.conditions.end_date)}</dd>
                     </div>
                   )}
 
                   {promotion.conditions.days_of_week && promotion.conditions.days_of_week.length > 0 && (
                     <div className="flex items-center justify-between">
-                      <dt className="font-medium">Jours</dt>
-                      <dd>{promotion.conditions.days_of_week.map(day => ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'][day]).join(', ')}</dd>
+                      <dt className="font-medium">Días</dt>
+                      <dd>{promotion.conditions.days_of_week.map(day => ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'][day]).join(', ')}</dd>
                     </div>
                   )}
 
                   {promotion.conditions.hours_of_day && (
                     <div className="flex items-center justify-between">
-                      <dt className="font-medium">Heures</dt>
+                      <dt className="font-medium">Horarios</dt>
                       <dd>
                         {promotion.conditions.hours_of_day.start} - {promotion.conditions.hours_of_day.end}
                       </dd>
@@ -257,33 +257,33 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
 
                   {promotion.conditions.max_uses_total && (
                     <div className="flex items-center justify-between">
-                      <dt className="font-medium">Utilisations max.</dt>
+                      <dt className="font-medium">Usos máximos</dt>
                       <dd>{promotion.conditions.max_uses_total}</dd>
                     </div>
                   )}
 
                   {promotion.conditions.max_uses_per_customer && (
                     <div className="flex items-center justify-between">
-                      <dt className="font-medium">Max par client</dt>
+                      <dt className="font-medium">Máx. por cliente</dt>
                       <dd>{promotion.conditions.max_uses_per_customer}</dd>
                     </div>
                   )}
 
                   {promotion.conditions.first_order_only && (
                     <div className="flex items-center justify-between">
-                      <dt className="font-medium">Première commande</dt>
-                      <dd>Oui</dd>
+                      <dt className="font-medium">Primer pedido</dt>
+                      <dd>Sí</dd>
                     </div>
                   )}
 
                   {promotion.type === 'buy_x_get_y' && (
                     <>
                       <div className="flex items-center justify-between">
-                        <dt className="font-medium">Achetez</dt>
+                        <dt className="font-medium">Compra</dt>
                         <dd>{promotion.conditions.buy_quantity}</dd>
                       </div>
                       <div className="flex items-center justify-between">
-                        <dt className="font-medium">Obtenez</dt>
+                        <dt className="font-medium">Recibe</dt>
                         <dd>{promotion.conditions.get_quantity}</dd>
                       </div>
                     </>
@@ -293,9 +293,9 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
 
               {promotion.visuals && Object.keys(promotion.visuals).length > 0 && (
                 <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5 shadow-sm">
-                  <h4 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-black">
+                    <h4 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-black">
                     <Tag size={16} />
-                    Éléments visuels
+                    Elementos visuales
                   </h4>
                   <div className="grid grid-cols-1 gap-4 text-sm text-black md:grid-cols-2">
                     {promotion.visuals.badge_text && (
@@ -315,14 +315,14 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
 
                     {promotion.visuals.banner_text && (
                       <div className="flex items-center justify-between">
-                        <span className="font-medium">Texte bannière</span>
+                        <span className="font-medium">Texto del banner</span>
                         <span className="text-right text-black">{promotion.visuals.banner_text}</span>
                       </div>
                     )}
 
                     {promotion.visuals.banner_cta && (
                       <div className="flex items-center justify-between">
-                        <span className="font-medium">Bouton</span>
+                        <span className="font-medium">Botón</span>
                         <span className="text-right text-black">{promotion.visuals.banner_cta}</span>
                       </div>
                     )}
@@ -330,10 +330,10 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
 
                   {promotion.visuals.banner_image && (
                     <div className="mt-4">
-                      <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-black">Image de bannière</span>
+                      <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-black">Imagen del banner</span>
                       <img
                         src={promotion.visuals.banner_image}
-                        alt="Bannière promotionnelle"
+                        alt="Banner promocional"
                         className="w-full max-h-40 rounded-xl object-cover shadow-sm"
                       />
                     </div>
@@ -354,11 +354,11 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
               {loading ? (
                 <div className="flex items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-slate-50/80 py-10 text-black shadow-sm">
                   <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-brand-primary"></div>
-                  <span>Chargement…</span>
+                  <span>Cargando...</span>
                 </div>
               ) : usages.length === 0 ? (
                 <div className="rounded-2xl border border-slate-200 bg-slate-50/80 py-10 text-center text-sm font-medium text-black shadow-sm">
-                  Aucune utilisation enregistrée pour cette promotion
+                  No hay usos registrados para esta promoción
                 </div>
               ) : (
                 <div className="overflow-hidden rounded-2xl border border-slate-200 shadow-sm">
@@ -366,9 +366,9 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
                     <thead className="bg-slate-50/90 text-xs font-semibold uppercase tracking-wide text-black">
                       <tr>
                         <th className="px-4 py-3 text-left">Date</th>
-                        <th className="px-4 py-3 text-left">Commande</th>
+                        <th className="px-4 py-3 text-left">Pedido</th>
                         <th className="px-4 py-3 text-left">Client</th>
-                        <th className="px-4 py-3 text-right">Montant</th>
+                        <th className="px-4 py-3 text-right">Monto</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">

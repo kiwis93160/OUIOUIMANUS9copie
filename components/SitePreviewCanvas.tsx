@@ -44,7 +44,7 @@ export const resolveZoneFromElement = (element: EditableElementKey): EditableZon
     return 'footer';
   }
 
-  throw new Error(`Zone introuvable pour l'élément modifiable "${element}"`);
+  throw new Error(`Zona no encontrada para el elemento editable "${element}"`);
 };
 
 interface SitePreviewCanvasProps {
@@ -291,7 +291,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
       <SectionCard zone="navigation" activeZone={activeZone}>
         <EditableElement
           id="navigation.style.background"
-          label="Modifier le fond de la navigation"
+          label="Editar el fondo de la navegación"
           onEdit={onEdit}
           className="block"
           buttonClassName="right-4 top-4"
@@ -301,7 +301,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
               <div className="login-brand" style={navigationTextStyle}>
                 <EditableElement
                   id="navigation.brandLogo"
-                  label="Modifier le logo principal"
+                  label="Editar el logo principal"
                   onEdit={onEdit}
                   as="span"
                   className="inline-flex items-center"
@@ -314,7 +314,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
                 </EditableElement>
                 <EditableElement
                   id="navigation.brand"
-                  label="Modifier le nom de la marque"
+                  label="Editar el nombre de la marca"
                   onEdit={onEdit}
                   as="span"
                   className="ml-3 inline-flex items-center"
@@ -334,7 +334,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
               <nav className="login-nav" aria-label="Navigation principale">
                 <EditableElement
                   id="navigation.links.home"
-                  label="Modifier le lien Accueil"
+                  label="Editar el enlace Inicio"
                   onEdit={onEdit}
                   as="span"
                   className="inline-flex"
@@ -352,7 +352,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
                 </EditableElement>
                 <EditableElement
                   id="navigation.links.about"
-                  label="Modifier le lien À propos"
+                  label="Editar el enlace Acerca de"
                   onEdit={onEdit}
                   as="span"
                   className="inline-flex"
@@ -370,7 +370,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
                 </EditableElement>
                 <EditableElement
                   id="navigation.links.menu"
-                  label="Modifier le lien Menu"
+                  label="Editar el enlace del menú"
                   onEdit={onEdit}
                   as="span"
                   className="inline-flex"
@@ -388,7 +388,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
                 </EditableElement>
                 <EditableElement
                   id="navigation.links.loginCta"
-                  label="Modifier le bouton personnel"
+                  label="Editar el botón del personal"
                   onEdit={onEdit}
                   as="span"
                   className="inline-flex"
@@ -401,7 +401,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
                   >
                     <EditableElement
                       id="navigation.staffLogo"
-                      label="Modifier le logo d'accès staff"
+                      label="Editar el logo de acceso del staff"
                       onEdit={onEdit}
                       as="span"
                       className="inline-flex"
@@ -420,7 +420,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
       <SectionCard zone="hero" activeZone={activeZone}>
         <EditableElement
           id="hero.backgroundImage"
-          label="Modifier le visuel de fond du hero"
+          label="Editar el fondo visual del hero"
           onEdit={onEdit}
           className="block"
           buttonClassName="right-4 top-4"
@@ -430,7 +430,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
               <div className="hero-content" style={heroTextStyle}>
                 <EditableElement
                   id="hero.title"
-                  label="Modifier le titre du hero"
+                  label="Editar el título del hero"
                   onEdit={onEdit}
                   className="block"
                   buttonClassName="right-0 -top-3"
@@ -447,7 +447,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
                 </EditableElement>
                 <EditableElement
                   id="hero.subtitle"
-                  label="Modifier le sous-titre du hero"
+                  label="Editar el subtítulo del hero"
                   onEdit={onEdit}
                   className="mt-4 block"
                   buttonClassName="right-0 -top-3"
@@ -464,7 +464,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
                 </EditableElement>
                 <EditableElement
                   id="hero.ctaLabel"
-                  label="Modifier le texte du bouton principal"
+                  label="Editar el texto del botón principal"
                   onEdit={onEdit}
                   className="mt-6 inline-flex"
                   buttonClassName="-right-3 -top-3"
@@ -492,7 +492,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
                 <div className="hero-history mt-6">
                 <EditableElement
                   id="hero.historyTitle"
-                  label="Modifier le titre de l'historique"
+                  label="Editar el título del historial"
                   onEdit={onEdit}
                   className="block"
                   buttonClassName="right-0 -top-3"
@@ -509,7 +509,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
                 </EditableElement>
                 <EditableElement
                   id="hero.reorderCtaLabel"
-                  label="Modifier le bouton de réassort"
+                  label="Editar el botón de resurtido"
                   onEdit={onEdit}
                   className="hero-history__list"
                   buttonClassName="right-2 top-2"
@@ -558,7 +558,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
       <SectionCard zone="about" activeZone={activeZone}>
         <EditableElement
           id="about.style.background"
-          label="Modifier le fond de la section À propos"
+          label="Editar el fondo de la sección Acerca de"
           onEdit={onEdit}
           className="block"
           buttonClassName="right-4 top-4"
@@ -567,7 +567,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
             <div className="section-inner section-inner--center" style={aboutTextStyle}>
               <EditableElement
                 id="about.title"
-                label="Modifier le titre À propos"
+                label="Editar el título de Acerca de"
                 onEdit={onEdit}
                 className="block"
                 buttonClassName="right-0 -top-3"
@@ -584,7 +584,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
               </EditableElement>
               <EditableElement
                 id="about.description"
-                label="Modifier la description À propos"
+                label="Editar la descripción de Acerca de"
                 onEdit={onEdit}
                 className="mt-4 block"
                 buttonClassName="right-0 -top-3"
@@ -602,7 +602,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
               {content.about.image && (
                 <EditableElement
                   id="about.image"
-                  label="Modifier l'image À propos"
+                  label="Editar la imagen de Acerca de"
                   onEdit={onEdit}
                   className="mt-6 block"
                   buttonClassName="right-4 top-4"
@@ -622,7 +622,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
       <SectionCard zone="menu" activeZone={activeZone}>
         <EditableElement
           id="menu.style.background"
-          label="Modifier le fond de la section Menu"
+          label="Editar el fondo de la sección del menú"
           onEdit={onEdit}
           className="block"
           buttonClassName="right-4 top-4"
@@ -631,7 +631,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
             <div className="section-inner section-inner--wide section-inner--center" style={menuTextStyle}>
               <EditableElement
                 id="menu.title"
-                label="Modifier le titre du menu"
+                label="Editar el título del menú"
                 onEdit={onEdit}
                 className="block"
                 buttonClassName="right-0 -top-3"
@@ -649,7 +649,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
               {content.menu.image && (
                 <EditableElement
                   id="menu.image"
-                  label="Modifier l'image du menu"
+                  label="Editar la imagen del menú"
                   onEdit={onEdit}
                   className="mb-8 block"
                   buttonClassName="right-4 top-4"
@@ -695,14 +695,14 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
                 ) : (
                   <div className="col-span-full rounded-2xl border border-dashed border-slate-300 bg-white/70 p-6 text-center">
                     <p className="text-sm text-slate-500" style={menuBodyTextStyle}>
-                      Aucun best seller sélectionné pour le moment.
+                      Ningún producto destacado seleccionado por ahora.
                     </p>
                   </div>
                 )}
               </div>
               <EditableElement
                 id="menu.ctaLabel"
-                label="Modifier le bouton de commande"
+                label="Editar el botón de pedido"
                 onEdit={onEdit}
                 className="section-actions mt-8"
                 buttonClassName="right-2 top-2"
@@ -729,7 +729,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
                   </button>
                   <EditableElement
                     id="menu.loadingLabel"
-                    label="Modifier le texte de chargement"
+                    label="Editar el texto de carga"
                     onEdit={onEdit}
                     className="ml-4 inline-flex"
                     buttonClassName="-right-3 -top-3"
@@ -756,7 +756,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
       <SectionCard zone="findUs" activeZone={activeZone}>
         <EditableElement
           id="findUs.style.background"
-          label="Modifier le fond de la section Encuéntranos"
+          label="Editar el fondo de la sección Encuéntranos"
           onEdit={onEdit}
           className="block"
           buttonClassName="right-4 top-4"
@@ -766,7 +766,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
               <div className="encuentranos-panel" style={findUsTextStyle}>
                 <EditableElement
                   id="findUs.title"
-                  label="Modifier le titre Encuéntranos"
+                  label="Editar el título Encuéntranos"
                   onEdit={onEdit}
                   className="block"
                   buttonClassName="right-0 -top-3"
@@ -789,7 +789,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
                     <div className="encuentranos-detail__content">
                       <EditableElement
                         id="findUs.addressLabel"
-                        label="Modifier le libellé de l'adresse"
+                        label="Editar la etiqueta de la dirección"
                         onEdit={onEdit}
                         className="block"
                         buttonClassName="right-0 -top-3"
@@ -806,7 +806,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
                       </EditableElement>
                       <EditableElement
                         id="findUs.address"
-                        label="Modifier l'adresse"
+                        label="Editar la dirección"
                         onEdit={onEdit}
                         className="mt-1 block"
                         buttonClassName="right-0 -top-3"
@@ -830,7 +830,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
                   <div className="encuentranos-detail__content">
                     <EditableElement
                       id="findUs.hoursLabel"
-                      label="Modifier le libellé des horaires"
+                      label="Editar la etiqueta de los horarios"
                       onEdit={onEdit}
                       className="block"
                       buttonClassName="right-0 -top-3"
@@ -847,7 +847,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
                     </EditableElement>
                     <EditableElement
                       id="findUs.hours"
-                      label="Modifier les horaires"
+                      label="Editar los horarios"
                       onEdit={onEdit}
                       className="mt-1 block"
                       buttonClassName="right-0 -top-3"
@@ -871,7 +871,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
                   <div className="encuentranos-detail__content">
                     <EditableElement
                       id="findUs.cityLabel"
-                      label="Modifier le libellé de l'email"
+                      label="Editar la etiqueta del correo"
                       onEdit={onEdit}
                       className="block"
                       buttonClassName="right-0 -top-3"
@@ -888,7 +888,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
                     </EditableElement>
                     <EditableElement
                       id="findUs.city"
-                      label="Modifier l'email"
+                      label="Editar el correo"
                       onEdit={onEdit}
                       className="mt-1 block"
                       buttonClassName="right-0 -top-3"
@@ -925,7 +925,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
                     >
                       <EditableElement
                         id="findUs.mapLabel"
-                        label="Modifier le libellé du lien Google Maps"
+                        label="Editar la etiqueta del enlace de Google Maps"
                         onEdit={onEdit}
                         className="inline-flex"
                         buttonClassName="-right-3 -top-3"
@@ -947,7 +947,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
                   <div className="encuentranos-map__placeholder">
                     <EditableElement
                       id="findUs.mapLabel"
-                      label="Modifier le libellé du lien Google Maps"
+                      label="Editar la etiqueta del enlace de Google Maps"
                       onEdit={onEdit}
                       className="inline-flex"
                       buttonClassName="-right-3 -top-3"
@@ -974,7 +974,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
       <SectionCard zone="footer" activeZone={activeZone}>
         <EditableElement
           id="footer.style.background"
-          label="Modifier le fond du pied de page"
+          label="Editar el fondo del pie de página"
           onEdit={onEdit}
           className="block"
           buttonClassName="right-4 top-4"
@@ -983,7 +983,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
             <div className="layout-container site-footer__inner" style={footerTextStyle}>
               <EditableElement
                 id="footer.text"
-                label="Modifier le texte du pied de page"
+                label="Editar el texto del pie de página"
                 onEdit={onEdit}
                 className="block"
                 buttonClassName="right-0 -top-3"
