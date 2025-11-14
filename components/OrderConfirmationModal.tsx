@@ -118,13 +118,26 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
       messageParts.push(`Comprobante: ${order.receipt_url}`);
     }
 
-    return encodeURIComponent(messageParts.join('\n'));
+    return messageParts.join('\n');
+  };
+
+  const buildWhatsAppUrl = (rawWhatsappNumber: string, message: string): string => {
+    const normalizedWhatsapp = sanitizeWhatsappNumber(rawWhatsappNumber) || DEFAULT_WHATSAPP_NUMBER;
+    const url = new URL(`https://wa.me/${normalizedWhatsapp}`);
+
+    url.search = new URLSearchParams({
+      // WhatsApp sometimes ignores the payload when only `\n` is used. Converting to CRLF
+      // ensures the text area is populated consistently across the native apps and the web
+      // client, while URLSearchParams handles the encoding of special characters.
+      text: message.replace(/\n/g, '\r\n')
+    }).toString();
+
+    return url.toString();
   };
 
   const handleWhatsAppClick = () => {
     const message = generateWhatsAppMessage();
-    const normalizedWhatsapp = sanitizeWhatsappNumber(whatsappNumber) || DEFAULT_WHATSAPP_NUMBER;
-    const whatsappUrl = `https://wa.me/${normalizedWhatsapp}?text=${message}`;
+    const whatsappUrl = buildWhatsAppUrl(whatsappNumber, message);
     window.open(whatsappUrl, '_blank');
 
     // Redirect customer to the public home page where the tracker is displayed
