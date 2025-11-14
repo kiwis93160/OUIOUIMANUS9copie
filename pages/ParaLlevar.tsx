@@ -25,9 +25,29 @@ const TakeawayCard: React.FC<{ order: Order, onValidate?: (orderId: string) => v
     const hasAppliedPromotions = (order.applied_promotions?.length ?? 0) > 0;
     const showPromotionDetails = hasAppliedPromotions;
 
+    const { borderClasses, quantityBackgroundClass } = (() => {
+        switch (urgencyStyles.level) {
+            case 'critical':
+                return {
+                    borderClasses: 'border-4 border-status-danger-hover',
+                    quantityBackgroundClass: 'bg-status-danger-hover',
+                };
+            case 'warning':
+                return {
+                    borderClasses: 'border-4 border-yellow-500',
+                    quantityBackgroundClass: 'bg-yellow-500',
+                };
+            default:
+                return {
+                    borderClasses: 'border-4 border-brand-dark',
+                    quantityBackgroundClass: 'bg-brand-dark',
+                };
+        }
+    })();
+
     return (
         <div className="relative">
-            <div className={`relative flex h-full flex-col overflow-hidden rounded-xl border text-gray-900 shadow-md transition-shadow duration-300 hover:shadow-lg ${urgencyStyles.border} ${urgencyStyles.background}`}>
+            <div className={`relative flex h-full flex-col overflow-hidden rounded-2xl ${borderClasses} text-gray-900 transition-colors duration-300 ${urgencyStyles.background}`}>
                 <span aria-hidden className={`absolute inset-y-0 left-0 w-1 ${urgencyStyles.accent}`} />
                 <header className="border-b border-gray-200 px-5 pt-3 pb-2">
                     <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
@@ -83,7 +103,7 @@ const TakeawayCard: React.FC<{ order: Order, onValidate?: (orderId: string) => v
                                                 <li key={item.id} className="flex items-stretch rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 shadow-sm overflow-hidden min-h-[3.5rem]">
                                                     <div className="flex flex-1 items-center justify-between gap-3 pr-3">
                                                         <div className="flex flex-1 items-center">
-                                                            <span className={`flex self-stretch w-12 shrink-0 items-center justify-center text-xl font-bold text-white shadow-md ${urgencyStyles.accent} rounded-l-lg`}>
+                                                            <span className={`flex self-stretch w-12 shrink-0 items-center justify-center text-xl font-bold text-white shadow-md ${quantityBackgroundClass} rounded-l-lg`}>
                                                                 {item.quantite}
                                                             </span>
                                                             <span className="font-semibold text-gray-900 text-[clamp(1.1rem,2.1vw,1.3rem)] leading-snug break-words text-balance whitespace-normal [hyphens:auto] px-3 py-3">
