@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle } from 'lucide-react';
 import { Order } from '../types';
 import { formatCurrencyCOP } from '../utils/formatIntegerAmount';
+import { buildWhatsAppUrl } from '../utils/whatsapp';
 
 interface OrderConfirmationModalProps {
   isOpen: boolean;
@@ -12,7 +13,6 @@ interface OrderConfirmationModalProps {
 
 const isFreeShippingType = (type?: string | null) => (type ?? '').toLowerCase() === 'free_shipping';
 const DEFAULT_WHATSAPP_NUMBER = '573238090562';
-const sanitizeWhatsappNumber = (value: string): string => value.replace(/[^\d]/g, '');
 
 const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
   isOpen,
@@ -121,23 +121,9 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
     return messageParts.join('\n');
   };
 
-  const buildWhatsAppUrl = (rawWhatsappNumber: string, message: string): string => {
-    const normalizedWhatsapp = sanitizeWhatsappNumber(rawWhatsappNumber) || DEFAULT_WHATSAPP_NUMBER;
-    const url = new URL(`https://wa.me/${normalizedWhatsapp}`);
-
-    url.search = new URLSearchParams({
-      // WhatsApp sometimes ignores the payload when only `\n` is used. Converting to CRLF
-      // ensures the text area is populated consistently across the native apps and the web
-      // client, while URLSearchParams handles the encoding of special characters.
-      text: message.replace(/\n/g, '\r\n')
-    }).toString();
-
-    return url.toString();
-  };
-
   const handleWhatsAppClick = () => {
     const message = generateWhatsAppMessage();
-    const whatsappUrl = buildWhatsAppUrl(whatsappNumber, message);
+    const whatsappUrl = buildWhatsAppUrl({ phone: whatsappNumber ?? DEFAULT_WHATSAPP_NUMBER, message });
     window.open(whatsappUrl, '_blank');
 
     // Redirect customer to the public home page where the tracker is displayed
