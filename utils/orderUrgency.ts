@@ -14,6 +14,48 @@ export interface OrderUrgencyStyles {
   background: string;
 }
 
+export interface OrderUrgencyToneClasses {
+  level: OrderUrgencyLevel;
+  /** Complete class list for the default timer chip. */
+  timer: string;
+  /** Border utility that mirrors the timer background colour. */
+  cardBorder: string;
+  /** Quantity badge background that mirrors the timer background colour. */
+  quantityBackground: string;
+  /** Raw background class so other components can copy the tone. */
+  timerBackground: string;
+  /** Hex colour that matches the timer background for inline styles. */
+  toneHex: string;
+}
+
+const createToneClasses = ({
+  backgroundClass,
+  backgroundHex,
+  textClass,
+  shadowClass = 'shadow-sm',
+}: {
+  backgroundClass: string;
+  backgroundHex: string;
+  textClass: string;
+  shadowClass?: string;
+}): Omit<OrderUrgencyToneClasses, 'level'> => {
+  const borderColourClass = backgroundClass.replace(/^bg-/, 'border-');
+
+  return {
+    timer: `${backgroundClass} ${textClass} border ${borderColourClass} ${shadowClass}`.trim(),
+    cardBorder: `border-4 ${borderColourClass}`,
+    quantityBackground: backgroundClass,
+    timerBackground: backgroundClass,
+    toneHex: backgroundHex,
+  };
+};
+
+const URGENCY_TONE_CLASS_MAP: Record<OrderUrgencyLevel, Omit<OrderUrgencyToneClasses, 'level'>> = {
+  critical: createToneClasses({ backgroundClass: 'bg-red-600', backgroundHex: '#dc2626', textClass: 'text-white' }),
+  warning: createToneClasses({ backgroundClass: 'bg-yellow-400', backgroundHex: '#facc15', textClass: 'text-gray-900' }),
+  normal: createToneClasses({ backgroundClass: 'bg-brand-accent-hover', backgroundHex: '#1d4ed8', textClass: 'text-white', shadowClass: 'shadow-none' }),
+};
+
 const URGENCY_STYLE_MAP: Record<OrderUrgencyLevel, Omit<OrderUrgencyStyles, 'level'>> = {
   critical: {
     border: 'border-4 border-solid border-red-500',
@@ -67,6 +109,16 @@ export const getOrderUrgencyStyles = (startTime?: number): OrderUrgencyStyles =>
     badge: styles.badge,
     icon: styles.icon,
     background: styles.background,
+  };
+};
+
+export const getOrderUrgencyToneClasses = (startTime?: number): OrderUrgencyToneClasses => {
+  const level = getOrderUrgencyLevel(startTime);
+  const toneClasses = URGENCY_TONE_CLASS_MAP[level];
+
+  return {
+    level,
+    ...toneClasses,
   };
 };
 

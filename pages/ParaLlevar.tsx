@@ -4,7 +4,7 @@ import { Order, OrderItem, WeeklySchedule } from '../types';
 import { Clock, Eye, User, MapPin, Phone } from 'lucide-react';
 import Modal from '../components/Modal';
 import OrderTimer from '../components/OrderTimer';
-import { getOrderUrgencyStyles } from '../utils/orderUrgency';
+import { getOrderUrgencyStyles, getOrderUrgencyToneClasses } from '../utils/orderUrgency';
 import { formatCurrencyCOP } from '../utils/formatIntegerAmount';
 import useSiteContent, { DEFAULT_SITE_CONTENT } from '../hooks/useSiteContent';
 import useOnlineOrderingSchedules from '../hooks/useOnlineOrderingSchedules';
@@ -17,6 +17,7 @@ const TakeawayCard: React.FC<{ order: Order, onValidate?: (orderId: string) => v
     const displayName = order.table_nom || `Pedido #${order.id.slice(-6)}`;
     const timerStart = order.date_envoi_cuisine || order.date_creation;
     const urgencyStyles = getOrderUrgencyStyles(timerStart);
+    const urgencyTone = getOrderUrgencyToneClasses(timerStart);
     const urgencyLabelMap: Record<typeof urgencyStyles.level, string> = {
         normal: 'Normal',
         warning: 'En seguimiento',
@@ -24,11 +25,13 @@ const TakeawayCard: React.FC<{ order: Order, onValidate?: (orderId: string) => v
     };
     const hasAppliedPromotions = (order.applied_promotions?.length ?? 0) > 0;
     const showPromotionDetails = hasAppliedPromotions;
+    const toneBorderStyle = useMemo<React.CSSProperties>(() => ({ borderColor: urgencyTone.toneHex }), [urgencyTone.toneHex]);
+    const toneFillStyle = useMemo<React.CSSProperties>(() => ({ backgroundColor: urgencyTone.toneHex }), [urgencyTone.toneHex]);
 
     return (
         <div className="relative">
-            <div className={`relative flex h-full flex-col overflow-hidden rounded-xl border text-gray-900 shadow-md transition-shadow duration-300 hover:shadow-lg ${urgencyStyles.border} ${urgencyStyles.background}`}>
-                <span aria-hidden className={`absolute inset-y-0 left-0 w-1 ${urgencyStyles.accent}`} />
+            <div className={`relative flex h-full flex-col overflow-hidden rounded-2xl ${urgencyTone.cardBorder} text-gray-900 transition-colors duration-300 ${urgencyStyles.background}`} style={toneBorderStyle}>
+                <span aria-hidden className={`absolute inset-y-0 left-0 w-1 ${urgencyTone.timerBackground}`} style={toneFillStyle} />
                 <header className="border-b border-gray-200 px-5 pt-3 pb-2">
                     <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
                         <div className="min-w-0 space-y-0.5">
@@ -83,7 +86,7 @@ const TakeawayCard: React.FC<{ order: Order, onValidate?: (orderId: string) => v
                                                 <li key={item.id} className="flex items-stretch rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 shadow-sm overflow-hidden min-h-[3.5rem]">
                                                     <div className="flex flex-1 items-center justify-between gap-3 pr-3">
                                                         <div className="flex flex-1 items-center">
-                                                            <span className={`flex self-stretch w-12 shrink-0 items-center justify-center text-xl font-bold text-white shadow-md ${urgencyStyles.accent} rounded-l-lg`}>
+                                                            <span className={`flex self-stretch w-12 shrink-0 items-center justify-center text-xl font-bold text-white shadow-md ${urgencyTone.quantityBackground} rounded-l-lg`} style={toneFillStyle}>
                                                                 {item.quantite}
                                                             </span>
                                                             <span className="font-semibold text-gray-900 text-[clamp(1.1rem,2.1vw,1.3rem)] leading-snug break-words text-balance whitespace-normal [hyphens:auto] px-3 py-3">
