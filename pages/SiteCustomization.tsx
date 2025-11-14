@@ -860,6 +860,7 @@ const snapshotRect = (rect: DOMRect | DOMRectReadOnly | null): RectSnapshot | nu
 interface FloatingEditorPanelProps {
   title: string;
   description?: string;
+  element: EditableElementKey;
   anchor: RectSnapshot | null;
   boundary: RectSnapshot | null;
   onClose: () => void;
@@ -869,6 +870,7 @@ interface FloatingEditorPanelProps {
 const FloatingEditorPanel: React.FC<FloatingEditorPanelProps> = ({
   title,
   description,
+  element,
   anchor,
   boundary,
   onClose,
@@ -878,6 +880,38 @@ const FloatingEditorPanel: React.FC<FloatingEditorPanelProps> = ({
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const [placement, setPlacement] = useState<'above' | 'below'>('above');
 
+  const resolveRects = useCallback(() => {
+    let resolvedAnchor = anchor;
+    let resolvedBoundary = boundary;
+    if (typeof document !== 'undefined') {
+      const escapedElementId =
+        typeof window !== 'undefined' && 'CSS' in window && typeof CSS.escape === 'function'
+          ? CSS.escape(element)
+          : element.replace(/"/g, '\\"');
+      const anchorButton = document.querySelector<HTMLElement>(
+        `[data-element-id="${escapedElementId}"]`,
+      );
+      if (anchorButton) {
+        resolvedAnchor = anchorButton.getBoundingClientRect();
+        const scopedBoundary = anchorButton.closest('[data-preview-boundary="true"]') as
+          | HTMLElement
+          | null;
+        if (scopedBoundary) {
+          resolvedBoundary = scopedBoundary.getBoundingClientRect();
+        }
+      }
+      if (!resolvedBoundary) {
+        const fallbackBoundaryNode = document.querySelector('[data-preview-boundary="true"]') as
+          | HTMLElement
+          | null;
+        if (fallbackBoundaryNode) {
+          resolvedBoundary = fallbackBoundaryNode.getBoundingClientRect();
+        }
+      }
+    }
+    return { resolvedAnchor, resolvedBoundary };
+  }, [anchor, boundary, element]);
+
   const updatePosition = useCallback(() => {
     if (typeof window === 'undefined') {
       return;
@@ -886,9 +920,10 @@ const FloatingEditorPanel: React.FC<FloatingEditorPanelProps> = ({
     if (!node) {
       return;
     }
+    const { resolvedAnchor, resolvedBoundary } = resolveRects();
     const panelRect = node.getBoundingClientRect();
     const fallbackBoundary: RectSnapshot =
-      boundary ?? {
+      resolvedBoundary ?? {
         top: 16,
         left: 16,
         right: window.innerWidth - 16,
@@ -897,7 +932,7 @@ const FloatingEditorPanel: React.FC<FloatingEditorPanelProps> = ({
         height: Math.max(window.innerHeight - 32, panelRect.height),
       };
     const fallbackTarget: RectSnapshot =
-      anchor ?? {
+      resolvedAnchor ?? {
         top: fallbackBoundary.top + fallbackBoundary.height / 2,
         bottom: fallbackBoundary.top + fallbackBoundary.height / 2,
         left: fallbackBoundary.left + fallbackBoundary.width / 2,
@@ -928,7 +963,7 @@ const FloatingEditorPanel: React.FC<FloatingEditorPanelProps> = ({
       top: Math.max(minTop, nextTop),
       left: nextLeft,
     });
-  }, [anchor, boundary]);
+  }, [resolveRects]);
 
   useLayoutEffect(() => {
     if (typeof window === 'undefined') {
@@ -2207,6 +2242,7 @@ const SiteCustomization: React.FC = () => {
         <FloatingEditorPanel
           title={activeFieldMeta.field.label}
           description={activeFieldMeta.field.description}
+          element={floatingEditor.element}
           anchor={floatingEditor.anchor}
           boundary={floatingEditor.boundary}
           onClose={closeFloatingEditor}
