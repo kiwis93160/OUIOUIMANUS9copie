@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo, Dispatch, SetStateAction } from 'react';
 import { api } from '../services/api';
 import { Order, OrderItem, WeeklySchedule } from '../types';
 import { Clock, Eye, User, MapPin, Phone } from 'lucide-react';
@@ -9,6 +9,33 @@ import { formatCurrencyCOP } from '../utils/formatIntegerAmount';
 import useSiteContent, { DEFAULT_SITE_CONTENT } from '../hooks/useSiteContent';
 import useOnlineOrderingSchedules from '../hooks/useOnlineOrderingSchedules';
 import { isWithinWeeklySchedule } from '../utils/weeklyScheduleUtils';
+
+type PhoneConfigKey = 'support' | 'confirmation' | 'report';
+
+const PHONE_CONFIG_METADATA: Record<PhoneConfigKey, { title: string; description: string; placeholder: string; helper: string }> = {
+    support: {
+        title: 'Número WhatsApp del restaurante en el tracker de pedido',
+        description: 'Visible para el cliente en el seguimiento del pedido para poder contactar al restaurante.',
+        placeholder: 'Ej.: +57 323 809 0562',
+        helper: 'Usa el formato internacional incluyendo el indicativo del país.',
+    },
+    confirmation: {
+        title: 'Número WhatsApp para confirmación de pedidos en línea',
+        description: 'Se utiliza para enviar automáticamente el resumen cuando el cliente confirma su pedido.',
+        placeholder: 'Ej.: 573238090562',
+        helper: 'Asegúrate de que este número tenga WhatsApp activo para recibir los mensajes.',
+    },
+    report: {
+        title: 'Número WhatsApp para el reporte diario',
+        description: 'Recibirás el reporte diario del restaurante en este número de WhatsApp.',
+        placeholder: 'Ej.: 573238090562',
+        helper: 'Puedes dejarlo vacío si no quieres recibir reportes diarios.',
+    },
+};
+
+const PHONE_CONFIG_ORDER: PhoneConfigKey[] = ['support', 'confirmation', 'report'];
+
+type ConfigFeedback = { message: string; tone: 'success' | 'error' };
 
 
 const TakeawayCard: React.FC<{ order: Order, onValidate?: (orderId: string) => void, onDeliver?: (orderId: string) => void, isProcessing?: boolean }> = ({ order, onValidate, onDeliver, isProcessing }) => {
@@ -242,9 +269,15 @@ const ParaLlevar: React.FC = () => {
     const { content: siteContent, loading: siteContentLoading, updateContent } = useSiteContent();
     const { schedule: weeklySchedule, updateSchedule, loading: scheduleLoading } = useOnlineOrderingSchedules();
     const [savingSchedule, setSavingSchedule] = useState(false);
-    const [scheduleFeedback, setScheduleFeedback] = useState<{ message: string; tone: 'success' | 'error' } | null>(null);
+    const [scheduleFeedback, setScheduleFeedback] = useState<ConfigFeedback | null>(null);
+    const [contactFeedback, setContactFeedback] = useState<ConfigFeedback | null>(null);
     const [now, setNow] = useState(() => new Date());
     const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+    const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+    const [draftSupportPhone, setDraftSupportPhone] = useState('');
+    const [draftConfirmationPhone, setDraftConfirmationPhone] = useState('');
+    const [draftReportPhone, setDraftReportPhone] = useState('');
+    const [savingContactConfig, setSavingContactConfig] = useState(false);
 
     useEffect(() => {
         if (typeof window === 'undefined') {
@@ -271,6 +304,11 @@ const ParaLlevar: React.FC = () => {
     const [editingSupportPhone, setEditingSupportPhone] = useState('');
     const [editingWhatsappPhone, setEditingWhatsappPhone] = useState('');
     const [editingReportWhatsappPhone, setEditingReportWhatsappPhone] = useState('');
+    const draftPhoneState: Record<PhoneConfigKey, { value: string; setter: Dispatch<SetStateAction<string>> }> = {
+        support: { value: draftSupportPhone, setter: setDraftSupportPhone },
+        confirmation: { value: draftConfirmationPhone, setter: setDraftConfirmationPhone },
+        report: { value: draftReportPhone, setter: setDraftReportPhone },
+    };
 
     useEffect(() => {
         if (weeklySchedule && !editingSchedule) {
@@ -292,9 +330,15 @@ const ParaLlevar: React.FC = () => {
     }, [siteContent]);
 
     const resolvedContent = siteContent ?? DEFAULT_SITE_CONTENT;
-    const supportPhoneNumber = resolvedContent.onlineOrdering.supportPhoneNumber?.trim();
-    const whatsappResumeNumber = resolvedContent.onlineOrdering.confirmationWhatsappNumber?.trim();
-    const reportWhatsappNumber = resolvedContent.onlineOrdering.reportWhatsappNumber?.trim();
+    const phoneDisplayValues = useMemo<Record<PhoneConfigKey, string>>(() => ({
+        support: editingSupportPhone.trim(),
+        confirmation: editingWhatsappPhone.trim(),
+        report: editingReportWhatsappPhone.trim(),
+    }), [editingReportWhatsappPhone, editingSupportPhone, editingWhatsappPhone]);
+    const configuredPhonesCount = useMemo(
+        () => PHONE_CONFIG_ORDER.filter((type) => Boolean(phoneDisplayValues[type])).length,
+        [phoneDisplayValues],
+    );
 
     const isCurrentlyOnline = useMemo(() => {
         return isWithinWeeklySchedule(weeklySchedule, now);
@@ -338,24 +382,8 @@ const ParaLlevar: React.FC = () => {
         setSavingSchedule(true);
         setScheduleFeedback(null);
         try {
-            const trimmedSupport = editingSupportPhone.trim();
-            const trimmedWhatsapp = editingWhatsappPhone.trim();
-            const trimmedReportWhatsapp = editingReportWhatsappPhone.trim();
-            const nextContent = {
-                ...resolvedContent,
-                onlineOrdering: {
-                    ...resolvedContent.onlineOrdering,
-                    supportPhoneNumber: trimmedSupport,
-                    confirmationWhatsappNumber: trimmedWhatsapp,
-                    reportWhatsappNumber: trimmedReportWhatsapp,
-                },
-            };
-
-            await Promise.all([
-                updateSchedule(editingSchedule),
-                updateContent(nextContent),
-            ]);
-            setScheduleFeedback({ message: 'Horarios y contactos actualizados con éxito.', tone: 'success' });
+            await updateSchedule(editingSchedule);
+            setScheduleFeedback({ message: 'Horarios actualizados con éxito.', tone: 'success' });
             setIsScheduleModalOpen(false);
         } catch (error) {
             console.error('Failed to update online ordering schedule', error);
@@ -366,12 +394,62 @@ const ParaLlevar: React.FC = () => {
         }
     }, [
         editingSchedule,
-        editingSupportPhone,
-        editingWhatsappPhone,
-        editingReportWhatsappPhone,
+        updateSchedule,
+    ]);
+
+    const handleOpenContactModal = useCallback(() => {
+        setDraftSupportPhone(editingSupportPhone);
+        setDraftConfirmationPhone(editingWhatsappPhone);
+        setDraftReportPhone(editingReportWhatsappPhone);
+        setIsContactModalOpen(true);
+    }, [editingReportWhatsappPhone, editingSupportPhone, editingWhatsappPhone]);
+
+    const handleCloseContactModal = useCallback(() => {
+        setIsContactModalOpen(false);
+        setDraftSupportPhone('');
+        setDraftConfirmationPhone('');
+        setDraftReportPhone('');
+    }, []);
+
+    const handleSaveContactConfig = useCallback(async () => {
+        setSavingContactConfig(true);
+        setContactFeedback(null);
+        try {
+            const trimmedSupport = draftSupportPhone.trim();
+            const trimmedConfirmation = draftConfirmationPhone.trim();
+            const trimmedReport = draftReportPhone.trim();
+
+            const nextContent = {
+                ...resolvedContent,
+                onlineOrdering: {
+                    ...resolvedContent.onlineOrdering,
+                    supportPhoneNumber: trimmedSupport,
+                    confirmationWhatsappNumber: trimmedConfirmation,
+                    reportWhatsappNumber: trimmedReport,
+                },
+            };
+
+            await updateContent(nextContent);
+
+            setEditingSupportPhone(trimmedSupport);
+            setEditingWhatsappPhone(trimmedConfirmation);
+            setEditingReportWhatsappPhone(trimmedReport);
+            setContactFeedback({ message: 'Números de contacto actualizados con éxito.', tone: 'success' });
+            handleCloseContactModal();
+        } catch (error) {
+            console.error('Failed to update contact phone numbers', error);
+            const message = error instanceof Error ? error.message : 'No fue posible guardar los números de contacto.';
+            setContactFeedback({ message, tone: 'error' });
+        } finally {
+            setSavingContactConfig(false);
+        }
+    }, [
+        handleCloseContactModal,
+        draftConfirmationPhone,
+        draftReportPhone,
+        draftSupportPhone,
         resolvedContent,
         updateContent,
-        updateSchedule,
     ]);
 
     const fetchOrders = useCallback(async () => {
@@ -443,60 +521,94 @@ const ParaLlevar: React.FC = () => {
                             </p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                        <span
-                            className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] ${
-                                isCurrentlyOnline
-                                    ? 'bg-emerald-100 text-emerald-700'
-                                    : 'bg-amber-100 text-amber-700'
-                            }`}
-                        >
-                            <span className={`h-2 w-2 rounded-full ${isCurrentlyOnline ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-                            {isCurrentlyOnline ? 'Abierto' : 'Cerrado'}
-                        </span>
-                        <button
-                            onClick={() => setIsScheduleModalOpen(true)}
-                            className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                            type="button"
-                        >
-                            Configurer
-                        </button>
+                    <div className="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:items-end">
+                        {scheduleFeedback && (
+                            <div
+                                className={`rounded-lg border px-3 py-2 text-xs font-medium ${
+                                    scheduleFeedback.tone === 'success'
+                                        ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                                        : 'border-red-200 bg-red-50 text-red-700'
+                                }`}
+                            >
+                                {scheduleFeedback.message}
+                            </div>
+                        )}
+                        <div className="flex flex-wrap items-center gap-3 sm:justify-end">
+                            <span
+                                className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] ${
+                                    isCurrentlyOnline
+                                        ? 'bg-emerald-100 text-emerald-700'
+                                        : 'bg-amber-100 text-amber-700'
+                                }`}
+                            >
+                                <span className={`h-2 w-2 rounded-full ${isCurrentlyOnline ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                                {isCurrentlyOnline ? 'Abierto' : 'Cerrado'}
+                            </span>
+                            <button
+                                onClick={() => setIsScheduleModalOpen(true)}
+                                className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                type="button"
+                            >
+                                Configurar horarios
+                            </button>
+                        </div>
                     </div>
                 </div>
-                {scheduleFeedback && (
-                    <p
-                        className={`mt-4 text-sm font-medium ${
-                            scheduleFeedback.tone === 'success' ? 'text-emerald-600' : 'text-red-600'
-                        }`}
-                    >
-                        {scheduleFeedback.message}
-                    </p>
-                )}
-                <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Número WhatsApp del restaurante en el tracker de pedido</p>
-                        <p className="mt-1 text-lg font-semibold text-gray-900">
-                            {supportPhoneNumber ? supportPhoneNumber : 'Sin configurar'}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">Este número aparece en el seguimiento del cliente para contactar al restaurante.</p>
+
+            </div>
+
+            <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-6">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                            <Phone size={22} />
+                        </div>
+                        <div>
+                            <h2 className="text-base font-semibold text-gray-900">Configuración de contactos</h2>
+                            <p className="text-sm text-gray-500">Gestiona los números que usan tus clientes y tu equipo.</p>
+                        </div>
                     </div>
-                    <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Número WhatsApp para confirmación de pedidos en línea</p>
-                        <p className="mt-1 text-lg font-semibold text-gray-900">
-                            {whatsappResumeNumber ? whatsappResumeNumber : 'Sin configurar'}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">Se usa para enviar automáticamente el resumen cuando el cliente confirma.</p>
-                    </div>
-                    <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Número WhatsApp para el reporte diario</p>
-                        <p className="mt-1 text-lg font-semibold text-gray-900">
-                            {reportWhatsappNumber ? reportWhatsappNumber : 'Sin configurar'}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">Se usa para enviar el reporte diario desde el modal correspondiente.</p>
+                    <div className="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:items-end">
+                        {contactFeedback && (
+                            <div
+                                className={`rounded-lg border px-3 py-2 text-xs font-medium ${
+                                    contactFeedback.tone === 'success'
+                                        ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                                        : 'border-red-200 bg-red-50 text-red-700'
+                                }`}
+                            >
+                                {contactFeedback.message}
+                            </div>
+                        )}
+                        <div className="flex flex-wrap items-center gap-3 sm:justify-end">
+                            <span
+                                className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] ${
+                                    configuredPhonesCount === PHONE_CONFIG_ORDER.length
+                                        ? 'bg-emerald-100 text-emerald-700'
+                                        : 'bg-amber-100 text-amber-700'
+                                }`}
+                            >
+                                <span
+                                    className={`h-2 w-2 rounded-full ${
+                                        configuredPhonesCount === PHONE_CONFIG_ORDER.length ? 'bg-emerald-500' : 'bg-amber-500'
+                                    }`}
+                                />
+                                {configuredPhonesCount === 0
+                                    ? 'Sin números'
+                                    : `${configuredPhonesCount}/${PHONE_CONFIG_ORDER.length} configurados`}
+                            </span>
+                            <button
+                                onClick={handleOpenContactModal}
+                                className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                type="button"
+                            >
+                                Configurar contactos
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-            
+
             <Modal isOpen={isScheduleModalOpen} onClose={() => setIsScheduleModalOpen(false)} title="Configuración de horarios" size="xs">
                 <div className="space-y-1.5">
                     {daysOfWeek.map(({ key, label }) => (
@@ -546,42 +658,6 @@ const ParaLlevar: React.FC = () => {
                             )}
                         </div>
                     ))}
-                    <div className="space-y-3 rounded border border-gray-200 bg-white/60 p-3">
-                        <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-500">Datos de contacto</h4>
-                        <label className="flex flex-col gap-1">
-                            <span className="text-[11px] font-medium text-gray-600">Número WhatsApp del restaurante en el tracker de pedido</span>
-                            <input
-                                type="tel"
-                                value={editingSupportPhone}
-                                onChange={(e) => setEditingSupportPhone(e.target.value)}
-                                className="w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/30"
-                                placeholder="Ej.: +57 323 809 0562"
-                            />
-                            <span className="text-[10px] text-gray-500">Visible para el cliente en el seguimiento del pedido.</span>
-                        </label>
-                        <label className="flex flex-col gap-1">
-                            <span className="text-[11px] font-medium text-gray-600">Número WhatsApp para confirmación de pedidos en línea</span>
-                            <input
-                                type="tel"
-                                value={editingWhatsappPhone}
-                                onChange={(e) => setEditingWhatsappPhone(e.target.value)}
-                                className="w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/30"
-                                placeholder="Ej.: 573238090562"
-                            />
-                            <span className="text-[10px] text-gray-500">Se utiliza cuando el cliente envía su resumen de pedido.</span>
-                        </label>
-                        <label className="flex flex-col gap-1">
-                            <span className="text-[11px] font-medium text-gray-600">Número WhatsApp para recibir el reporte diario</span>
-                            <input
-                                type="tel"
-                                value={editingReportWhatsappPhone}
-                                onChange={(e) => setEditingReportWhatsappPhone(e.target.value)}
-                                className="w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/30"
-                                placeholder="Ej.: 573238090562"
-                            />
-                            <span className="text-[10px] text-gray-500">El reporte diario se enviará automáticamente a este número.</span>
-                        </label>
-                    </div>
                     <div className="flex justify-end gap-1.5 pt-2 border-t border-gray-200">
                         <button
                             onClick={() => setIsScheduleModalOpen(false)}
@@ -601,7 +677,52 @@ const ParaLlevar: React.FC = () => {
                     </div>
                 </div>
             </Modal>
-            
+
+            <Modal
+                isOpen={isContactModalOpen}
+                onClose={handleCloseContactModal}
+                title="Configurar números de contacto"
+                size="xs"
+            >
+                <div className="space-y-4">
+                    {PHONE_CONFIG_ORDER.map((type) => {
+                        const meta = PHONE_CONFIG_METADATA[type];
+                        const { value, setter } = draftPhoneState[type];
+                        return (
+                            <label key={type} className="flex flex-col gap-1 rounded border border-gray-200 bg-gray-50 p-2">
+                                <span className="text-[11px] font-semibold text-gray-700">{meta.title}</span>
+                                <p className="text-[11px] text-gray-500 leading-relaxed">{meta.description}</p>
+                                <input
+                                    type="tel"
+                                    value={value}
+                                    onChange={(e) => setter(e.target.value)}
+                                    className="mt-1 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/30"
+                                    placeholder={meta.placeholder}
+                                />
+                                <span className="text-[10px] text-gray-500">{meta.helper}</span>
+                            </label>
+                        );
+                    })}
+                    <div className="flex justify-end gap-1.5 border-t border-gray-200 pt-2">
+                        <button
+                            onClick={handleCloseContactModal}
+                            className="rounded border border-gray-300 bg-white px-2.5 py-1 text-[11px] font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
+                            type="button"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            onClick={handleSaveContactConfig}
+                            disabled={savingContactConfig}
+                            className="rounded bg-blue-600 px-2.5 py-1 text-[11px] font-semibold text-white shadow transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
+                            type="button"
+                        >
+                            {savingContactConfig ? 'Guardando...' : 'Guardar'}
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+
             <div className="mt-6 grid grid-cols-1 gap-8 md:grid-cols-2">
                 {/* Column for validation */}
                 <div className="bg-gray-100 p-4 rounded-xl">
