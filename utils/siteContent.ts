@@ -651,6 +651,7 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     closedSubtitle: 'Revenez durant nos horaires de service pour commander vos plats préférés.',
     supportPhoneNumber: '+57 323 809 0562',
     confirmationWhatsappNumber: '573238090562',
+    reportWhatsappNumber: '573238090562',
   },
   elementStyles: DEFAULT_ELEMENT_STYLES,
   elementRichText: DEFAULT_ELEMENT_RICH_TEXT,
@@ -743,6 +744,10 @@ const resolveOnlineOrderingSettings = (
     settings?.confirmationWhatsappNumber ?? null,
     fallback.confirmationWhatsappNumber,
   ),
+  reportWhatsappNumber: resolveString(
+    settings?.reportWhatsappNumber ?? null,
+    fallback.reportWhatsappNumber,
+  ),
 });
 
 export const sanitizeSiteContentInput = (content: SiteContent): SiteContent => ({
@@ -813,6 +818,7 @@ export const sanitizeSiteContentInput = (content: SiteContent): SiteContent => (
     closedSubtitle: trimOrEmpty(content.onlineOrdering.closedSubtitle),
     supportPhoneNumber: trimOrEmpty(content.onlineOrdering.supportPhoneNumber),
     confirmationWhatsappNumber: trimOrEmpty(content.onlineOrdering.confirmationWhatsappNumber),
+    reportWhatsappNumber: trimOrEmpty(content.onlineOrdering.reportWhatsappNumber),
   },
   elementStyles: sanitizeElementStyles(content.elementStyles, DEFAULT_ELEMENT_STYLES),
   elementRichText: sanitizeElementRichText(content.elementRichText, DEFAULT_ELEMENT_RICH_TEXT),
