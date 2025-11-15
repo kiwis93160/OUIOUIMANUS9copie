@@ -608,7 +608,7 @@ const ParaLlevar: React.FC = () => {
                     })}
                 </div>
             </div>
-            
+
             <Modal isOpen={isScheduleModalOpen} onClose={() => setIsScheduleModalOpen(false)} title="Configuración de horarios" size="xs">
                 <div className="space-y-1.5">
                     {daysOfWeek.map(({ key, label }) => (
