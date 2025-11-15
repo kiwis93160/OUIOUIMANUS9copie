@@ -640,23 +640,6 @@ const ParaLlevar: React.FC = () => {
                         </div>
                     </div>
                 </div>
-                <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {PHONE_CONFIG_ORDER.map((type) => {
-                        const meta = PHONE_CONFIG_METADATA[type];
-                        const displayValue = phoneDisplayValues[type];
-                        const isConfigured = Boolean(displayValue);
-
-                        return (
-                            <div key={type} className="rounded-xl border border-gray-200 bg-gray-50 p-4 shadow-sm">
-                                <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">{meta.title}</p>
-                                <p className="mt-1 text-lg font-semibold text-gray-900">
-                                    {isConfigured ? displayValue : 'Sin configurar'}
-                                </p>
-                                <p className="mt-3 text-xs text-gray-500">{meta.description}</p>
-                            </div>
-                        );
-                    })}
-                </div>
             </div>
 
             <Modal isOpen={isScheduleModalOpen} onClose={() => setIsScheduleModalOpen(false)} title="Configuración de horarios" size="xs">
