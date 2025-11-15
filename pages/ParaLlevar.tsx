@@ -430,21 +430,21 @@ const ParaLlevar: React.FC = () => {
         updateSchedule,
     ]);
 
-    const openContactModal = useCallback(() => {
+    const handleOpenContactModal = useCallback(() => {
         setDraftSupportPhone(editingSupportPhone);
         setDraftConfirmationPhone(editingWhatsappPhone);
         setDraftReportPhone(editingReportWhatsappPhone);
         setIsContactModalOpen(true);
     }, [editingReportWhatsappPhone, editingSupportPhone, editingWhatsappPhone]);
 
-    const closeContactModal = useCallback(() => {
+    const handleCloseContactModal = useCallback(() => {
         setIsContactModalOpen(false);
         setDraftSupportPhone('');
         setDraftConfirmationPhone('');
         setDraftReportPhone('');
     }, []);
 
-    const handleContactSubmit = useCallback(async () => {
+    const handleSaveContactConfig = useCallback(async () => {
         setSavingContactConfig(true);
         setContactFeedback(null);
         try {
@@ -468,7 +468,7 @@ const ParaLlevar: React.FC = () => {
             setEditingWhatsappPhone(trimmedConfirmation);
             setEditingReportWhatsappPhone(trimmedReport);
             setContactFeedback({ message: 'Números de contacto actualizados con éxito.', tone: 'success' });
-            closeContactModal();
+            handleCloseContactModal();
         } catch (error) {
             console.error('Failed to update contact phone numbers', error);
             const message = error instanceof Error ? error.message : 'No fue posible guardar los números de contacto.';
@@ -477,7 +477,7 @@ const ParaLlevar: React.FC = () => {
             setSavingContactConfig(false);
         }
     }, [
-        closeContactModal,
+        handleCloseContactModal,
         draftConfirmationPhone,
         draftReportPhone,
         draftSupportPhone,
@@ -631,7 +631,7 @@ const ParaLlevar: React.FC = () => {
                                     : `${configuredPhonesCount}/${PHONE_CONFIG_ORDER.length} configurados`}
                             </span>
                             <button
-                                onClick={openContactModal}
+                                onClick={handleOpenContactModal}
                                 className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                                 type="button"
                             >
@@ -730,7 +730,7 @@ const ParaLlevar: React.FC = () => {
 
             <Modal
                 isOpen={isContactModalOpen}
-                onClose={closeContactModal}
+                onClose={handleCloseContactModal}
                 title="Configurar números de contacto"
                 size="xs"
             >
@@ -755,14 +755,14 @@ const ParaLlevar: React.FC = () => {
                     })}
                     <div className="flex justify-end gap-1.5 border-t border-gray-200 pt-2">
                         <button
-                            onClick={closeContactModal}
+                            onClick={handleCloseContactModal}
                             className="rounded border border-gray-300 bg-white px-2.5 py-1 text-[11px] font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
                             type="button"
                         >
                             Cancelar
                         </button>
                         <button
-                            onClick={handleContactSubmit}
+                            onClick={handleSaveContactConfig}
                             disabled={savingContactConfig}
                             className="rounded bg-blue-600 px-2.5 py-1 text-[11px] font-semibold text-white shadow transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
                             type="button"
