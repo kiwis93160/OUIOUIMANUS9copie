@@ -270,6 +270,7 @@ const ParaLlevar: React.FC = () => {
     const [editingSchedule, setEditingSchedule] = useState<WeeklySchedule | null>(null);
     const [editingSupportPhone, setEditingSupportPhone] = useState('');
     const [editingWhatsappPhone, setEditingWhatsappPhone] = useState('');
+    const [editingReportWhatsappPhone, setEditingReportWhatsappPhone] = useState('');
 
     useEffect(() => {
         if (weeklySchedule && !editingSchedule) {
@@ -281,16 +282,19 @@ const ParaLlevar: React.FC = () => {
         if (!siteContent) {
             setEditingSupportPhone(DEFAULT_SITE_CONTENT.onlineOrdering.supportPhoneNumber);
             setEditingWhatsappPhone(DEFAULT_SITE_CONTENT.onlineOrdering.confirmationWhatsappNumber);
+            setEditingReportWhatsappPhone(DEFAULT_SITE_CONTENT.onlineOrdering.reportWhatsappNumber);
             return;
         }
 
         setEditingSupportPhone(siteContent.onlineOrdering.supportPhoneNumber ?? '');
         setEditingWhatsappPhone(siteContent.onlineOrdering.confirmationWhatsappNumber ?? '');
+        setEditingReportWhatsappPhone(siteContent.onlineOrdering.reportWhatsappNumber ?? '');
     }, [siteContent]);
 
     const resolvedContent = siteContent ?? DEFAULT_SITE_CONTENT;
     const supportPhoneNumber = resolvedContent.onlineOrdering.supportPhoneNumber?.trim();
     const whatsappResumeNumber = resolvedContent.onlineOrdering.confirmationWhatsappNumber?.trim();
+    const reportWhatsappNumber = resolvedContent.onlineOrdering.reportWhatsappNumber?.trim();
 
     const isCurrentlyOnline = useMemo(() => {
         return isWithinWeeklySchedule(weeklySchedule, now);
@@ -336,12 +340,14 @@ const ParaLlevar: React.FC = () => {
         try {
             const trimmedSupport = editingSupportPhone.trim();
             const trimmedWhatsapp = editingWhatsappPhone.trim();
+            const trimmedReportWhatsapp = editingReportWhatsappPhone.trim();
             const nextContent = {
                 ...resolvedContent,
                 onlineOrdering: {
                     ...resolvedContent.onlineOrdering,
                     supportPhoneNumber: trimmedSupport,
                     confirmationWhatsappNumber: trimmedWhatsapp,
+                    reportWhatsappNumber: trimmedReportWhatsapp,
                 },
             };
 
@@ -349,7 +355,7 @@ const ParaLlevar: React.FC = () => {
                 updateSchedule(editingSchedule),
                 updateContent(nextContent),
             ]);
-            setScheduleFeedback({ message: 'Horarios y números actualizados con éxito.', tone: 'success' });
+            setScheduleFeedback({ message: 'Horarios y contactos actualizados con éxito.', tone: 'success' });
             setIsScheduleModalOpen(false);
         } catch (error) {
             console.error('Failed to update online ordering schedule', error);
@@ -358,7 +364,15 @@ const ParaLlevar: React.FC = () => {
         } finally {
             setSavingSchedule(false);
         }
-    }, [editingSchedule, editingSupportPhone, editingWhatsappPhone, resolvedContent, updateContent, updateSchedule]);
+    }, [
+        editingSchedule,
+        editingSupportPhone,
+        editingWhatsappPhone,
+        editingReportWhatsappPhone,
+        resolvedContent,
+        updateContent,
+        updateSchedule,
+    ]);
 
     const fetchOrders = useCallback(async () => {
         // Don't set loading to true on refetches for a smoother experience
@@ -458,20 +472,27 @@ const ParaLlevar: React.FC = () => {
                         {scheduleFeedback.message}
                     </p>
                 )}
-                <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Número mostrado en el tracker</p>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Número WhatsApp del restaurante en el tracker de pedido</p>
                         <p className="mt-1 text-lg font-semibold text-gray-900">
                             {supportPhoneNumber ? supportPhoneNumber : 'Sin configurar'}
                         </p>
                         <p className="text-xs text-gray-500 mt-1">Este número aparece en el seguimiento del cliente para contactar al restaurante.</p>
                     </div>
                     <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Número para resúmenes de WhatsApp</p>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Número WhatsApp para confirmación de pedidos en línea</p>
                         <p className="mt-1 text-lg font-semibold text-gray-900">
                             {whatsappResumeNumber ? whatsappResumeNumber : 'Sin configurar'}
                         </p>
                         <p className="text-xs text-gray-500 mt-1">Se usa para enviar automáticamente el resumen cuando el cliente confirma.</p>
+                    </div>
+                    <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Número WhatsApp para el reporte diario</p>
+                        <p className="mt-1 text-lg font-semibold text-gray-900">
+                            {reportWhatsappNumber ? reportWhatsappNumber : 'Sin configurar'}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">Se usa para enviar el reporte diario desde el modal correspondiente.</p>
                     </div>
                 </div>
             </div>
@@ -528,7 +549,7 @@ const ParaLlevar: React.FC = () => {
                     <div className="space-y-3 rounded border border-gray-200 bg-white/60 p-3">
                         <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-500">Datos de contacto</h4>
                         <label className="flex flex-col gap-1">
-                            <span className="text-[11px] font-medium text-gray-600">Número mostrado en el tracker</span>
+                            <span className="text-[11px] font-medium text-gray-600">Número WhatsApp del restaurante en el tracker de pedido</span>
                             <input
                                 type="tel"
                                 value={editingSupportPhone}
@@ -539,7 +560,7 @@ const ParaLlevar: React.FC = () => {
                             <span className="text-[10px] text-gray-500">Visible para el cliente en el seguimiento del pedido.</span>
                         </label>
                         <label className="flex flex-col gap-1">
-                            <span className="text-[11px] font-medium text-gray-600">Número para resúmenes de WhatsApp</span>
+                            <span className="text-[11px] font-medium text-gray-600">Número WhatsApp para confirmación de pedidos en línea</span>
                             <input
                                 type="tel"
                                 value={editingWhatsappPhone}
@@ -548,6 +569,17 @@ const ParaLlevar: React.FC = () => {
                                 placeholder="Ej.: 573238090562"
                             />
                             <span className="text-[10px] text-gray-500">Se utiliza cuando el cliente envía su resumen de pedido.</span>
+                        </label>
+                        <label className="flex flex-col gap-1">
+                            <span className="text-[11px] font-medium text-gray-600">Número WhatsApp para recibir el reporte diario</span>
+                            <input
+                                type="tel"
+                                value={editingReportWhatsappPhone}
+                                onChange={(e) => setEditingReportWhatsappPhone(e.target.value)}
+                                className="w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/30"
+                                placeholder="Ej.: 573238090562"
+                            />
+                            <span className="text-[10px] text-gray-500">El reporte diario se enviará automáticamente a este número.</span>
                         </label>
                     </div>
                     <div className="flex justify-end gap-1.5 pt-2 border-t border-gray-200">

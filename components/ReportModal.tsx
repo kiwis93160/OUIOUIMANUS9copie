@@ -5,6 +5,24 @@ import { DailyReport, RoleLogin } from '../types';
 import { Users, ShoppingCart, DollarSign, Package, AlertTriangle, MessageSquare, LogIn } from 'lucide-react';
 import { formatCurrencyCOP } from '../utils/formatIntegerAmount';
 
+interface ReportModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    whatsappNumber?: string;
+}
+
+const DEFAULT_WHATSAPP_NUMBER = '573238090562';
+const sanitizeWhatsappNumber = (value: string): string => value.replace(/[^\d]/g, '');
+const buildWhatsAppUrl = (rawWhatsappNumber: string, message: string): string => {
+    const normalizedWhatsapp = sanitizeWhatsappNumber(rawWhatsappNumber) || DEFAULT_WHATSAPP_NUMBER;
+    const url = new URL(`https://wa.me/${normalizedWhatsapp}`);
+    url.search = new URLSearchParams({
+        text: message.replace(/\n/g, '\r\n'),
+    }).toString();
+
+    return url.toString();
+};
+
 const ReportStat: React.FC<{ icon: React.ReactNode; label: string; value: React.ReactNode }> = ({ icon, label, value }) => (
     <div className="flex flex-col items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50/80 p-4 shadow-sm sm:flex-row sm:items-center">
         <div className="rounded-full bg-brand-primary/20 p-2 text-brand-primary sm:p-3">
@@ -17,7 +35,7 @@ const ReportStat: React.FC<{ icon: React.ReactNode; label: string; value: React.
     </div>
 );
 
-const ReportModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
+const ReportModal: React.FC<ReportModalProps> = ({ isOpen, onClose, whatsappNumber }) => {
     const [report, setReport] = useState<DailyReport | null>(null);
     const [loading, setLoading] = useState(true);
     const [reportError, setReportError] = useState<string | null>(null);
@@ -112,7 +130,7 @@ const ReportModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpe
     const handleSendToWhatsApp = () => {
         if (!report) return;
         const message = formatReportForWhatsApp(report);
-        const whatsappUrl = `https://wa.me/?text=${message}`;
+        const whatsappUrl = buildWhatsAppUrl(whatsappNumber ?? '', message);
         window.open(whatsappUrl, '_blank');
         onClose();
     };

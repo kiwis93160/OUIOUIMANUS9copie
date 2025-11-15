@@ -6,12 +6,15 @@ import { api } from '../services/api';
 import { NotificationCounts } from '../types';
 import ReportModal from '../components/ReportModal';
 import { Menu } from 'lucide-react';
+import useSiteContent from '../hooks/useSiteContent';
 
 const ProtectedLayout: React.FC = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const { role } = useAuth();
   const [notifications, setNotifications] = useState<NotificationCounts | null>(null);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const { content: siteContent } = useSiteContent();
+  const reportWhatsappNumber = siteContent?.onlineOrdering.reportWhatsappNumber;
 
   const openSidebar = () => setSidebarOpen(true);
   const closeSidebar = () => setSidebarOpen(false);
@@ -84,6 +87,7 @@ const ProtectedLayout: React.FC = () => {
       <ReportModal
         isOpen={isReportModalOpen}
         onClose={() => setIsReportModalOpen(false)}
+        whatsappNumber={reportWhatsappNumber}
       />
     </>
   );

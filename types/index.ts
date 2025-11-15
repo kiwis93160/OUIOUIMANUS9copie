@@ -200,6 +200,7 @@ export interface OnlineOrderingSettings {
   closedSubtitle: string;
   supportPhoneNumber: string;
   confirmationWhatsappNumber: string;
+  reportWhatsappNumber: string;
 }
 
 export interface SiteContent {
