@@ -124,7 +124,7 @@ const ReportModal: React.FC<ReportModalProps> = ({ isOpen, onClose, whatsappNumb
           });
         }
     
-        return encodeURIComponent(parts.join('\n'));
+        return parts.join('\n');
       };
 
     const handleSendToWhatsApp = () => {
