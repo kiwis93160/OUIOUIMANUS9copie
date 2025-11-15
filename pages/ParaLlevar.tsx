@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo, Dispatch, SetStateAction } from 'react';
 import { api } from '../services/api';
 import { Order, OrderItem, WeeklySchedule } from '../types';
 import { Clock, Eye, User, MapPin, Phone } from 'lucide-react';
@@ -32,6 +32,8 @@ const PHONE_CONFIG_METADATA: Record<PhoneConfigKey, { title: string; description
         helper: 'Puedes dejarlo vacío si no quieres recibir reportes diarios.',
     },
 };
+
+const PHONE_CONFIG_ORDER: PhoneConfigKey[] = ['support', 'confirmation', 'report'];
 
 
 const TakeawayCard: React.FC<{ order: Order, onValidate?: (orderId: string) => void, onDeliver?: (orderId: string) => void, isProcessing?: boolean }> = ({ order, onValidate, onDeliver, isProcessing }) => {
@@ -268,10 +270,11 @@ const ParaLlevar: React.FC = () => {
     const [configFeedback, setConfigFeedback] = useState<{ message: string; tone: 'success' | 'error' } | null>(null);
     const [now, setNow] = useState(() => new Date());
     const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
-    const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
-    const [activePhoneConfig, setActivePhoneConfig] = useState<PhoneConfigKey | null>(null);
-    const [editingPhoneValue, setEditingPhoneValue] = useState('');
-    const [savingPhone, setSavingPhone] = useState(false);
+    const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+    const [draftSupportPhone, setDraftSupportPhone] = useState('');
+    const [draftConfirmationPhone, setDraftConfirmationPhone] = useState('');
+    const [draftReportPhone, setDraftReportPhone] = useState('');
+    const [savingContactConfig, setSavingContactConfig] = useState(false);
 
     useEffect(() => {
         if (typeof window === 'undefined') {
@@ -298,6 +301,11 @@ const ParaLlevar: React.FC = () => {
     const [editingSupportPhone, setEditingSupportPhone] = useState('');
     const [editingWhatsappPhone, setEditingWhatsappPhone] = useState('');
     const [editingReportWhatsappPhone, setEditingReportWhatsappPhone] = useState('');
+    const draftPhoneState: Record<PhoneConfigKey, { value: string; setter: Dispatch<SetStateAction<string>> }> = {
+        support: { value: draftSupportPhone, setter: setDraftSupportPhone },
+        confirmation: { value: draftConfirmationPhone, setter: setDraftConfirmationPhone },
+        report: { value: draftReportPhone, setter: setDraftReportPhone },
+    };
 
     useEffect(() => {
         if (weeklySchedule && !editingSchedule) {
@@ -319,7 +327,15 @@ const ParaLlevar: React.FC = () => {
     }, [siteContent]);
 
     const resolvedContent = siteContent ?? DEFAULT_SITE_CONTENT;
-    const phoneConfigOrder: PhoneConfigKey[] = ['support', 'confirmation', 'report'];
+    const phoneDisplayValues = useMemo<Record<PhoneConfigKey, string>>(() => ({
+        support: editingSupportPhone.trim(),
+        confirmation: editingWhatsappPhone.trim(),
+        report: editingReportWhatsappPhone.trim(),
+    }), [editingReportWhatsappPhone, editingSupportPhone, editingWhatsappPhone]);
+    const configuredPhonesCount = useMemo(
+        () => PHONE_CONFIG_ORDER.filter((type) => Boolean(phoneDisplayValues[type])).length,
+        [phoneDisplayValues],
+    );
 
     const isCurrentlyOnline = useMemo(() => {
         return isWithinWeeklySchedule(weeklySchedule, now);
@@ -378,36 +394,27 @@ const ParaLlevar: React.FC = () => {
         updateSchedule,
     ]);
 
-    const closePhoneModal = useCallback(() => {
-        setIsPhoneModalOpen(false);
-        setActivePhoneConfig(null);
-        setEditingPhoneValue('');
-    }, []);
-
-    const openPhoneModal = useCallback((type: PhoneConfigKey) => {
-        const nextValue = type === 'support'
-            ? editingSupportPhone
-            : type === 'confirmation'
-                ? editingWhatsappPhone
-                : editingReportWhatsappPhone;
-
-        setActivePhoneConfig(type);
-        setEditingPhoneValue(nextValue);
-        setIsPhoneModalOpen(true);
+    const openContactModal = useCallback(() => {
+        setDraftSupportPhone(editingSupportPhone);
+        setDraftConfirmationPhone(editingWhatsappPhone);
+        setDraftReportPhone(editingReportWhatsappPhone);
+        setIsContactModalOpen(true);
     }, [editingReportWhatsappPhone, editingSupportPhone, editingWhatsappPhone]);
 
-    const handlePhoneSubmit = useCallback(async () => {
-        if (!activePhoneConfig) {
-            return;
-        }
+    const closeContactModal = useCallback(() => {
+        setIsContactModalOpen(false);
+        setDraftSupportPhone('');
+        setDraftConfirmationPhone('');
+        setDraftReportPhone('');
+    }, []);
 
-        setSavingPhone(true);
+    const handleContactSubmit = useCallback(async () => {
+        setSavingContactConfig(true);
         setConfigFeedback(null);
         try {
-            const trimmedValue = editingPhoneValue.trim();
-            const trimmedSupport = activePhoneConfig === 'support' ? trimmedValue : editingSupportPhone.trim();
-            const trimmedConfirmation = activePhoneConfig === 'confirmation' ? trimmedValue : editingWhatsappPhone.trim();
-            const trimmedReport = activePhoneConfig === 'report' ? trimmedValue : editingReportWhatsappPhone.trim();
+            const trimmedSupport = draftSupportPhone.trim();
+            const trimmedConfirmation = draftConfirmationPhone.trim();
+            const trimmedReport = draftReportPhone.trim();
 
             const nextContent = {
                 ...resolvedContent,
@@ -421,30 +428,23 @@ const ParaLlevar: React.FC = () => {
 
             await updateContent(nextContent);
 
-            if (activePhoneConfig === 'support') {
-                setEditingSupportPhone(trimmedValue);
-            } else if (activePhoneConfig === 'confirmation') {
-                setEditingWhatsappPhone(trimmedValue);
-            } else {
-                setEditingReportWhatsappPhone(trimmedValue);
-            }
-
-            setConfigFeedback({ message: 'Número de contacto actualizado con éxito.', tone: 'success' });
-            closePhoneModal();
+            setEditingSupportPhone(trimmedSupport);
+            setEditingWhatsappPhone(trimmedConfirmation);
+            setEditingReportWhatsappPhone(trimmedReport);
+            setConfigFeedback({ message: 'Números de contacto actualizados con éxito.', tone: 'success' });
+            closeContactModal();
         } catch (error) {
-            console.error('Failed to update contact phone number', error);
-            const message = error instanceof Error ? error.message : 'No fue posible guardar el número de contacto.';
+            console.error('Failed to update contact phone numbers', error);
+            const message = error instanceof Error ? error.message : 'No fue posible guardar los números de contacto.';
             setConfigFeedback({ message, tone: 'error' });
         } finally {
-            setSavingPhone(false);
+            setSavingContactConfig(false);
         }
     }, [
-        activePhoneConfig,
-        closePhoneModal,
-        editingPhoneValue,
-        editingReportWhatsappPhone,
-        editingSupportPhone,
-        editingWhatsappPhone,
+        closeContactModal,
+        draftConfirmationPhone,
+        draftReportPhone,
+        draftSupportPhone,
         resolvedContent,
         updateContent,
     ]);
@@ -539,52 +539,69 @@ const ParaLlevar: React.FC = () => {
                     </div>
                 </div>
     
-                {configFeedback && (
-                    <p
-                        className={`mt-4 text-sm font-medium ${
-                            configFeedback.tone === 'success' ? 'text-emerald-600' : 'text-red-600'
-                        }`}
-                    >
-                        {configFeedback.message}
-                    </p>
-                )}
+            </div>
+
+            {configFeedback && (
+                <div
+                    className={`rounded-xl border px-4 py-3 text-sm font-medium ${
+                        configFeedback.tone === 'success'
+                            ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                            : 'border-red-200 bg-red-50 text-red-700'
+                    }`}
+                >
+                    {configFeedback.message}
+                </div>
+            )}
+
+            <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-6">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                            <Phone size={22} />
+                        </div>
+                        <div>
+                            <h2 className="text-base font-semibold text-gray-900">Configuración de contactos</h2>
+                            <p className="text-sm text-gray-500">Gestiona los números que usan tus clientes y tu equipo.</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <span
+                            className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] ${
+                                configuredPhonesCount === PHONE_CONFIG_ORDER.length
+                                    ? 'bg-emerald-100 text-emerald-700'
+                                    : 'bg-amber-100 text-amber-700'
+                            }`}
+                        >
+                            <span
+                                className={`h-2 w-2 rounded-full ${
+                                    configuredPhonesCount === PHONE_CONFIG_ORDER.length ? 'bg-emerald-500' : 'bg-amber-500'
+                                }`}
+                            />
+                            {configuredPhonesCount === 0
+                                ? 'Sin números'
+                                : `${configuredPhonesCount}/${PHONE_CONFIG_ORDER.length} configurados`}
+                        </span>
+                        <button
+                            onClick={openContactModal}
+                            className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                            type="button"
+                        >
+                            Configurar contactos
+                        </button>
+                    </div>
+                </div>
                 <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {phoneConfigOrder.map((type) => {
+                    {PHONE_CONFIG_ORDER.map((type) => {
                         const meta = PHONE_CONFIG_METADATA[type];
-                        const rawValue = type === 'support'
-                            ? editingSupportPhone
-                            : type === 'confirmation'
-                                ? editingWhatsappPhone
-                                : editingReportWhatsappPhone;
-                        const displayValue = rawValue.trim();
+                        const displayValue = phoneDisplayValues[type];
                         const isConfigured = Boolean(displayValue);
 
                         return (
                             <div key={type} className="rounded-xl border border-gray-200 bg-gray-50 p-4 shadow-sm">
-                                <div className="flex items-start justify-between gap-2">
-                                    <div>
-                                        <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">{meta.title}</p>
-                                        <p className="mt-1 text-lg font-semibold text-gray-900">
-                                            {isConfigured ? displayValue : 'Sin configurar'}
-                                        </p>
-                                    </div>
-                                    <div className="flex flex-col items-end gap-1">
-                                        <span
-                                            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${
-                                                isConfigured ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
-                                            }`}
-                                        >
-                                            {isConfigured ? 'Configurado' : 'Pendiente'}
-                                        </span>
-                                        <button
-                                            onClick={() => openPhoneModal(type)}
-                                            className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-2 py-1 text-[11px] font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
-                                            type="button"
-                                        >
-                                            Configurar
-                                        </button>
-                                    </div>
-                                </div>
+                                <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">{meta.title}</p>
+                                <p className="mt-1 text-lg font-semibold text-gray-900">
+                                    {isConfigured ? displayValue : 'Sin configurar'}
+                                </p>
                                 <p className="mt-3 text-xs text-gray-500">{meta.description}</p>
                             </div>
                         );
@@ -662,46 +679,48 @@ const ParaLlevar: React.FC = () => {
             </Modal>
 
             <Modal
-                isOpen={isPhoneModalOpen}
-                onClose={closePhoneModal}
-                title={activePhoneConfig ? PHONE_CONFIG_METADATA[activePhoneConfig].title : 'Editar número'}
+                isOpen={isContactModalOpen}
+                onClose={closeContactModal}
+                title="Configurar números de contacto"
                 size="xs"
             >
-                {activePhoneConfig && (
-                    <div className="space-y-3">
-                        <p className="text-xs text-gray-600 leading-relaxed">
-                            {PHONE_CONFIG_METADATA[activePhoneConfig].description}
-                        </p>
-                        <label className="flex flex-col gap-1">
-                            <span className="text-[11px] font-semibold text-gray-600">Número de WhatsApp</span>
-                            <input
-                                type="tel"
-                                value={editingPhoneValue}
-                                onChange={(e) => setEditingPhoneValue(e.target.value)}
-                                className="w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/30"
-                                placeholder={PHONE_CONFIG_METADATA[activePhoneConfig].placeholder}
-                            />
-                            <span className="text-[10px] text-gray-500">{PHONE_CONFIG_METADATA[activePhoneConfig].helper}</span>
-                        </label>
-                        <div className="flex justify-end gap-1.5 border-t border-gray-200 pt-2">
-                            <button
-                                onClick={closePhoneModal}
-                                className="rounded border border-gray-300 bg-white px-2.5 py-1 text-[11px] font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
-                                type="button"
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={handlePhoneSubmit}
-                                disabled={savingPhone}
-                                className="rounded bg-blue-600 px-2.5 py-1 text-[11px] font-semibold text-white shadow transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
-                                type="button"
-                            >
-                                {savingPhone ? 'Guardando...' : 'Guardar'}
-                            </button>
-                        </div>
+                <div className="space-y-4">
+                    {PHONE_CONFIG_ORDER.map((type) => {
+                        const meta = PHONE_CONFIG_METADATA[type];
+                        const { value, setter } = draftPhoneState[type];
+                        return (
+                            <label key={type} className="flex flex-col gap-1 rounded border border-gray-200 bg-gray-50 p-2">
+                                <span className="text-[11px] font-semibold text-gray-700">{meta.title}</span>
+                                <p className="text-[11px] text-gray-500 leading-relaxed">{meta.description}</p>
+                                <input
+                                    type="tel"
+                                    value={value}
+                                    onChange={(e) => setter(e.target.value)}
+                                    className="mt-1 w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/30"
+                                    placeholder={meta.placeholder}
+                                />
+                                <span className="text-[10px] text-gray-500">{meta.helper}</span>
+                            </label>
+                        );
+                    })}
+                    <div className="flex justify-end gap-1.5 border-t border-gray-200 pt-2">
+                        <button
+                            onClick={closeContactModal}
+                            className="rounded border border-gray-300 bg-white px-2.5 py-1 text-[11px] font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
+                            type="button"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            onClick={handleContactSubmit}
+                            disabled={savingContactConfig}
+                            className="rounded bg-blue-600 px-2.5 py-1 text-[11px] font-semibold text-white shadow transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
+                            type="button"
+                        >
+                            {savingContactConfig ? 'Guardando...' : 'Guardar'}
+                        </button>
                     </div>
-                )}
+                </div>
             </Modal>
 
             <div className="mt-6 grid grid-cols-1 gap-8 md:grid-cols-2">
