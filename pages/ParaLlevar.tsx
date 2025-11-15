@@ -35,6 +35,8 @@ const PHONE_CONFIG_METADATA: Record<PhoneConfigKey, { title: string; description
 
 const PHONE_CONFIG_ORDER: PhoneConfigKey[] = ['support', 'confirmation', 'report'];
 
+type ConfigFeedback = { message: string; tone: 'success' | 'error' };
+
 
 const TakeawayCard: React.FC<{ order: Order, onValidate?: (orderId: string) => void, onDeliver?: (orderId: string) => void, isProcessing?: boolean }> = ({ order, onValidate, onDeliver, isProcessing }) => {
     const [isReceiptVisible, setIsReceiptVisible] = useState(false);
@@ -267,7 +269,8 @@ const ParaLlevar: React.FC = () => {
     const { content: siteContent, loading: siteContentLoading, updateContent } = useSiteContent();
     const { schedule: weeklySchedule, updateSchedule, loading: scheduleLoading } = useOnlineOrderingSchedules();
     const [savingSchedule, setSavingSchedule] = useState(false);
-    const [configFeedback, setConfigFeedback] = useState<{ message: string; tone: 'success' | 'error' } | null>(null);
+    const [scheduleFeedback, setScheduleFeedback] = useState<ConfigFeedback | null>(null);
+    const [contactFeedback, setContactFeedback] = useState<ConfigFeedback | null>(null);
     const [now, setNow] = useState(() => new Date());
     const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
     const [isContactModalOpen, setIsContactModalOpen] = useState(false);
@@ -412,6 +415,39 @@ const ParaLlevar: React.FC = () => {
         setSavingContactConfig(true);
         setConfigFeedback(null);
         try {
+            await updateSchedule(editingSchedule);
+            setScheduleFeedback({ message: 'Horarios actualizados con éxito.', tone: 'success' });
+            setIsScheduleModalOpen(false);
+        } catch (error) {
+            console.error('Failed to update online ordering schedule', error);
+            const message = error instanceof Error ? error.message : 'No fue posible actualizar la configuración.';
+            setScheduleFeedback({ message, tone: 'error' });
+        } finally {
+            setSavingSchedule(false);
+        }
+    }, [
+        editingSchedule,
+        updateSchedule,
+    ]);
+
+    const openContactModal = useCallback(() => {
+        setDraftSupportPhone(editingSupportPhone);
+        setDraftConfirmationPhone(editingWhatsappPhone);
+        setDraftReportPhone(editingReportWhatsappPhone);
+        setIsContactModalOpen(true);
+    }, [editingReportWhatsappPhone, editingSupportPhone, editingWhatsappPhone]);
+
+    const closeContactModal = useCallback(() => {
+        setIsContactModalOpen(false);
+        setDraftSupportPhone('');
+        setDraftConfirmationPhone('');
+        setDraftReportPhone('');
+    }, []);
+
+    const handleContactSubmit = useCallback(async () => {
+        setSavingContactConfig(true);
+        setContactFeedback(null);
+        try {
             const trimmedSupport = draftSupportPhone.trim();
             const trimmedConfirmation = draftConfirmationPhone.trim();
             const trimmedReport = draftReportPhone.trim();
@@ -431,12 +467,12 @@ const ParaLlevar: React.FC = () => {
             setEditingSupportPhone(trimmedSupport);
             setEditingWhatsappPhone(trimmedConfirmation);
             setEditingReportWhatsappPhone(trimmedReport);
-            setConfigFeedback({ message: 'Números de contacto actualizados con éxito.', tone: 'success' });
+            setContactFeedback({ message: 'Números de contacto actualizados con éxito.', tone: 'success' });
             closeContactModal();
         } catch (error) {
             console.error('Failed to update contact phone numbers', error);
             const message = error instanceof Error ? error.message : 'No fue posible guardar los números de contacto.';
-            setConfigFeedback({ message, tone: 'error' });
+            setContactFeedback({ message, tone: 'error' });
         } finally {
             setSavingContactConfig(false);
         }
@@ -518,40 +554,41 @@ const ParaLlevar: React.FC = () => {
                             </p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                        <span
-                            className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] ${
-                                isCurrentlyOnline
-                                    ? 'bg-emerald-100 text-emerald-700'
-                                    : 'bg-amber-100 text-amber-700'
-                            }`}
-                        >
-                            <span className={`h-2 w-2 rounded-full ${isCurrentlyOnline ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-                            {isCurrentlyOnline ? 'Abierto' : 'Cerrado'}
-                        </span>
-                        <button
-                            onClick={() => setIsScheduleModalOpen(true)}
-                            className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                            type="button"
-                        >
-                            Configurar horarios
-                        </button>
+                    <div className="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:items-end">
+                        {scheduleFeedback && (
+                            <div
+                                className={`rounded-lg border px-3 py-2 text-xs font-medium ${
+                                    scheduleFeedback.tone === 'success'
+                                        ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                                        : 'border-red-200 bg-red-50 text-red-700'
+                                }`}
+                            >
+                                {scheduleFeedback.message}
+                            </div>
+                        )}
+                        <div className="flex flex-wrap items-center gap-3 sm:justify-end">
+                            <span
+                                className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] ${
+                                    isCurrentlyOnline
+                                        ? 'bg-emerald-100 text-emerald-700'
+                                        : 'bg-amber-100 text-amber-700'
+                                }`}
+                            >
+                                <span className={`h-2 w-2 rounded-full ${isCurrentlyOnline ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                                {isCurrentlyOnline ? 'Abierto' : 'Cerrado'}
+                            </span>
+                            <button
+                                onClick={() => setIsScheduleModalOpen(true)}
+                                className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                type="button"
+                            >
+                                Configurar horarios
+                            </button>
+                        </div>
                     </div>
                 </div>
-    
-            </div>
 
-            {configFeedback && (
-                <div
-                    className={`rounded-xl border px-4 py-3 text-sm font-medium ${
-                        configFeedback.tone === 'success'
-                            ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-                            : 'border-red-200 bg-red-50 text-red-700'
-                    }`}
-                >
-                    {configFeedback.message}
-                </div>
-            )}
+            </div>
 
             <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-6">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -564,30 +601,43 @@ const ParaLlevar: React.FC = () => {
                             <p className="text-sm text-gray-500">Gestiona los números que usan tus clientes y tu equipo.</p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                        <span
-                            className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] ${
-                                configuredPhonesCount === PHONE_CONFIG_ORDER.length
-                                    ? 'bg-emerald-100 text-emerald-700'
-                                    : 'bg-amber-100 text-amber-700'
-                            }`}
-                        >
-                            <span
-                                className={`h-2 w-2 rounded-full ${
-                                    configuredPhonesCount === PHONE_CONFIG_ORDER.length ? 'bg-emerald-500' : 'bg-amber-500'
+                    <div className="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:items-end">
+                        {contactFeedback && (
+                            <div
+                                className={`rounded-lg border px-3 py-2 text-xs font-medium ${
+                                    contactFeedback.tone === 'success'
+                                        ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                                        : 'border-red-200 bg-red-50 text-red-700'
                                 }`}
-                            />
-                            {configuredPhonesCount === 0
-                                ? 'Sin números'
-                                : `${configuredPhonesCount}/${PHONE_CONFIG_ORDER.length} configurados`}
-                        </span>
-                        <button
-                            onClick={openContactModal}
-                            className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                            type="button"
-                        >
-                            Configurar contactos
-                        </button>
+                            >
+                                {contactFeedback.message}
+                            </div>
+                        )}
+                        <div className="flex flex-wrap items-center gap-3 sm:justify-end">
+                            <span
+                                className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] ${
+                                    configuredPhonesCount === PHONE_CONFIG_ORDER.length
+                                        ? 'bg-emerald-100 text-emerald-700'
+                                        : 'bg-amber-100 text-amber-700'
+                                }`}
+                            >
+                                <span
+                                    className={`h-2 w-2 rounded-full ${
+                                        configuredPhonesCount === PHONE_CONFIG_ORDER.length ? 'bg-emerald-500' : 'bg-amber-500'
+                                    }`}
+                                />
+                                {configuredPhonesCount === 0
+                                    ? 'Sin números'
+                                    : `${configuredPhonesCount}/${PHONE_CONFIG_ORDER.length} configurados`}
+                            </span>
+                            <button
+                                onClick={openContactModal}
+                                className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                type="button"
+                            >
+                                Configurar contactos
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
