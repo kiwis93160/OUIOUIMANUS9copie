@@ -380,7 +380,40 @@ const ParaLlevar: React.FC = () => {
         }
 
         setSavingSchedule(true);
-        setScheduleFeedback(null);
+        setConfigFeedback(null);
+        try {
+            await updateSchedule(editingSchedule);
+            setConfigFeedback({ message: 'Horarios actualizados con éxito.', tone: 'success' });
+            setIsScheduleModalOpen(false);
+        } catch (error) {
+            console.error('Failed to update online ordering schedule', error);
+            const message = error instanceof Error ? error.message : 'No fue posible actualizar la configuración.';
+            setConfigFeedback({ message, tone: 'error' });
+        } finally {
+            setSavingSchedule(false);
+        }
+    }, [
+        editingSchedule,
+        updateSchedule,
+    ]);
+
+    const openContactModal = useCallback(() => {
+        setDraftSupportPhone(editingSupportPhone);
+        setDraftConfirmationPhone(editingWhatsappPhone);
+        setDraftReportPhone(editingReportWhatsappPhone);
+        setIsContactModalOpen(true);
+    }, [editingReportWhatsappPhone, editingSupportPhone, editingWhatsappPhone]);
+
+    const closeContactModal = useCallback(() => {
+        setIsContactModalOpen(false);
+        setDraftSupportPhone('');
+        setDraftConfirmationPhone('');
+        setDraftReportPhone('');
+    }, []);
+
+    const handleContactSubmit = useCallback(async () => {
+        setSavingContactConfig(true);
+        setConfigFeedback(null);
         try {
             await updateSchedule(editingSchedule);
             setScheduleFeedback({ message: 'Horarios actualizados con éxito.', tone: 'success' });
@@ -606,6 +639,23 @@ const ParaLlevar: React.FC = () => {
                             </button>
                         </div>
                     </div>
+                </div>
+                <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {PHONE_CONFIG_ORDER.map((type) => {
+                        const meta = PHONE_CONFIG_METADATA[type];
+                        const displayValue = phoneDisplayValues[type];
+                        const isConfigured = Boolean(displayValue);
+
+                        return (
+                            <div key={type} className="rounded-xl border border-gray-200 bg-gray-50 p-4 shadow-sm">
+                                <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">{meta.title}</p>
+                                <p className="mt-1 text-lg font-semibold text-gray-900">
+                                    {isConfigured ? displayValue : 'Sin configurar'}
+                                </p>
+                                <p className="mt-3 text-xs text-gray-500">{meta.description}</p>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
 
