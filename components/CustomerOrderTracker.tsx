@@ -923,47 +923,43 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                         return (
                                             <div
                                                 key={item.id}
-                                                className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/95 px-6 py-2 text-slate-900 shadow-xl transition-all hover:-translate-y-0.5 hover:border-amber-300/60 hover:shadow-amber-500/30"
+                                                className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/95 text-slate-900 shadow-xl transition-all hover:-translate-y-0.5 hover:border-amber-300/60 hover:shadow-amber-500/30"
                                             >
-                                                <div className="flex items-stretch gap-4">
-                                                    <div className="flex flex-shrink-0 items-stretch">
-                                                        <div className="flex aspect-square items-center justify-center self-stretch rounded-2xl bg-gradient-to-b from-orange-500 to-rose-500 text-4xl font-black text-white shadow-inner shadow-amber-500/40">
-                                                            <span className="flex h-[70%] w-[70%] items-center justify-center rounded-xl bg-white/15 text-3xl font-bold leading-tight">
-                                                                {item.quantite}
-                                                            </span>
-                                                        </div>
+                                                <div className="flex items-stretch">
+                                                    <div className="flex w-20 flex-shrink-0 items-center justify-center self-stretch bg-gradient-to-b from-orange-500 to-rose-500 text-3xl font-black text-white shadow-inner shadow-amber-500/40 sm:w-24">
+                                                        <span className="text-2xl font-extrabold leading-none sm:text-3xl">{item.quantite}</span>
                                                     </div>
-                                                    <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                                    <div className="flex flex-1 flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
                                                         <div className="min-w-0 flex-1 space-y-2">
                                                             <div className="space-y-1">
                                                                 <p className="mb-0 text-base font-semibold leading-tight text-balance text-slate-900 sm:text-lg">
                                                                     {item.nom_produit}
                                                                 </p>
-                                                            {!isFreeShipping && (
-                                                                <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
-                                                                    {formatCurrencyCOP(item.prix_unitaire)} /u
-                                                                </p>
+                                                                {!isFreeShipping && (
+                                                                    <p className="mt-0 text-xs font-medium uppercase tracking-wider text-slate-500">
+                                                                        {formatCurrencyCOP(item.prix_unitaire)} /u
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                            {itemDescription && (
+                                                                <p className="mt-0 text-sm leading-snug text-slate-600">{itemDescription}</p>
+                                                            )}
+                                                            {trimmedComment && (
+                                                                <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-sm italic text-amber-700 shadow-inner shadow-amber-200/60">
+                                                                    « {trimmedComment} »
+                                                                </div>
+                                                            )}
+                                                            {isDomicilio && (
+                                                                <div className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${
+                                                                    isFreeShipping
+                                                                        ? 'border border-emerald-200 bg-emerald-50 text-emerald-700'
+                                                                        : 'border border-slate-200 bg-slate-50 text-slate-600'
+                                                                }`}>
+                                                                    <TruckIcon size={14} />
+                                                                    {isFreeShipping ? 'Entrega gratis' : 'Entrega'}
+                                                                </div>
                                                             )}
                                                         </div>
-                                                        {itemDescription && (
-                                                            <p className="text-sm leading-snug text-slate-600">{itemDescription}</p>
-                                                        )}
-                                                        {trimmedComment && (
-                                                            <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-sm italic text-amber-700 shadow-inner shadow-amber-200/60">
-                                                                « {trimmedComment} »
-                                                            </div>
-                                                        )}
-                                                        {isDomicilio && (
-                                                            <div className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${
-                                                                isFreeShipping
-                                                                    ? 'border border-emerald-200 bg-emerald-50 text-emerald-700'
-                                                                    : 'border border-slate-200 bg-slate-50 text-slate-600'
-                                                            }`}>
-                                                                <TruckIcon size={14} />
-                                                                {isFreeShipping ? 'Entrega gratis' : 'Entrega'}
-                                                            </div>
-                                                        )}
-                                                    </div>
                                                         <div className="flex shrink-0 flex-col items-end gap-2 text-right">
                                                             {isFreeShipping ? (
                                                                 <>
