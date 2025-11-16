@@ -821,7 +821,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                         {(hasClientDetails || order.receipt_url) && (
                             <div className="grid gap-4 sm:grid-cols-2 items-stretch">
                                 {hasClientDetails && (
-                                    <div className="rounded-2xl bg-gradient-to-br from-slate-900/40 via-slate-900/30 to-slate-900/25 p-5 backdrop-blur-2xl border border-white/15 flex h-full flex-col">
+                                    <div className="rounded-2xl bg-gradient-to-br from-slate-900/40 via-slate-900/30 to-slate-900/25 p-5 backdrop-blur-2xl border border-white/15 flex h-full min-h-0 flex-col">
                                         <p className="text-xs font-bold uppercase tracking-wider text-white/50 mb-3">Informations client</p>
                                         <div className="space-y-2.5">
                                             {clientName && (
@@ -865,12 +865,12 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                     </div>
                                 )}
                                 {order.receipt_url && (
-                                    <div className="rounded-2xl bg-gradient-to-br from-slate-900/40 via-slate-900/30 to-slate-900/25 p-5 backdrop-blur-2xl border border-white/15 flex h-full flex-col">
+                                    <div className="rounded-2xl bg-gradient-to-br from-slate-900/40 via-slate-900/30 to-slate-900/25 p-5 backdrop-blur-2xl border border-white/15 flex h-full min-h-0 flex-col">
                                             <p className="text-xs font-bold uppercase tracking-wider text-white/50 mb-3">Comprobante de pago</p>
                                             <button
                                                 type="button"
                                                 onClick={() => setReceiptModalOpen(true)}
-                                            className="group relative flex h-full w-full flex-1 min-h-[160px] overflow-hidden rounded-xl border border-white/20 bg-black/30 shadow-lg transition-transform hover:-translate-y-0.5 hover:shadow-amber-500/20 focus:outline-none focus:ring-2 focus:ring-white/50"
+                                            className="group relative flex h-full min-h-0 w-full flex-1 overflow-hidden rounded-xl border border-white/20 bg-black/30 shadow-lg transition-transform hover:-translate-y-0.5 hover:shadow-amber-500/20 focus:outline-none focus:ring-2 focus:ring-white/50"
                                                 aria-label="Abrir el comprobante de pago"
                                             >
                                                 {canDisplayReceiptImage ? (
@@ -923,19 +923,22 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                         return (
                                             <div
                                                 key={item.id}
-                                                className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/95 pl-28 pr-6 py-4 text-slate-900 shadow-xl transition-all hover:-translate-y-0.5 hover:border-amber-300/60 hover:shadow-amber-500/30"
+                                                className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/95 px-6 py-2 text-slate-900 shadow-xl transition-all hover:-translate-y-0.5 hover:border-amber-300/60 hover:shadow-amber-500/30"
                                             >
-                                                <div className="absolute left-0 top-1/2 flex h-20 w-20 -translate-y-1/2 items-center justify-center rounded-r-2xl bg-gradient-to-b from-orange-500 to-rose-500 text-4xl font-black text-white shadow-inner shadow-amber-500/40 sm:h-24 sm:w-24">
-                                                    <span className="rounded-lg bg-white/15 px-5 py-2 text-3xl font-bold leading-tight">
-                                                        {item.quantite}
-                                                    </span>
-                                                </div>
-                                                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                                    <div className="min-w-0 flex-1 space-y-2">
-                                                        <div className="space-y-1">
-                                                            <p className="mb-0 text-base font-semibold leading-tight text-balance text-slate-900 sm:text-lg">
-                                                                {item.nom_produit}
-                                                            </p>
+                                                <div className="flex items-stretch gap-4">
+                                                    <div className="flex flex-shrink-0 items-stretch">
+                                                        <div className="flex aspect-square items-center justify-center self-stretch rounded-2xl bg-gradient-to-b from-orange-500 to-rose-500 text-4xl font-black text-white shadow-inner shadow-amber-500/40">
+                                                            <span className="flex h-[70%] w-[70%] items-center justify-center rounded-xl bg-white/15 text-3xl font-bold leading-tight">
+                                                                {item.quantite}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                                        <div className="min-w-0 flex-1 space-y-2">
+                                                            <div className="space-y-1">
+                                                                <p className="mb-0 text-base font-semibold leading-tight text-balance text-slate-900 sm:text-lg">
+                                                                    {item.nom_produit}
+                                                                </p>
                                                             {!isFreeShipping && (
                                                                 <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
                                                                     {formatCurrencyCOP(item.prix_unitaire)} /u
@@ -961,21 +964,22 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                             </div>
                                                         )}
                                                     </div>
-                                                    <div className="flex shrink-0 flex-col items-end gap-2 text-right">
-                                                        {isFreeShipping ? (
-                                                            <>
-                                                                <span className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-1.5 text-sm font-semibold text-emerald-700 shadow-inner shadow-emerald-200/40">
-                                                                    <Gift size={16} /> Gratuit
+                                                        <div className="flex shrink-0 flex-col items-end gap-2 text-right">
+                                                            {isFreeShipping ? (
+                                                                <>
+                                                                    <span className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-1.5 text-sm font-semibold text-emerald-700 shadow-inner shadow-emerald-200/40">
+                                                                        <Gift size={16} /> Gratuit
+                                                                    </span>
+                                                                    <span className="text-xs font-medium text-emerald-600/70 line-through decoration-emerald-400">
+                                                                        {formatCurrencyCOP(8000)}
+                                                                    </span>
+                                                                </>
+                                                            ) : (
+                                                                <span className="rounded-full bg-slate-100 px-4 py-1.5 text-lg font-bold text-slate-900 shadow-inner shadow-slate-200">
+                                                                    {formatCurrencyCOP(item.prix_unitaire * item.quantite)}
                                                                 </span>
-                                                                <span className="text-xs font-medium text-emerald-600/70 line-through decoration-emerald-400">
-                                                                    {formatCurrencyCOP(8000)}
-                                                                </span>
-                                                            </>
-                                                        ) : (
-                                                            <span className="rounded-full bg-slate-100 px-4 py-1.5 text-lg font-bold text-slate-900 shadow-inner shadow-slate-200">
-                                                                {formatCurrencyCOP(item.prix_unitaire * item.quantite)}
-                                                            </span>
-                                                        )}
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
