@@ -2551,12 +2551,15 @@ export const api = {
   },
 
   markTakeawayAsDelivered: async (orderId: string): Promise<Order> => {
+    const nowIso = new Date().toISOString();
+
     await supabase
       .from('orders')
       .update({
         statut: 'finalisee',
         estado_cocina: 'entregada',
         payment_method: 'transferencia',
+        date_servido: nowIso,
       })
       .eq('id', orderId);
 
