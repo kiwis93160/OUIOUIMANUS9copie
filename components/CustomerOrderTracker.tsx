@@ -181,8 +181,8 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
 
     const steps = [
         { name: 'Enviado', icon: FileText, description: 'Tu pedido se envió a la cocina', subtext: 'Estamos verificando tu orden' },
-        { name: 'Validado', icon: CheckCircle, description: 'En espera de la validacion de tu pedido', subtext: 'Enviando a la cocina' },
-        { name: 'En preparacion', icon: ChefHat, description: 'Nuestros chefs n paparando tus platos', subtext: 'Tu pedido estará listo pronto' },
+        { name: 'Validado', icon: CheckCircle, description: 'Esperando la validacion de tu pedido', subtext: 'Enviando a la cocina' },
+        { name: 'En preparacion', icon: ChefHat, description: 'Nuestros chefs están preparando tus platos', subtext: 'Tu pedido estará listo pronto' },
         { name: 'Listo', icon: PackageCheck, description: 'Tu pedido está listo para entrega', subtext: 'Puedes pasar a retirarlo' },
         { name: 'Entregado', icon: TruckIcon, description: 'Tu pedido fue entregado', subtext: '¡Buen provecho!' }
     ];
@@ -821,7 +821,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                         {(hasClientDetails || order.receipt_url) && (
                             <div className="grid gap-4 sm:grid-cols-2 items-stretch">
                                 {hasClientDetails && (
-                                    <div className="rounded-2xl bg-gradient-to-br from-slate-900/40 via-slate-900/30 to-slate-900/25 p-5 backdrop-blur-2xl border border-white/15 flex flex-col">
+                                    <div className="rounded-2xl bg-gradient-to-br from-slate-900/40 via-slate-900/30 to-slate-900/25 p-5 backdrop-blur-2xl border border-white/15 flex h-full flex-col">
                                         <p className="text-xs font-bold uppercase tracking-wider text-white/50 mb-3">Informations client</p>
                                         <div className="space-y-2.5">
                                             {clientName && (
@@ -865,12 +865,12 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                     </div>
                                 )}
                                 {order.receipt_url && (
-                                    <div className="rounded-2xl bg-gradient-to-br from-slate-900/40 via-slate-900/30 to-slate-900/25 p-5 backdrop-blur-2xl border border-white/15 flex flex-col">
+                                    <div className="rounded-2xl bg-gradient-to-br from-slate-900/40 via-slate-900/30 to-slate-900/25 p-5 backdrop-blur-2xl border border-white/15 flex h-full flex-col">
                                             <p className="text-xs font-bold uppercase tracking-wider text-white/50 mb-3">Comprobante de pago</p>
                                             <button
                                                 type="button"
                                                 onClick={() => setReceiptModalOpen(true)}
-                                            className="group relative flex w-full flex-1 min-h-[160px] overflow-hidden rounded-xl border border-white/20 bg-black/30 shadow-lg transition-transform hover:-translate-y-0.5 hover:shadow-amber-500/20 focus:outline-none focus:ring-2 focus:ring-white/50"
+                                            className="group relative flex h-full w-full flex-1 min-h-[160px] overflow-hidden rounded-xl border border-white/20 bg-black/30 shadow-lg transition-transform hover:-translate-y-0.5 hover:shadow-amber-500/20 focus:outline-none focus:ring-2 focus:ring-white/50"
                                                 aria-label="Abrir el comprobante de pago"
                                             >
                                                 {canDisplayReceiptImage ? (
@@ -925,7 +925,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                 key={item.id}
                                                 className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/95 pl-28 pr-6 py-4 text-slate-900 shadow-xl transition-all hover:-translate-y-0.5 hover:border-amber-300/60 hover:shadow-amber-500/30"
                                             >
-                                                <div className="absolute inset-y-0 left-0 flex w-24 items-center justify-center bg-gradient-to-b from-orange-500 to-rose-500 text-4xl font-black text-white shadow-inner shadow-amber-500/40">
+                                                <div className="absolute left-0 top-1/2 flex h-20 w-20 -translate-y-1/2 items-center justify-center rounded-r-2xl bg-gradient-to-b from-orange-500 to-rose-500 text-4xl font-black text-white shadow-inner shadow-amber-500/40 sm:h-24 sm:w-24">
                                                     <span className="rounded-lg bg-white/15 px-5 py-2 text-3xl font-bold leading-tight">
                                                         {item.quantite}
                                                     </span>
@@ -933,7 +933,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                                     <div className="min-w-0 flex-1 space-y-2">
                                                         <div className="space-y-1">
-                                                            <p className="text-base font-semibold leading-tight text-balance text-slate-900 sm:text-lg">
+                                                            <p className="mb-0 text-base font-semibold leading-tight text-balance text-slate-900 sm:text-lg">
                                                                 {item.nom_produit}
                                                             </p>
                                                             {!isFreeShipping && (
