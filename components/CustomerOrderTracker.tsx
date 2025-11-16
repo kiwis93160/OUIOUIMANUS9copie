@@ -180,11 +180,11 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
     }, [receiptUrl, canDisplayReceiptImage, isReceiptPdf, handleOpenReceiptInNewTab, setReceiptPreviewError]);
 
     const steps = [
-        { name: 'Enviado', icon: FileText, description: 'Tu pedido se envió con éxito', subtext: 'Estamos verificando tu orden' },
-        { name: 'Validado', icon: CheckCircle, description: '¡Pedido validado! Preparación en curso...', subtext: 'Enviando a la cocina' },
-        { name: 'En preparacion', icon: ChefHat, description: 'Nuestros chefs preparan tu pedido con cuidado', subtext: 'Tu pedido estará listo pronto' },
-        { name: 'Listo', icon: PackageCheck, description: 'El pedido está listo para entrega o recogida', subtext: 'Puedes pasar a retirarlo' },
-        { name: 'Entregado al domiciliario/cliente', icon: TruckIcon, description: 'Tu pedido fue entregado correctamente', subtext: '¡Buen provecho!' }
+        { name: 'Enviado', icon: FileText, description: 'Tu pedido se envió a la cocina', subtext: 'Estamos verificando tu orden' },
+        { name: 'Validado', icon: CheckCircle, description: 'En espera de la validacion de tu pedido', subtext: 'Enviando a la cocina' },
+        { name: 'En preparacion', icon: ChefHat, description: 'Nuestros chefs n paparando tus platos', subtext: 'Tu pedido estará listo pronto' },
+        { name: 'Listo', icon: PackageCheck, description: 'Tu pedido está listo para entrega', subtext: 'Puedes pasar a retirarlo' },
+        { name: 'Entregado', icon: TruckIcon, description: 'Tu pedido fue entregado', subtext: '¡Buen provecho!' }
     ];
 
     const promotionColorSchemes = useMemo(
@@ -594,7 +594,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                             )}
                         </div>
 
-                        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                        <div className="grid grid-cols-5 gap-3 sm:gap-4 overflow-x-auto">
                             {steps.map((step, index) => {
                                 const isActive = index === currentStep;
                                 const isFinalStep = index === steps.length - 1;
@@ -1050,9 +1050,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                         </div>
                     </div>
                     <div
-                        className={`flex items-start sm:items-center justify-between gap-3 sm:gap-4 px-2 ${
-                            steps.length > 3 ? 'flex-wrap sm:flex-nowrap' : ''
-                        }`}
+                        className="flex items-start sm:items-center justify-between gap-3 sm:gap-4 px-2 overflow-x-auto"
                     >
                         {steps.map((step, index) => {
                             const isActive = index === currentStep;
