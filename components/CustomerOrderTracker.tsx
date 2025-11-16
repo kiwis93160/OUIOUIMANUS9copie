@@ -96,6 +96,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
     const [isReceiptModalOpen, setReceiptModalOpen] = useState(false);
     const [productDescriptions, setProductDescriptions] = useState<Record<string, string>>({});
     const [isReceiptPreviewError, setReceiptPreviewError] = useState(false);
+    const [clientInfoHeight, setClientInfoHeight] = useState<number | null>(null);
 
     const receiptUrl = order?.receipt_url ?? '';
     const normalizedSupportPhone = (supportPhoneNumber ?? '').trim();
@@ -362,6 +363,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
     }, [order]);
 
     const heroProgressRef = useRef<HTMLDivElement | null>(null);
+    const clientInfoRef = useRef<HTMLDivElement | null>(null);
 
     const stepCount = Math.max(steps.length - 1, 1);
     const isOrderCompleted = Boolean(
@@ -503,6 +505,40 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
     const clientPhone = order.clientInfo?.telephone ?? order.client_phone ?? '';
     const clientAddress = order.clientInfo?.adresse ?? order.client_address ?? '';
     const hasClientDetails = Boolean(clientName || clientPhone || clientAddress);
+
+    useEffect(() => {
+        if (!hasClientDetails) {
+            setClientInfoHeight(null);
+            return;
+        }
+
+        const node = clientInfoRef.current;
+        if (!node) {
+            setClientInfoHeight(null);
+            return;
+        }
+
+        const updateHeight = () => {
+            const nextHeight = node.getBoundingClientRect().height;
+            setClientInfoHeight(prev => (prev !== nextHeight ? nextHeight : prev));
+        };
+
+        updateHeight();
+
+        if (typeof ResizeObserver === 'undefined') {
+            return;
+        }
+
+        const observer = new ResizeObserver(() => {
+            updateHeight();
+        });
+
+        observer.observe(node);
+
+        return () => {
+            observer.disconnect();
+        };
+    }, [hasClientDetails, clientName, clientPhone, clientAddress]);
     const getPromotionIcon = (promo: { type?: string | null }) => {
         if (isFreeShippingType(promo.type)) return <TruckIcon size={16} />;
         if (promo.type === 'percentage') return <Percent size={16} />;
@@ -819,9 +855,12 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                         {/* Tampon PEDIDO LISTO rendu au niveau du conteneur principal pour éviter les doublons */}
 
                         {(hasClientDetails || order.receipt_url) && (
-                            <div className="grid gap-4 sm:grid-cols-2 items-stretch">
+                            <div className="grid gap-4 sm:grid-cols-2 items-start">
                                 {hasClientDetails && (
-                                    <div className="rounded-2xl bg-gradient-to-br from-slate-900/40 via-slate-900/30 to-slate-900/25 p-5 backdrop-blur-2xl border border-white/15 flex h-full min-h-0 flex-col">
+                                    <div
+                                        ref={clientInfoRef}
+                                        className="rounded-2xl bg-gradient-to-br from-slate-900/40 via-slate-900/30 to-slate-900/25 p-5 backdrop-blur-2xl border border-white/15 flex flex-col"
+                                    >
                                         <p className="text-xs font-bold uppercase tracking-wider text-white/50 mb-3">Informations client</p>
                                         <div className="space-y-2.5">
                                             {clientName && (
@@ -865,12 +904,15 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                     </div>
                                 )}
                                 {order.receipt_url && (
-                                    <div className="rounded-2xl bg-gradient-to-br from-slate-900/40 via-slate-900/30 to-slate-900/25 p-5 backdrop-blur-2xl border border-white/15 flex h-full min-h-0 flex-col">
+                                    <div
+                                        className="rounded-2xl bg-gradient-to-br from-slate-900/40 via-slate-900/30 to-slate-900/25 p-5 backdrop-blur-2xl border border-white/15 flex flex-col"
+                                        style={clientInfoHeight ? { height: clientInfoHeight } : undefined}
+                                    >
                                             <p className="text-xs font-bold uppercase tracking-wider text-white/50 mb-3">Comprobante de pago</p>
                                             <button
                                                 type="button"
                                                 onClick={() => setReceiptModalOpen(true)}
-                                            className="group relative flex h-full min-h-0 w-full flex-1 overflow-hidden rounded-xl border border-white/20 bg-black/30 shadow-lg transition-transform hover:-translate-y-0.5 hover:shadow-amber-500/20 focus:outline-none focus:ring-2 focus:ring-white/50"
+                                            className="group relative flex min-h-0 w-full flex-1 overflow-hidden rounded-xl border border-white/20 bg-black/30 shadow-lg transition-transform hover:-translate-y-0.5 hover:shadow-amber-500/20 focus:outline-none focus:ring-2 focus:ring-white/50"
                                                 aria-label="Abrir el comprobante de pago"
                                             >
                                                 {canDisplayReceiptImage ? (
