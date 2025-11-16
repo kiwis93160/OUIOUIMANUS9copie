@@ -53,7 +53,13 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, order, onF
               <Upload size={18} />
               <span>{receiptFile ? receiptFile.name : 'Selecciona un archivo...'}</span>
             </label>
-            <input id="payment-receipt" type="file" accept="image/*,.pdf" onChange={e => setReceiptFile(e.target.files ? e.target.files[0] : null)} className="hidden" />
+            <input
+              id="payment-receipt"
+              type="file"
+              accept="image/*"
+              onChange={e => setReceiptFile(e.target.files ? e.target.files[0] : null)}
+              className="hidden"
+            />
           </div>
         )}
 
