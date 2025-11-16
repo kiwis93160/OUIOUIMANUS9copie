@@ -183,7 +183,8 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
         { name: 'Enviado', icon: FileText, description: 'Tu pedido se envió con éxito', subtext: 'Estamos verificando tu orden' },
         { name: 'Validado', icon: CheckCircle, description: '¡Pedido validado! Preparación en curso...', subtext: 'Enviando a la cocina' },
         { name: 'En preparacion', icon: ChefHat, description: 'Nuestros chefs preparan tu pedido con cuidado', subtext: 'Tu pedido estará listo pronto' },
-        { name: 'Listo', icon: PackageCheck, description: 'El pedido está listo para entrega o recogida', subtext: 'Puedes pasar a retirarlo' }
+        { name: 'Listo', icon: PackageCheck, description: 'El pedido está listo para entrega o recogida', subtext: 'Puedes pasar a retirarlo' },
+        { name: 'Entregado al domiciliario/cliente', icon: TruckIcon, description: 'Tu pedido fue entregado correctamente', subtext: '¡Buen provecho!' }
     ];
 
     const promotionColorSchemes = useMemo(
@@ -223,9 +224,12 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
         if (
             order.statut === 'finalisee' ||
             order.estado_cocina === 'servido' ||
-            order.estado_cocina === 'entregada' ||
-            order.estado_cocina === 'listo'
+            order.estado_cocina === 'entregada'
         ) {
+            return 4;
+        }
+
+        if (order.estado_cocina === 'listo') {
             return 3;
         }
 
@@ -259,7 +263,9 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                 const prepTime = baseTime + (itemCount * timePerItem);
                 return `${prepTime}-${prepTime + 5} min`;
             case 3: // Listo
-                return 'Prêt !';
+                return '¡Listo!';
+            case 4: // Entregado
+                return 'Completado';
             default:
                 return '';
         }
@@ -283,6 +289,8 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
             case 2: // En preparacion
                 return formatTime(order.date_en_preparacion);
             case 3: // Listo
+                return formatTime(order.date_listo_cuisine);
+            case 4: // Entregado
                 return formatTime(order.date_servido);
             default:
                 return '';
@@ -360,8 +368,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
         order && (
             order.statut === 'finalisee' ||
             order.estado_cocina === 'servido' ||
-            order.estado_cocina === 'entregada' ||
-            order.estado_cocina === 'listo'
+            order.estado_cocina === 'entregada'
         )
     );
     const normalizedStepIndex = Math.max(0, currentStep);
