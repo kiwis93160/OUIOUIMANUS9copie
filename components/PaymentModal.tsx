@@ -14,6 +14,7 @@ interface PaymentModalProps {
 const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, order, onFinalize }) => {
   const [paymentMethod, setPaymentMethod] = useState<Order['payment_method']>('efectivo');
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
+  const [receiptError, setReceiptError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -57,9 +58,20 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, order, onF
               id="payment-receipt"
               type="file"
               accept="image/*"
-              onChange={e => setReceiptFile(e.target.files ? e.target.files[0] : null)}
+              onChange={e => {
+                const file = e.target.files ? e.target.files[0] : null;
+                if (file && !file.type.startsWith('image/')) {
+                  setReceiptFile(null);
+                  setReceiptError('Solo se permiten imágenes como comprobante.');
+                  e.target.value = '';
+                  return;
+                }
+                setReceiptError(null);
+                setReceiptFile(file);
+              }}
               className="hidden"
             />
+            {receiptError && <p className="mt-2 text-sm text-red-600">{receiptError}</p>}
           </div>
         )}
 

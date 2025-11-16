@@ -216,6 +216,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
     const [clientAddress, setClientAddress] = useState<string>('');
     const [paymentMethod, setPaymentMethod] = useState<'transferencia' | 'efectivo'>('transferencia');
     const [paymentProof, setPaymentProof] = useState<File | null>(null);
+    const [paymentProofError, setPaymentProofError] = useState<string | null>(null);
     const [submitting, setSubmitting] = useState(false);
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [submittedOrder, setSubmittedOrder] = useState<Order | null>(null);
@@ -980,11 +981,24 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                                 <input
                                     type="file"
                                     id="paymentProof"
-                                    onChange={(e) => setPaymentProof(e.target.files ? e.target.files[0] : null)}
+                                    onChange={(e) => {
+                                        const file = e.target.files ? e.target.files[0] : null;
+                                        if (file && !file.type.startsWith('image/')) {
+                                            setPaymentProof(null);
+                                            setPaymentProofError('Solo se permiten archivos de imagen para el comprobante.');
+                                            e.target.value = '';
+                                            return;
+                                        }
+                                        setPaymentProof(file);
+                                        setPaymentProofError(null);
+                                    }}
                                     className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                                     accept="image/*"
                                     required
                                 />
+                                {paymentProofError && (
+                                    <p className="mt-2 text-sm text-red-600">{paymentProofError}</p>
+                                )}
                             </div>
                         )}
 
