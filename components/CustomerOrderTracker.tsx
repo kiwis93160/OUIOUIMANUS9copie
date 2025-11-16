@@ -1394,7 +1394,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                 return (
                                     <div
                                         key={item.id}
-                                        className={`group relative overflow-hidden rounded-2xl border px-5 py-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg ${
+                                        className={`group relative overflow-hidden rounded-2xl border px-5 pt-1 pb-1 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg ${
                                             variant === 'hero'
                                                 ? 'border-white/20 bg-slate-900/35 text-gray-100 backdrop-blur-2xl'
                                                 : 'border-slate-200 bg-white text-slate-600'
