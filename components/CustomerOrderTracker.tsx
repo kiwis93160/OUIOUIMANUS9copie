@@ -473,37 +473,9 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
 
     const detailContainerClasses = 'border-t pt-6 mt-6 space-y-4 relative md:w-1/2 md:mx-auto';
 
-    if (loading) {
-        return <div className={containerClasses}>Cargando el seguimiento del pedido...</div>;
-    }
-
-    if (!order) {
-        // If order is not found and variant is hero (on home page), display nothing or a subtle message
-        if (variant === 'hero') {
-            return null; // Or a subtle message like 'No active order found.'
-        }
-        // For 'page' variant (on /commande-client), display the original message
-        return (
-            <div className={containerClasses}>
-                <div className={contentClasses}>
-                    <h2 className={`text-2xl font-bold mb-4 text-red-600`}>Pedido no encontrado</h2>
-                    <p className={`text-gray-600 mb-6`}>No pudimos encontrar tu pedido.</p>
-                    <button onClick={onNewOrderClick} className="bg-brand-primary text-brand-secondary font-bold py-3 px-6 rounded-lg hover:bg-yellow-400 transition">
-                        Hacer un nuevo pedido
-                    </button>
-                </div>
-            </div>
-        );
-    }
-    
-    const originalSubtotal = order.subtotal ?? order.total ?? 0;
-    const totalDiscount = order.total_discount ?? 0;
-    const subtotalAfterDiscounts = Math.max(originalSubtotal - totalDiscount, 0);
-    const hasAppliedPromotions = (order.applied_promotions?.length ?? 0) > 0;
-    const isTakeawayOrder = order.type === 'a_emporter';
-    const clientName = order.clientInfo?.nom ?? order.client_name ?? '';
-    const clientPhone = order.clientInfo?.telephone ?? order.client_phone ?? '';
-    const clientAddress = order.clientInfo?.adresse ?? order.client_address ?? '';
+    const clientName = order?.clientInfo?.nom ?? order?.client_name ?? '';
+    const clientPhone = order?.clientInfo?.telephone ?? order?.client_phone ?? '';
+    const clientAddress = order?.clientInfo?.adresse ?? order?.client_address ?? '';
     const hasClientDetails = Boolean(clientName || clientPhone || clientAddress);
 
     useEffect(() => {
@@ -538,7 +510,36 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
         return () => {
             observer.disconnect();
         };
-    }, [hasClientDetails, clientName, clientPhone, clientAddress]);
+    }, [hasClientDetails]);
+
+    if (loading) {
+        return <div className={containerClasses}>Cargando el seguimiento del pedido...</div>;
+    }
+
+    if (!order) {
+        // If order is not found and variant is hero (on home page), display nothing or a subtle message
+        if (variant === 'hero') {
+            return null; // Or a subtle message like 'No active order found.'
+        }
+        // For 'page' variant (on /commande-client), display the original message
+        return (
+            <div className={containerClasses}>
+                <div className={contentClasses}>
+                    <h2 className={`text-2xl font-bold mb-4 text-red-600`}>Pedido no encontrado</h2>
+                    <p className={`text-gray-600 mb-6`}>No pudimos encontrar tu pedido.</p>
+                    <button onClick={onNewOrderClick} className="bg-brand-primary text-brand-secondary font-bold py-3 px-6 rounded-lg hover:bg-yellow-400 transition">
+                        Hacer un nuevo pedido
+                    </button>
+                </div>
+            </div>
+        );
+    }
+    
+    const originalSubtotal = order.subtotal ?? order.total ?? 0;
+    const totalDiscount = order.total_discount ?? 0;
+    const subtotalAfterDiscounts = Math.max(originalSubtotal - totalDiscount, 0);
+    const hasAppliedPromotions = (order.applied_promotions?.length ?? 0) > 0;
+    const isTakeawayOrder = order.type === 'a_emporter';
     const getPromotionIcon = (promo: { type?: string | null }) => {
         if (isFreeShippingType(promo.type)) return <TruckIcon size={16} />;
         if (promo.type === 'percentage') return <Percent size={16} />;
