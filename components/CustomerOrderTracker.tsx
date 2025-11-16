@@ -966,29 +966,33 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                         return (
                                             <div
                                                 key={item.id}
-                                                className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/95 text-slate-900 shadow-xl transition-all hover:-translate-y-0.5 hover:border-amber-300/60 hover:shadow-amber-500/30"
+                                                className="group relative overflow-hidden rounded-[28px] bg-white/95 text-slate-900 shadow-[0_20px_45px_rgba(15,23,42,0.08)] ring-1 ring-black/5 transition-all hover:-translate-y-0.5 hover:shadow-[0_25px_55px_rgba(249,115,22,0.25)]"
                                             >
                                                 <div className="flex items-stretch">
-                                                    <div className="flex w-20 flex-shrink-0 items-center justify-center self-stretch bg-gradient-to-b from-orange-500 to-rose-500 text-3xl font-black text-white shadow-inner shadow-amber-500/40 sm:w-24">
-                                                        <span className="text-2xl font-extrabold leading-none sm:text-3xl">{item.quantite}</span>
+                                                    <div className="relative flex w-24 flex-col items-center justify-center gap-2 self-stretch bg-gradient-to-b from-[#ff7a18] via-[#ff4154] to-[#ff2d83] text-white shadow-inner shadow-[#ffaf5f]/40 sm:w-28">
+                                                        <span className="text-3xl font-black leading-none drop-shadow-md sm:text-4xl">{item.quantite}</span>
+                                                        <span className="text-[11px] font-semibold uppercase tracking-[0.25em] text-white/70">uds</span>
+                                                        <div className="pointer-events-none absolute inset-0 opacity-35 mix-blend-soft-light">
+                                                            <div className="h-full w-full bg-gradient-to-b from-white/60 via-transparent to-white/30" />
+                                                        </div>
                                                     </div>
-                                                    <div className="flex flex-1 flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6 mt-1 mb-1">
+                                                    <div className="flex flex-1 flex-col gap-4 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-7 sm:py-5">
                                                         <div className="min-w-0 flex-1 space-y-2">
                                                             <div className="space-y-1">
-                                                                <p className="mb-0 text-base font-semibold leading-tight text-balance text-slate-900 sm:text-lg">
+                                                                <p className="text-base font-semibold leading-tight text-balance text-slate-900 sm:text-lg">
                                                                     {item.nom_produit}
                                                                 </p>
                                                                 {!isFreeShipping && (
-                                                                    <p className="mt-0 text-xs font-medium uppercase tracking-wider text-slate-500">
+                                                                    <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-slate-400">
                                                                         {formatCurrencyCOP(item.prix_unitaire)} /u
                                                                     </p>
                                                                 )}
                                                             </div>
                                                             {itemDescription && (
-                                                                <p className="mt-0 text-sm leading-snug text-slate-600">{itemDescription}</p>
+                                                                <p className="text-sm leading-snug text-slate-600">{itemDescription}</p>
                                                             )}
                                                             {trimmedComment && (
-                                                                <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-sm italic text-amber-700 shadow-inner shadow-amber-200/60">
+                                                                <div className="rounded-2xl border border-amber-200/70 bg-amber-50/90 px-4 py-2 text-sm italic text-amber-700 shadow-inner shadow-amber-200/60">
                                                                     « {trimmedComment} »
                                                                 </div>
                                                             )}
@@ -999,28 +1003,19 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                                         : 'border border-slate-200 bg-slate-50 text-slate-600'
                                                                 }`}>
                                                                     <TruckIcon size={14} />
-                                                                    {isFreeShipping ? 'Entrega gratis' : 'Entrega'}
+                                                                    {isFreeShipping ? 'Domicilio gratis' : 'Costo de envío'}
                                                                 </div>
                                                             )}
                                                         </div>
-                                                        <div className="flex shrink-0 flex-col items-end gap-2 text-right">
-                                                            {isFreeShipping ? (
-                                                                <>
-                                                                    <span className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-1.5 text-sm font-semibold text-emerald-700 shadow-inner shadow-emerald-200/40">
-                                                                        <Gift size={16} /> Gratuit
-                                                                    </span>
-                                                                    <span className="text-xs font-medium text-emerald-600/70 line-through decoration-emerald-400">
-                                                                        {formatCurrencyCOP(8000)}
-                                                                    </span>
-                                                                </>
-                                                            ) : (
-                                                                <span className="rounded-full bg-slate-100 px-4 py-1.5 text-lg font-bold text-slate-900 shadow-inner shadow-slate-200">
-                                                                    {formatCurrencyCOP(item.prix_unitaire * item.quantite)}
-                                                                </span>
-                                                            )}
+                                                        <div className="shrink-0 text-right">
+                                                            <p className="text-[11px] font-semibold uppercase tracking-[0.4em] text-slate-400">Total</p>
+                                                            <p className="text-2xl font-black text-slate-900 sm:text-3xl">
+                                                                {formatCurrencyCOP(item.prix_unitaire * item.quantite)}
+                                                            </p>
                                                         </div>
                                                     </div>
                                                 </div>
+                                                <div className="pointer-events-none absolute inset-0 rounded-[28px] border border-white/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                                             </div>
                                         );
                                     })
