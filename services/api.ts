@@ -76,6 +76,7 @@ type SupabaseProductRow = {
   image: string | null;
   is_best_seller: boolean | null | undefined;
   best_seller_rank: number | null | undefined;
+  extras: Product['extras'] | null | undefined;
   product_recipes: SupabaseRecipeRow[] | null;
 };
 
@@ -387,6 +388,7 @@ const mapProductRow = (row: SupabaseProductRow, ingredientMap?: Map<string, Ingr
     recipe,
     is_best_seller: row.is_best_seller ?? false,
     best_seller_rank: row.best_seller_rank ?? null,
+    extras: row.extras ?? undefined,
   };
 
   if (ingredientMap) {
@@ -797,13 +799,23 @@ type SelectProductsQueryOptions = {
   orderBy?: { column: string; ascending?: boolean; nullsFirst?: boolean };
   includeBestSellerColumns?: boolean;
   includeRecipes?: boolean;
+  includeExtras?: boolean;
 };
 
-const buildProductSelectColumns = (includeBestSellerColumns: boolean, includeRecipes: boolean): string => {
+const buildProductSelectColumns = (
+  includeBestSellerColumns: boolean,
+  includeRecipes: boolean,
+  includeExtras: boolean,
+): string => {
   const bestSellerColumns = includeBestSellerColumns
     ? `,
         is_best_seller,
         best_seller_rank`
+    : '';
+
+  const extrasColumn = includeExtras
+    ? `,
+        extras`
     : '';
 
   const recipeColumns = includeRecipes
@@ -821,16 +833,17 @@ const buildProductSelectColumns = (includeBestSellerColumns: boolean, includeRec
         prix_vente,
         categoria_id,
         estado,
-        image${bestSellerColumns}${recipeColumns}
+        image${bestSellerColumns}${extrasColumn}${recipeColumns}
       `;
 };
 
 const selectProductsQuery = (options?: SelectProductsQueryOptions) => {
   const includeBestSellerColumns = options?.includeBestSellerColumns !== false;
   const includeRecipes = options?.includeRecipes !== false;
+  const includeExtras = options?.includeExtras !== false;
   let query = supabase
     .from('products')
-    .select(buildProductSelectColumns(includeBestSellerColumns, includeRecipes));
+    .select(buildProductSelectColumns(includeBestSellerColumns, includeRecipes, includeExtras));
 
   if (options?.orderBy) {
     query = query.order(options.orderBy.column, {
@@ -844,7 +857,7 @@ const selectProductsQuery = (options?: SelectProductsQueryOptions) => {
   return query;
 };
 
-const isMissingBestSellerColumnError = (error: { message?: string } | null): boolean => {
+const isMissingColumnError = (error: { message?: string } | null, columnName: string): boolean => {
   if (!error?.message) {
     return false;
   }
@@ -853,25 +866,47 @@ const isMissingBestSellerColumnError = (error: { message?: string } | null): boo
   return (
     normalizedMessage.includes('does not exist') &&
     normalizedMessage.includes('column') &&
-    (normalizedMessage.includes('is_best_seller') || normalizedMessage.includes('best_seller_rank'))
+    normalizedMessage.includes(columnName.toLowerCase())
   );
 };
+
+const isMissingBestSellerColumnError = (error: { message?: string } | null): boolean =>
+  isMissingColumnError(error, 'is_best_seller') || isMissingColumnError(error, 'best_seller_rank');
+
+const isMissingExtrasColumnError = (error: { message?: string } | null): boolean =>
+  isMissingColumnError(error, 'extras');
 
 const runProductsQueryWithFallback = async <T>(
   executor: (
     query: ReturnType<typeof selectProductsQuery>,
     includeBestSellerColumns: boolean,
+    includeExtrasColumn: boolean,
   ) => Promise<SupabaseResponse<T>>,
   options?: Omit<SelectProductsQueryOptions, 'includeBestSellerColumns'>,
 ): Promise<SupabaseResponse<T>> => {
-  const includeBestSellerColumns = true;
-  let response = await executor(selectProductsQuery({ ...options, includeBestSellerColumns }), includeBestSellerColumns);
+  let includeBestSellerColumns = true;
+  let includeExtrasColumn = options?.includeExtras !== false;
+  let response = await executor(
+    selectProductsQuery({ ...options, includeBestSellerColumns, includeExtras: includeExtrasColumn }),
+    includeBestSellerColumns,
+    includeExtrasColumn,
+  );
 
-  if (isMissingBestSellerColumnError(response.error)) {
-    const fallbackIncludeBestSellerColumns = false;
+  if (response.error && includeExtrasColumn && isMissingExtrasColumnError(response.error)) {
+    includeExtrasColumn = false;
     response = await executor(
-      selectProductsQuery({ ...options, includeBestSellerColumns: fallbackIncludeBestSellerColumns }),
-      fallbackIncludeBestSellerColumns,
+      selectProductsQuery({ ...options, includeBestSellerColumns, includeExtras: includeExtrasColumn }),
+      includeBestSellerColumns,
+      includeExtrasColumn,
+    );
+  }
+
+  if (response.error && includeBestSellerColumns && isMissingBestSellerColumnError(response.error)) {
+    includeBestSellerColumns = false;
+    response = await executor(
+      selectProductsQuery({ ...options, includeBestSellerColumns, includeExtras: includeExtrasColumn }),
+      includeBestSellerColumns,
+      includeExtrasColumn,
     );
   }
 
@@ -1075,8 +1110,10 @@ const createSalesEntriesForOrder = async (order: Order): Promise<number> => {
   const productIds = Array.from(new Set(order.items.map(item => item.produitRef)));
   const productsPromise =
     productIds.length > 0
-      ? runProductsQueryWithFallback(query => query.in('id', productIds))
-      : runProductsQueryWithFallback(query => query.limit(0));
+      ? runProductsQueryWithFallback((query, _includeBestSellerColumns, _includeExtrasColumn) =>
+          query.in('id', productIds),
+        )
+      : runProductsQueryWithFallback((query, _includeBestSellerColumns, _includeExtrasColumn) => query.limit(0));
   const [categories, ingredients, productsResponse] = await Promise.all([
     fetchCategories(),
     fetchIngredients(),
@@ -1314,7 +1351,7 @@ export const api = {
         fetchTablesWithMeta(),
         fetchIngredients(),
         fetchCategories(),
-        runProductsQueryWithFallback(query => query),
+        runProductsQueryWithFallback((query, _includeBestSellerColumns, _includeExtrasColumn) => query),
         selectOrdersQuery().eq('statut', 'finalisee').gte('date_creation', businessDayIso),
         selectOrdersQuery().eq('statut', 'finalisee').gte('date_creation', previousStartIso).lt('date_creation', endIso),
       ]);
@@ -1614,7 +1651,9 @@ export const api = {
 
   getProducts: async (): Promise<Product[]> => {
     const [productRows, ingredients] = await Promise.all([
-      runProductsQueryWithFallback(query => query.neq('estado', 'archive')),
+      runProductsQueryWithFallback((query, _includeBestSellerColumns, _includeExtrasColumn) =>
+        query.neq('estado', 'archive'),
+      ),
       fetchIngredientsOrWarn('getProducts'),
     ]);
     const rows = unwrap<SupabaseProductRow[]>(productRows as SupabaseResponse<SupabaseProductRow[]>);
@@ -1626,7 +1665,9 @@ export const api = {
 
   getProductById: async (productId: string): Promise<Product | null> => {
     const [productResponse, ingredients] = await Promise.all([
-      runProductsQueryWithFallback(query => query.eq('id', productId).maybeSingle()),
+      runProductsQueryWithFallback((query, _includeBestSellerColumns, _includeExtrasColumn) =>
+        query.eq('id', productId).maybeSingle(),
+      ),
       fetchIngredientsOrWarn('getProductById'),
     ]);
 
@@ -1644,7 +1685,7 @@ export const api = {
 
   getBestSellerProducts: async (): Promise<Product[]> => {
     const [productsResponse, ingredients] = await Promise.all([
-      runProductsQueryWithFallback((query, includeBestSellerColumns) => {
+      runProductsQueryWithFallback((query, includeBestSellerColumns, _includeExtrasColumn) => {
         if (!includeBestSellerColumns) {
           return query.limit(0);
         }
@@ -1677,23 +1718,40 @@ export const api = {
 
   addProduct: async (product: Omit<Product, 'id'>): Promise<Product> => {
     const normalizedImage = normalizeCloudinaryImageUrl(product.image);
+    const extrasPayload = product.extras ? (product.extras.length > 0 ? product.extras : null) : product.extras;
+    const baseInsertPayload = {
+      nom_produit: product.nom_produit,
+      description: product.description ?? null,
+      prix_vente: product.prix_vente,
+      categoria_id: product.categoria_id,
+      estado: product.estado,
+      image: normalizedImage,
+      is_best_seller: product.is_best_seller ?? false,
+      best_seller_rank: product.is_best_seller ? product.best_seller_rank : null,
+    };
 
-    const response = await supabase
+    const buildInsertPayload = (includeExtras: boolean) =>
+      includeExtras && extrasPayload !== undefined
+        ? { ...baseInsertPayload, extras: extrasPayload }
+        : baseInsertPayload;
+
+    let response = await supabase
       .from('products')
-      .insert({
-        nom_produit: product.nom_produit,
-        description: product.description ?? null,
-        prix_vente: product.prix_vente,
-        categoria_id: product.categoria_id,
-        estado: product.estado,
-        image: normalizedImage,
-        is_best_seller: product.is_best_seller ?? false,
-        best_seller_rank: product.is_best_seller ? product.best_seller_rank : null,
-      })
+      .insert(buildInsertPayload(true))
       .select(
-        'id, nom_produit, description, prix_vente, categoria_id, estado, image, is_best_seller, best_seller_rank',
+        'id, nom_produit, description, prix_vente, categoria_id, estado, image, is_best_seller, best_seller_rank, extras',
       )
       .single();
+
+    if (response.error && extrasPayload !== undefined && isMissingExtrasColumnError(response.error)) {
+      response = await supabase
+        .from('products')
+        .insert(buildInsertPayload(false))
+        .select(
+          'id, nom_produit, description, prix_vente, categoria_id, estado, image, is_best_seller, best_seller_rank',
+        )
+        .single();
+    }
 
     const productRow = unwrap<SupabaseProductRow>(response as SupabaseResponse<SupabaseProductRow>);
 
@@ -1732,18 +1790,32 @@ export const api = {
         });
     }
 
-    const response = await supabase
+    const extrasPayload = product.extras ? (product.extras.length > 0 ? product.extras : null) : product.extras;
+    const basePayload = {
+      nom_produit: product.nom_produit,
+      description: product.description ?? null,
+      prix_vente: product.prix_vente,
+      categoria_id: product.categoria_id,
+      estado: product.estado,
+      image: imageUrl ?? null,
+    };
+
+    const buildPayload = (includeExtras: boolean) =>
+      includeExtras && extrasPayload !== undefined ? { ...basePayload, extras: extrasPayload } : basePayload;
+
+    let response = await supabase
       .from('products')
-      .insert({
-        nom_produit: product.nom_produit,
-        description: product.description ?? null,
-        prix_vente: product.prix_vente,
-        categoria_id: product.categoria_id,
-        estado: product.estado,
-        image: imageUrl ?? null,
-      })
-      .select('id, nom_produit, description, prix_vente, categoria_id, estado, image')
+      .insert(buildPayload(true))
+      .select('id, nom_produit, description, prix_vente, categoria_id, estado, image, extras')
       .single();
+
+    if (response.error && extrasPayload !== undefined && isMissingExtrasColumnError(response.error)) {
+      response = await supabase
+        .from('products')
+        .insert(buildPayload(false))
+        .select('id, nom_produit, description, prix_vente, categoria_id, estado, image')
+        .single();
+    }
 
     const productRow = unwrap<SupabaseProductRow>(response as SupabaseResponse<SupabaseProductRow>);
 
@@ -1782,15 +1854,37 @@ export const api = {
     }
 
     const payload: Record<string, unknown> = {};
+    const shouldUpdateExtras = updates.extras !== undefined;
     if (updates.nom_produit !== undefined) payload.nom_produit = updates.nom_produit;
     if (updates.description !== undefined) payload.description = updates.description;
     if (updates.prix_vente !== undefined) payload.prix_vente = updates.prix_vente;
     if (updates.categoria_id !== undefined) payload.categoria_id = updates.categoria_id;
     if (updates.estado !== undefined) payload.estado = updates.estado;
+    if (shouldUpdateExtras) {
+      payload.extras = updates.extras && updates.extras.length > 0 ? updates.extras : null;
+    }
     if (imageUrl !== undefined) payload.image = imageUrl;
 
     if (Object.keys(payload).length > 0) {
-      await supabase.from('products').update(payload).eq('id', productId);
+      const performUpdate = (updatePayload: Record<string, unknown>) =>
+        supabase.from('products').update(updatePayload).eq('id', productId);
+
+      let updateResponse = await performUpdate(payload);
+      let updateError = updateResponse.error;
+
+      if (updateError && shouldUpdateExtras && isMissingExtrasColumnError(updateError)) {
+        const { extras, ...fallbackPayload } = payload;
+        if (Object.keys(fallbackPayload).length > 0) {
+          updateResponse = await performUpdate(fallbackPayload);
+          updateError = updateResponse.error;
+        } else {
+          updateError = null;
+        }
+      }
+
+      if (updateError) {
+        throw new Error(updateError.message);
+      }
     }
 
     if (updates.recipe) {
@@ -2601,7 +2695,7 @@ export const api = {
       selectOrdersQuery().eq('statut', 'finalisee'),
       fetchCategories(),
       fetchIngredients(),
-      runProductsQueryWithFallback(query => query),
+      runProductsQueryWithFallback((query, _includeBestSellerColumns, _includeExtrasColumn) => query),
     ]);
     let roleLoginsResult: RoleLogin[] = [];
     let roleLoginsUnavailable = false;
