@@ -1,12 +1,12 @@
 
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 import { uploadProductImage, resolveProductImageUrl } from '../services/cloudinary';
 import { Product, Category, Ingredient, RecipeItem } from '../types';
 import Modal from '../components/Modal';
-import { PlusCircle, Edit, Trash2, Search, Settings, GripVertical, CheckCircle, Clock, XCircle, MoreVertical, Upload, HelpCircle } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, Search, Settings, GripVertical, CheckCircle, Clock, XCircle, Upload, HelpCircle } from 'lucide-react';
 import { formatCurrencyCOP, formatIntegerAmount } from '../utils/formatIntegerAmount';
 import { convertPriceToUsageUnit, getUsageUnitLabel } from '../utils/ingredientUnits';
 
@@ -200,14 +200,28 @@ const Produits: React.FC = () => {
 
 const ProductCard: React.FC<{ product: Product; category?: Category; onEdit: () => void; onDelete: () => void; onStatusChange: (product: Product, newStatus: Product['estado']) => void; canEdit: boolean; }> = ({ product, category, onEdit, onDelete, onStatusChange, canEdit }) => {
     const { text, color, Icon } = getStatusInfo(product.estado);
-    const [menuOpen, setMenuOpen] = useState(false);
+    const [statusMenuOpen, setStatusMenuOpen] = useState(false);
+    const statusMenuRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        if (!statusMenuOpen) return;
+
+        const handleClickOutside = (event: MouseEvent) => {
+            if (statusMenuRef.current && !statusMenuRef.current.contains(event.target as Node)) {
+                setStatusMenuOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [statusMenuOpen]);
     
     const margin = product.prix_vente - (product.cout_revient || 0);
     const marginPercentage = product.prix_vente > 0 ? (margin / product.prix_vente) * 100 : 0;
 
     return (
-        <div className="ui-card flex flex-col overflow-hidden">
-            <div className="relative">
+        <div className="ui-card flex flex-col">
+            <div className="relative overflow-hidden rounded-t-xl">
                 <img src={product.image} alt={product.nom_produit} className="w-full h-40 object-cover" />
                 {product.is_best_seller && (
                     <span className="absolute top-2 left-2 rounded-full bg-brand-primary/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white shadow-md">
@@ -228,25 +242,52 @@ const ProductCard: React.FC<{ product: Product; category?: Category; onEdit: () 
                  <p className="text-xs text-black mt-1 flex-grow">{product.description}</p>
                 
                 <div className="flex justify-between items-center mt-4">
-                    <span className={`px-2 py-1 text-xs font-bold rounded-full flex items-center gap-1 ${color}`}>
-                        <Icon size={14} /> {text}
-                    </span>
+                    <div className="relative" ref={statusMenuRef}>
+                        <button
+                            type="button"
+                            onClick={() => canEdit && setStatusMenuOpen(prev => !prev)}
+                            className={`px-2 py-1 text-xs font-bold rounded-full flex items-center gap-1 transition-colors ${canEdit ? 'hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary cursor-pointer' : ''} ${color}`}
+                            disabled={!canEdit}
+                        >
+                            <Icon size={14} /> {text}
+                        </button>
+                        {canEdit && statusMenuOpen && (
+                            <div className="absolute left-0 bottom-full mb-2 w-44 bg-white rounded-md shadow-lg z-10 border">
+                                <p className="px-4 pt-2 pb-1 text-xs text-gray-500">Changer statut :</p>
+                                {['disponible', 'agotado_temporal', 'agotado_indefinido'].map(status => (
+                                    <button
+                                        key={status}
+                                        type="button"
+                                        onClick={() => {
+                                            onStatusChange(product, status as Product['estado']);
+                                            setStatusMenuOpen(false);
+                                        }}
+                                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    >
+                                        {getStatusInfo(status as Product['estado']).text}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                     {canEdit && (
-                        <div className="relative">
-                            <button onClick={() => setMenuOpen(!menuOpen)} className="p-1 text-gray-500 hover:text-gray-800"><MoreVertical size={20} /></button>
-                            {menuOpen && (
-                                <div className="absolute right-0 bottom-full mb-2 w-48 bg-white rounded-md shadow-lg z-10 border">
-                                    <button onClick={() => { onEdit(); setMenuOpen(false); }} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Modifier</button>
-                                    <button onClick={() => { onDelete(); setMenuOpen(false); }} className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Supprimer</button>
-                                    <div className="border-t my-1"></div>
-                                    <p className="px-4 pt-2 pb-1 text-xs text-gray-500">Changer statut :</p>
-                                    {['disponible', 'agotado_temporal', 'agotado_indefinido'].map(status => (
-                                        <button key={status} onClick={() => { onStatusChange(product, status as Product['estado']); setMenuOpen(false); }} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                            {getStatusInfo(status as Product['estado']).text}
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
+                        <div className="flex items-center gap-2 text-gray-500">
+                            <button
+                                type="button"
+                                onClick={onEdit}
+                                className="p-2 rounded-full hover:bg-gray-100 hover:text-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
+                                aria-label="Modifier le produit"
+                            >
+                                <Edit size={18} />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={onDelete}
+                                className="p-2 rounded-full hover:bg-gray-100 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-500/40"
+                                aria-label="Supprimer le produit"
+                            >
+                                <Trash2 size={18} />
+                            </button>
                         </div>
                     )}
                 </div>
