@@ -297,6 +297,16 @@ export interface RecipeItem {
   qte_utilisee: number; // en 'g', 'ml', ou 'unite' selon l'ingrédient
 }
 
+export interface ProductExtraOption {
+  name: string;
+  price: number;
+}
+
+export interface ProductExtra {
+  name: string;
+  options: ProductExtraOption[];
+}
+
 export interface Product {
   id: string;
   nom_produit: string;
@@ -309,6 +319,7 @@ export interface Product {
   cout_revient?: number;
   is_best_seller: boolean;
   best_seller_rank: number | null;
+  extras?: ProductExtra[];
 }
 
 export interface Category {

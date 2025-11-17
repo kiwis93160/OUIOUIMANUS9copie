@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 import { uploadProductImage, resolveProductImageUrl } from '../services/cloudinary';
-import { Product, Category, Ingredient, RecipeItem } from '../types';
+import { Product, Category, Ingredient, RecipeItem, ProductExtra } from '../types';
 import Modal from '../components/Modal';
 import { PlusCircle, Edit, Trash2, Search, Settings, GripVertical, CheckCircle, Clock, XCircle, Upload, HelpCircle } from 'lucide-react';
 import { formatCurrencyCOP, formatIntegerAmount } from '../utils/formatIntegerAmount';
@@ -297,6 +297,16 @@ const ProductCard: React.FC<{ product: Product; category?: Category; onEdit: () 
 };
 
 
+type ProductExtraOptionFormState = {
+    name: string;
+    price: string;
+};
+
+type ProductExtraFormState = {
+    name: string;
+    options: ProductExtraOptionFormState[];
+};
+
 type ProductFormState = {
     nom_produit: string;
     prix_vente: number;
@@ -307,6 +317,32 @@ type ProductFormState = {
     recipe: RecipeItem[];
     is_best_seller: boolean;
     best_seller_rank: number | null;
+    extras: ProductExtraFormState[];
+};
+
+const convertExtrasToFormState = (extras?: ProductExtra[] | null): ProductExtraFormState[] => {
+    if (!extras) return [];
+    return extras.map(extra => ({
+        name: extra.name,
+        options: extra.options.map(option => ({
+            name: option.name,
+            price: option.price.toString(),
+        })),
+    }));
+};
+
+const sanitizeExtras = (extras: ProductExtraFormState[]): ProductExtra[] => {
+    return extras
+        .map(extra => ({
+            name: extra.name.trim(),
+            options: extra.options
+                .map(option => ({
+                    name: option.name.trim(),
+                    price: Number.parseFloat(option.price.replace(',', '.')) || 0,
+                }))
+                .filter(option => option.name),
+        }))
+        .filter(extra => extra.name && extra.options.length > 0);
 };
 
 const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSuccess: () => void; product: Product | null; mode: 'add' | 'edit'; categories: Category[]; ingredients: Ingredient[]; occupiedPositions: Map<number, Product>; }> = ({ isOpen, onClose, onSuccess, product, mode, categories, ingredients, occupiedPositions }) => {
@@ -314,12 +350,13 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
         nom_produit: product?.nom_produit || '',
         prix_vente: product?.prix_vente || 0,
         categoria_id: product?.categoria_id || (categories[0]?.id ?? ''),
-        estado: product?.estado || 'disponible',
+        estado: product?.estado || 'agotado_indefinido',
         image: product?.image ?? '',
         description: product?.description || '',
         recipe: product?.recipe || [],
         is_best_seller: product?.is_best_seller ?? false,
         best_seller_rank: product?.best_seller_rank ?? null,
+        extras: convertExtrasToFormState(product?.extras),
     });
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [isSubmitting, setSubmitting] = useState(false);
@@ -331,12 +368,13 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
             nom_produit: product?.nom_produit || '',
             prix_vente: product?.prix_vente || 0,
             categoria_id: product?.categoria_id || (categories[0]?.id ?? ''),
-            estado: product?.estado || 'disponible',
+            estado: product?.estado || 'agotado_indefinido',
             image: product?.image ?? '',
             description: product?.description || '',
             recipe: product?.recipe || [],
             is_best_seller: product?.is_best_seller ?? false,
             best_seller_rank: product?.best_seller_rank ?? null,
+            extras: convertExtrasToFormState(product?.extras),
         });
         setImageFile(null);
     }, [isOpen, product, categories]);
@@ -414,6 +452,67 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
         setFormData({ ...formData, recipe: newRecipe });
     };
 
+    const addExtraGroup = () => {
+        setFormData(prev => ({
+            ...prev,
+            extras: [...prev.extras, { name: '', options: [] }],
+        }));
+    };
+
+    const removeExtraGroup = (index: number) => {
+        setFormData(prev => ({
+            ...prev,
+            extras: prev.extras.filter((_, idx) => idx !== index),
+        }));
+    };
+
+    const handleExtraNameChange = (index: number, value: string) => {
+        setFormData(prev => ({
+            ...prev,
+            extras: prev.extras.map((extra, idx) => (idx === index ? { ...extra, name: value } : extra)),
+        }));
+    };
+
+    const addExtraOption = (extraIndex: number) => {
+        setFormData(prev => ({
+            ...prev,
+            extras: prev.extras.map((extra, idx) =>
+                idx === extraIndex
+                    ? { ...extra, options: [...extra.options, { name: '', price: '' }] }
+                    : extra,
+            ),
+        }));
+    };
+
+    const removeExtraOption = (extraIndex: number, optionIndex: number) => {
+        setFormData(prev => ({
+            ...prev,
+            extras: prev.extras.map((extra, idx) =>
+                idx === extraIndex
+                    ? { ...extra, options: extra.options.filter((_, optIdx) => optIdx !== optionIndex) }
+                    : extra,
+            ),
+        }));
+    };
+
+    const handleExtraOptionChange = (
+        extraIndex: number,
+        optionIndex: number,
+        field: keyof ProductExtraOptionFormState,
+        value: string,
+    ) => {
+        setFormData(prev => ({
+            ...prev,
+            extras: prev.extras.map((extra, idx) => {
+                if (idx !== extraIndex) return extra;
+                const options = extra.options.map((option, optIdx) =>
+                    optIdx === optionIndex ? { ...option, [field]: value } : option,
+                );
+                return { ...extra, options };
+            }),
+        }));
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (formData.recipe.length === 0) {
@@ -438,17 +537,19 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                 imageUrl = await uploadProductImage(imageFile, formData.nom_produit);
             }
 
+            const sanitizedExtras = sanitizeExtras(formData.extras);
             const finalData = {
                 ...formData,
+                extras: sanitizedExtras,
                 image: imageUrl,
                 is_best_seller: formData.is_best_seller,
                 best_seller_rank: formData.is_best_seller ? formData.best_seller_rank : null,
-            };
+            } as Omit<Product, 'id'>;
 
             if (mode === 'edit' && product) {
                 await api.updateProduct(product.id, finalData);
             } else {
-                await api.addProduct(finalData as Omit<Product, 'id'>);
+                await api.addProduct(finalData);
             }
             onSuccess();
             setImageFile(null);
@@ -465,101 +566,126 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
     return (
         <Modal isOpen={isOpen} onClose={onClose} title={mode === 'add' ? 'Ajouter un Produit' : 'Modifier le Produit'} size="lg">
             <form onSubmit={handleSubmit} className="space-y-4">
-                 <div className="max-h-[65vh] overflow-y-auto pr-2 space-y-4">
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Nom</label>
-                            <input type="text" value={formData.nom_produit} onChange={e => setFormData({...formData, nom_produit: e.target.value})} required className="mt-1 ui-input"/>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Prix de vente</label>
-                            <input
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                value={formData.prix_vente}
-                                onChange={event => {
-                                    const { valueAsNumber, value } = event.currentTarget;
-                                    const normalizedValue = Number.isNaN(valueAsNumber)
-                                        ? Number(value.replace(',', '.'))
-                                        : valueAsNumber;
-                                    setFormData(prev => ({
-                                        ...prev,
-                                        prix_vente: Number.isNaN(normalizedValue) ? prev.prix_vente : normalizedValue,
-                                    }));
-                                }}
-                                required
-                                className="mt-1 ui-input"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Catégorie</label>
-                            <select value={formData.categoria_id} onChange={e => setFormData({...formData, categoria_id: e.target.value})} required className="mt-1 ui-select">
-                                {categories.map(c => <option key={c.id} value={c.id}>{c.nom}</option>)}
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Statut</label>
-                            <select value={formData.estado} onChange={e => setFormData({...formData, estado: e.target.value as Product['estado']})} required className="mt-1 ui-select">
-                                <option value="disponible">Disponible</option>
-                                <option value="agotado_temporal">Rupture (Temp.)</option>
-                                <option value="agotado_indefinido">Indisponible</option>
-                            </select>
-                        </div>
-                        <div className="sm:col-span-2 flex items-center gap-2 pt-2">
-                            <input
-                                id="best-seller-toggle"
-                                type="checkbox"
-                                checked={formData.is_best_seller}
-                                onChange={event => handleBestSellerToggle(event.target.checked)}
-                                className="h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary"
-                            />
-                            <label htmlFor="best-seller-toggle" className="text-sm font-medium text-gray-700">Best seller</label>
-                        </div>
-                        <div className="sm:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700" htmlFor="best-seller-rank">Position dans le classement</label>
-                            <select
-                                id="best-seller-rank"
-                                value={formData.best_seller_rank ?? ''}
-                                onChange={handleBestSellerRankChange}
-                                disabled={!formData.is_best_seller}
-                                className="mt-1 ui-select"
+                 <div className="max-h-[65vh] overflow-y-auto pr-2 space-y-5">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <div className="rounded-xl border border-gray-200 p-4 flex flex-col gap-4">
+                            <div>
+                                <p className="text-sm font-medium text-gray-700">Image du produit</p>
+                                <p className="text-xs text-gray-500">Utilisez une image carrée pour un meilleur rendu.</p>
+                            </div>
+                            <div className="aspect-square w-full overflow-hidden rounded-lg bg-gray-50">
+                                <img
+                                    src={imageFile ? URL.createObjectURL(imageFile) : resolveProductImageUrl(formData.image)}
+                                    alt="Aperçu du produit"
+                                    className="h-full w-full object-cover"
+                                />
+                            </div>
+                            <label
+                                htmlFor="product-image-upload"
+                                className="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary text-center"
                             >
-                                <option value="">Sélectionner une position</option>
-                                {BEST_SELLER_RANKS.map(rank => {
-                                    const occupant = occupiedPositions.get(rank);
-                                    const isCurrentProduct = occupant?.id === product?.id;
-                                    const isDisabled = Boolean(occupant && !isCurrentProduct);
-                                    const label = occupant
-                                        ? isCurrentProduct
-                                            ? `${rank} – Position actuelle`
-                                            : `${rank} – Occupé par ${occupant.nom_produit}`
-                                        : `${rank}`;
-                                    return (
-                                        <option key={rank} value={rank} disabled={isDisabled}>
-                                            {label}
+                                <div className="flex items-center justify-center gap-2">
+                                    <Upload size={16} />
+                                    <span>Changer l'image</span>
+                                </div>
+                                <input
+                                    id="product-image-upload"
+                                    type="file"
+                                    className="sr-only"
+                                    onChange={e => setImageFile(e.target.files ? e.target.files[0] : null)}
+                                />
+                            </label>
+                        </div>
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Nom</label>
+                                <input
+                                    type="text"
+                                    value={formData.nom_produit}
+                                    onChange={e => setFormData({ ...formData, nom_produit: e.target.value })}
+                                    required
+                                    className="mt-1 ui-input"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Prix de vente</label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={formData.prix_vente}
+                                    onChange={event => {
+                                        const { valueAsNumber, value } = event.currentTarget;
+                                        const normalizedValue = Number.isNaN(valueAsNumber)
+                                            ? Number(value.replace(',', '.'))
+                                            : valueAsNumber;
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            prix_vente: Number.isNaN(normalizedValue) ? prev.prix_vente : normalizedValue,
+                                        }));
+                                    }}
+                                    required
+                                    className="mt-1 ui-input"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Catégorie</label>
+                                <select
+                                    value={formData.categoria_id}
+                                    onChange={e => setFormData({ ...formData, categoria_id: e.target.value })}
+                                    required
+                                    className="mt-1 ui-select"
+                                >
+                                    {categories.map(c => (
+                                        <option key={c.id} value={c.id}>
+                                            {c.nom}
                                         </option>
-                                    );
-                                })}
-                            </select>
-                            {formData.is_best_seller && formData.best_seller_rank === null && (
-                                <p className="mt-1 text-xs text-red-600">Sélectionnez une position disponible pour ce best seller.</p>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-700">
-                        <div>
-                            <p className="text-xs uppercase tracking-wide text-gray-500">Coût de revient</p>
-                            <p className="text-lg font-semibold text-gray-900">{formatCurrencyCOP(recipeCost)}</p>
-                        </div>
-                        <div>
-                            <p className="text-xs uppercase tracking-wide text-gray-500">Marge</p>
-                            <p className={`text-lg font-semibold ${marginValue >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>{formatCurrencyCOP(marginValue)}</p>
-                        </div>
-                        <div>
-                            <p className="text-xs uppercase tracking-wide text-gray-500">Marge %</p>
-                            <p className={`text-lg font-semibold ${marginPercentage >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>{Number.isFinite(marginPercentage) ? formatIntegerAmount(marginPercentage) : '0'}%</p>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="rounded-xl border border-gray-200 p-4 space-y-3">
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        id="best-seller-toggle"
+                                        type="checkbox"
+                                        checked={formData.is_best_seller}
+                                        onChange={event => handleBestSellerToggle(event.target.checked)}
+                                        className="h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary"
+                                    />
+                                    <label htmlFor="best-seller-toggle" className="text-sm font-medium text-gray-700">
+                                        Best seller
+                                    </label>
+                                </div>
+                                <select
+                                    aria-label="Position du best seller"
+                                    value={formData.best_seller_rank ?? ''}
+                                    onChange={handleBestSellerRankChange}
+                                    disabled={!formData.is_best_seller}
+                                    className="ui-select"
+                                >
+                                    <option value="">Sélectionner une position</option>
+                                    {BEST_SELLER_RANKS.map(rank => {
+                                        const occupant = occupiedPositions.get(rank);
+                                        const isCurrentProduct = occupant?.id === product?.id;
+                                        const isDisabled = Boolean(occupant && !isCurrentProduct);
+                                        const label = occupant
+                                            ? isCurrentProduct
+                                                ? `${rank} – Position actuelle`
+                                                : `${rank} – Occupé par ${occupant.nom_produit}`
+                                            : `${rank}`;
+                                        return (
+                                            <option key={rank} value={rank} disabled={isDisabled}>
+                                                {label}
+                                            </option>
+                                        );
+                                    })}
+                                </select>
+                                {formData.is_best_seller && formData.best_seller_rank === null && (
+                                    <p className="text-xs text-red-600">
+                                        Sélectionnez une position disponible pour ce best seller.
+                                    </p>
+                                )}
+                            </div>
                         </div>
                     </div>
 
@@ -568,30 +694,92 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                         <textarea
                             rows={3}
                             value={formData.description}
-                            onChange={e => setFormData({...formData, description: e.target.value})}
+                            onChange={e => setFormData({ ...formData, description: e.target.value })}
                             className="mt-1 ui-textarea"
                             placeholder="Courte description du produit..."
                         />
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Image du produit</label>
-                         <div className="mt-1 flex items-center gap-4">
-                            <img
-                                src={imageFile ? URL.createObjectURL(imageFile) : resolveProductImageUrl(formData.image)}
-                                alt="Aperçu"
-                                className="w-20 h-20 object-cover rounded-md bg-gray-100"
-                            />
-                             <label htmlFor="product-image-upload" className="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary">
-                                 <div className="flex items-center gap-2">
-                                     <Upload size={16} />
-                                     <span>Changer l'image</span>
-                                 </div>
-                                <input id="product-image-upload" type="file" className="sr-only" onChange={e => setImageFile(e.target.files ? e.target.files[0] : null)} />
-                            </label>
-                         </div>
+                    <div className="rounded-xl border border-gray-200 p-4 space-y-4">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <h4 className="text-base font-semibold text-gray-800">Extras du produit</h4>
+                                <p className="text-sm text-gray-500">Ajoutez des options additionnelles facturables.</p>
+                            </div>
+                            <button type="button" onClick={addExtraGroup} className="ui-btn-secondary py-2 px-3 text-sm">
+                                Ajouter un extra
+                            </button>
+                        </div>
+                        {formData.extras.length === 0 ? (
+                            <p className="text-sm text-gray-500">Aucun extra n'est défini pour ce produit.</p>
+                        ) : (
+                            <div className="space-y-3">
+                                {formData.extras.map((extra, extraIndex) => (
+                                    <div key={extraIndex} className="rounded-lg border border-gray-200 p-3 space-y-3">
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                type="text"
+                                                value={extra.name}
+                                                onChange={event => handleExtraNameChange(extraIndex, event.target.value)}
+                                                placeholder="Nom de l'extra (ex: Sauces)"
+                                                className="ui-input flex-1"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => removeExtraGroup(extraIndex)}
+                                                className="p-2 text-gray-400 hover:text-red-500"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
+                                        <div className="space-y-2">
+                                            {extra.options.map((option, optionIndex) => (
+                                                <div
+                                                    key={optionIndex}
+                                                    className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_auto]"
+                                                >
+                                                    <input
+                                                        type="text"
+                                                        value={option.name}
+                                                        onChange={event =>
+                                                            handleExtraOptionChange(extraIndex, optionIndex, 'name', event.target.value)
+                                                        }
+                                                        placeholder="Nom de l'option"
+                                                        className="ui-input"
+                                                    />
+                                                    <input
+                                                        type="number"
+                                                        min="0"
+                                                        step="0.01"
+                                                        value={option.price}
+                                                        onChange={event =>
+                                                            handleExtraOptionChange(extraIndex, optionIndex, 'price', event.target.value)
+                                                        }
+                                                        placeholder="Prix"
+                                                        className="ui-input"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeExtraOption(extraIndex, optionIndex)}
+                                                        className="p-2 text-gray-400 hover:text-red-500"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => addExtraOption(extraIndex)}
+                                            className="text-sm font-medium text-brand-primary hover:underline"
+                                        >
+                                            Ajouter une option
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
-
 
                     <div>
                         <h4 className="text-md font-semibold text-gray-800 border-b pb-2 mb-2">Recette</h4>
@@ -619,6 +807,25 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                             })}
                         </div>
                         <button type="button" onClick={addRecipeItem} className="mt-2 text-sm text-blue-600 hover:underline">Ajouter un ingrédient</button>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-700">
+                        <div>
+                            <p className="text-xs uppercase tracking-wide text-gray-500">Coût de revient</p>
+                            <p className="text-lg font-semibold text-gray-900">{formatCurrencyCOP(recipeCost)}</p>
+                        </div>
+                        <div>
+                            <p className="text-xs uppercase tracking-wide text-gray-500">Marge</p>
+                            <p className={`text-lg font-semibold ${marginValue >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                                {formatCurrencyCOP(marginValue)}
+                            </p>
+                        </div>
+                        <div>
+                            <p className="text-xs uppercase tracking-wide text-gray-500">Marge %</p>
+                            <p className={`text-lg font-semibold ${marginPercentage >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                                {Number.isFinite(marginPercentage) ? formatIntegerAmount(marginPercentage) : '0'}%
+                            </p>
+                        </div>
                     </div>
                 </div>
 
