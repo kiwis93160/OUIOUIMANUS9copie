@@ -220,8 +220,8 @@ const ProductCard: React.FC<{ product: Product; category?: Category; onEdit: () 
     const marginPercentage = product.prix_vente > 0 ? (margin / product.prix_vente) * 100 : 0;
 
     return (
-        <div className="ui-card flex flex-col overflow-hidden">
-            <div className="relative">
+        <div className="ui-card flex flex-col">
+            <div className="relative overflow-hidden rounded-t-xl">
                 <img src={product.image} alt={product.nom_produit} className="w-full h-40 object-cover" />
                 {product.is_best_seller && (
                     <span className="absolute top-2 left-2 rounded-full bg-brand-primary/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white shadow-md">
@@ -252,7 +252,7 @@ const ProductCard: React.FC<{ product: Product; category?: Category; onEdit: () 
                             <Icon size={14} /> {text}
                         </button>
                         {canEdit && statusMenuOpen && (
-                            <div className="absolute left-0 mt-2 w-44 bg-white rounded-md shadow-lg z-10 border">
+                            <div className="absolute left-0 bottom-full mb-2 w-44 bg-white rounded-md shadow-lg z-10 border">
                                 <p className="px-4 pt-2 pb-1 text-xs text-gray-500">Changer statut :</p>
                                 {['disponible', 'agotado_temporal', 'agotado_indefinido'].map(status => (
                                     <button
