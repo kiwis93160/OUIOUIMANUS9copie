@@ -972,7 +972,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                     <div className="flex w-20 flex-shrink-0 items-center justify-center self-stretch bg-gradient-to-b from-orange-500 to-rose-500 text-3xl font-black text-white shadow-inner shadow-amber-500/40 sm:w-24">
                                                         <span className="text-2xl font-extrabold leading-none sm:text-3xl">{item.quantite}</span>
                                                     </div>
-                                                    <div className="flex flex-1 flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6 mt-1 mb-1">
+                                                    <div className="flex flex-1 flex-col gap-3 p-0 sm:flex-row sm:items-center sm:justify-between sm:p-0 mt-1 mb-1">
                                                         <div className="min-w-0 flex-1 space-y-2">
                                                             <div className="space-y-1">
                                                                 <p className="mb-0 text-base font-semibold leading-tight text-balance text-slate-900 sm:text-lg">
