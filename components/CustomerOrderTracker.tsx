@@ -968,11 +968,11 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                 key={item.id}
                                                 className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/95 text-slate-900 shadow-xl transition-all hover:-translate-y-0.5 hover:border-amber-300/60 hover:shadow-amber-500/30"
                                             >
-                                                <div className="flex items-start">
-                                                    <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center bg-gradient-to-b from-orange-500 to-rose-500 text-3xl font-black text-white shadow-inner shadow-amber-500/40 sm:h-24 sm:w-24">
+                                                <div className="flex items-stretch">
+                                                    <div className="flex aspect-square min-h-[4.5rem] min-w-[4.5rem] flex-shrink-0 items-center justify-center rounded-l-2xl bg-gradient-to-b from-orange-500 to-rose-500 text-3xl font-black text-white shadow-inner shadow-amber-500/40 sm:min-h-[5.5rem] sm:min-w-[5.5rem]">
                                                         <span className="text-2xl font-extrabold leading-none sm:text-3xl">{item.quantite}</span>
                                                     </div>
-                                                    <div className="my-0 flex flex-1 flex-col gap-3 px-[15px] py-0 sm:flex-row sm:items-center sm:justify-between">
+                                                    <div className="my-0 flex flex-1 flex-col gap-3 px-[15px] py-0 sm:flex-row sm:items-center sm:justify-between self-start">
                                                         <div className="min-w-0 flex-1">
                                                             <div>
                                                                 <p className="my-0 text-base font-semibold leading-tight text-balance text-slate-900 sm:text-lg">
