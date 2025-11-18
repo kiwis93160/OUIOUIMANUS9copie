@@ -29,7 +29,7 @@ const Modal: React.FC<ModalProps> = ({
     md: 'max-w-lg',
     lg: 'max-w-2xl',
     xl: 'max-w-4xl',
-    half: '', // Custom handling for half size
+    half: 'w-full', // Inline styles handle the final width but keep full width for small screens
   };
 
   const headingId = useId();
@@ -160,9 +160,19 @@ const Modal: React.FC<ModalProps> = ({
   };
 
   if (size === 'half') {
-    // For 'half' size: 50% on large screens (≥1024px), viewport-minus-margins on smaller
-    baseStyle.width = 'calc(100vw - 32px)';
-    baseStyle.maxWidth = 'calc(100vw - 32px)';
+    if (viewportWidth !== null) {
+      const availableWidth = Math.max(viewportWidth - VIEWPORT_MARGIN * 2, 320);
+      const isDesktop = viewportWidth >= 1024;
+      const targetWidth = isDesktop
+        ? Math.max(320, Math.min(availableWidth, viewportWidth / 2))
+        : availableWidth;
+
+      baseStyle.width = `${targetWidth}px`;
+      baseStyle.maxWidth = `${targetWidth}px`;
+    } else {
+      baseStyle.width = '100%';
+      baseStyle.maxWidth = '100%';
+    }
     baseStyle.minWidth = '320px';
     // Use media query via CSS class for responsiveness (applied via className below)
   } else if (preferredWidth !== null) {
