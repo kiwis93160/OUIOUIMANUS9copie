@@ -567,22 +567,24 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
         <Modal isOpen={isOpen} onClose={onClose} title={mode === 'add' ? 'Ajouter un Produit' : 'Modifier le Produit'} size="lg">
             <form onSubmit={handleSubmit} className="space-y-4">
                  <div className="max-h-[65vh] overflow-y-auto pr-2 space-y-5">
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        <div className="rounded-xl border border-gray-200 p-4 flex flex-col gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] md:items-stretch">
+                        <div className="rounded-2xl border border-brand-border bg-brand-accent/10 p-4 flex flex-col gap-4 h-full">
                             <div>
-                                <p className="text-sm font-medium text-gray-700">Image du produit</p>
-                                <p className="text-xs text-gray-500">Utilisez une image carrée pour un meilleur rendu.</p>
+                                <p className="text-sm font-semibold text-gray-800">Image du produit</p>
+                                <p className="text-xs text-gray-600">Utilisez une image carrée pour un meilleur rendu.</p>
                             </div>
-                            <div className="aspect-square w-full overflow-hidden rounded-lg bg-gray-50">
-                                <img
-                                    src={imageFile ? URL.createObjectURL(imageFile) : resolveProductImageUrl(formData.image)}
-                                    alt="Aperçu du produit"
-                                    className="h-full w-full object-cover"
-                                />
+                            <div className="flex-1">
+                                <div className="h-full w-full overflow-hidden rounded-xl bg-white shadow-sm">
+                                    <img
+                                        src={imageFile ? URL.createObjectURL(imageFile) : resolveProductImageUrl(formData.image)}
+                                        alt="Aperçu du produit"
+                                        className="h-full w-full object-cover"
+                                    />
+                                </div>
                             </div>
                             <label
                                 htmlFor="product-image-upload"
-                                className="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary text-center"
+                                className="cursor-pointer bg-white/70 py-2 px-3 border border-brand-border rounded-lg shadow-sm text-sm font-medium text-gray-700 hover:bg-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary text-center"
                             >
                                 <div className="flex items-center justify-center gap-2">
                                     <Upload size={16} />
@@ -596,147 +598,179 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                                 />
                             </label>
                         </div>
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Nom</label>
-                                <input
-                                    type="text"
-                                    value={formData.nom_produit}
-                                    onChange={e => setFormData({ ...formData, nom_produit: e.target.value })}
-                                    required
-                                    className="mt-1 ui-input"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Prix de vente</label>
-                                <input
-                                    type="number"
-                                    step="0.01"
-                                    min="0"
-                                    value={formData.prix_vente}
-                                    onChange={event => {
-                                        const { valueAsNumber, value } = event.currentTarget;
-                                        const normalizedValue = Number.isNaN(valueAsNumber)
-                                            ? Number(value.replace(',', '.'))
-                                            : valueAsNumber;
-                                        setFormData(prev => ({
-                                            ...prev,
-                                            prix_vente: Number.isNaN(normalizedValue) ? prev.prix_vente : normalizedValue,
-                                        }));
-                                    }}
-                                    required
-                                    className="mt-1 ui-input"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Catégorie</label>
-                                <select
-                                    value={formData.categoria_id}
-                                    onChange={e => setFormData({ ...formData, categoria_id: e.target.value })}
-                                    required
-                                    className="mt-1 ui-select"
-                                >
-                                    {categories.map(c => (
-                                        <option key={c.id} value={c.id}>
-                                            {c.nom}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="rounded-xl border border-gray-200 p-4 space-y-3">
-                                <div className="flex items-center gap-2">
+                        <div className="flex flex-col gap-4 h-full">
+                            <div className="rounded-2xl border border-brand-border bg-brand-accent/5 p-4 space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Nom</label>
                                     <input
-                                        id="best-seller-toggle"
-                                        type="checkbox"
-                                        checked={formData.is_best_seller}
-                                        onChange={event => handleBestSellerToggle(event.target.checked)}
-                                        className="h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary"
+                                        type="text"
+                                        value={formData.nom_produit}
+                                        onChange={e => setFormData({ ...formData, nom_produit: e.target.value })}
+                                        required
+                                        className="mt-1 ui-input"
                                     />
-                                    <label htmlFor="best-seller-toggle" className="text-sm font-medium text-gray-700">
-                                        Best seller
-                                    </label>
                                 </div>
-                                <select
-                                    aria-label="Position du best seller"
-                                    value={formData.best_seller_rank ?? ''}
-                                    onChange={handleBestSellerRankChange}
-                                    disabled={!formData.is_best_seller}
-                                    className="ui-select"
-                                >
-                                    <option value="">Sélectionner une position</option>
-                                    {BEST_SELLER_RANKS.map(rank => {
-                                        const occupant = occupiedPositions.get(rank);
-                                        const isCurrentProduct = occupant?.id === product?.id;
-                                        const isDisabled = Boolean(occupant && !isCurrentProduct);
-                                        const label = occupant
-                                            ? isCurrentProduct
-                                                ? `${rank} – Position actuelle`
-                                                : `${rank} – Occupé par ${occupant.nom_produit}`
-                                            : `${rank}`;
-                                        return (
-                                            <option key={rank} value={rank} disabled={isDisabled}>
-                                                {label}
-                                            </option>
-                                        );
-                                    })}
-                                </select>
-                                {formData.is_best_seller && formData.best_seller_rank === null && (
-                                    <p className="text-xs text-red-600">
-                                        Sélectionnez une position disponible pour ce best seller.
-                                    </p>
-                                )}
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Prix de vente</label>
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            min="0"
+                                            value={formData.prix_vente}
+                                            onChange={event => {
+                                                const { valueAsNumber, value } = event.currentTarget;
+                                                const normalizedValue = Number.isNaN(valueAsNumber)
+                                                    ? Number(value.replace(',', '.'))
+                                                    : valueAsNumber;
+                                                setFormData(prev => ({
+                                                    ...prev,
+                                                    prix_vente: Number.isNaN(normalizedValue) ? prev.prix_vente : normalizedValue,
+                                                }));
+                                            }}
+                                            required
+                                            className="mt-1 ui-input"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Catégorie</label>
+                                        <select
+                                            value={formData.categoria_id}
+                                            onChange={e => setFormData({ ...formData, categoria_id: e.target.value })}
+                                            required
+                                            className="mt-1 ui-select"
+                                        >
+                                            {categories.map(c => (
+                                                <option key={c.id} value={c.id}>
+                                                    {c.nom}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="rounded-2xl border border-brand-border bg-brand-accent/15 p-4 space-y-4 flex-1">
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                id="best-seller-toggle"
+                                                type="checkbox"
+                                                checked={formData.is_best_seller}
+                                                onChange={event => handleBestSellerToggle(event.target.checked)}
+                                                className="h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary"
+                                            />
+                                            <label htmlFor="best-seller-toggle" className="text-sm font-medium text-gray-700">
+                                                Best seller
+                                            </label>
+                                        </div>
+                                        {formData.is_best_seller && (
+                                            <span className="rounded-full bg-white/70 px-3 py-1 text-xs font-medium text-brand-primary">
+                                                Mise en avant
+                                            </span>
+                                        )}
+                                    </div>
+                                    <select
+                                        aria-label="Position du best seller"
+                                        value={formData.best_seller_rank ?? ''}
+                                        onChange={handleBestSellerRankChange}
+                                        disabled={!formData.is_best_seller}
+                                        className="ui-select"
+                                    >
+                                        <option value="">Sélectionner une position</option>
+                                        {BEST_SELLER_RANKS.map(rank => {
+                                            const occupant = occupiedPositions.get(rank);
+                                            const isCurrentProduct = occupant?.id === product?.id;
+                                            const isDisabled = Boolean(occupant && !isCurrentProduct);
+                                            const label = occupant
+                                                ? isCurrentProduct
+                                                    ? `${rank} – Position actuelle`
+                                                    : `${rank} – Occupé par ${occupant.nom_produit}`
+                                                : `${rank}`;
+                                            return (
+                                                <option key={rank} value={rank} disabled={isDisabled}>
+                                                    {label}
+                                                </option>
+                                            );
+                                        })}
+                                    </select>
+                                    {formData.is_best_seller && formData.best_seller_rank === null && (
+                                        <p className="text-xs text-red-600">
+                                            Sélectionnez une position disponible pour ce best seller.
+                                        </p>
+                                    )}
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Description</label>
+                                    <textarea
+                                        rows={3}
+                                        value={formData.description}
+                                        onChange={e => setFormData({ ...formData, description: e.target.value })}
+                                        className="mt-1 ui-textarea"
+                                        placeholder="Courte description du produit..."
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Description</label>
-                        <textarea
-                            rows={3}
-                            value={formData.description}
-                            onChange={e => setFormData({ ...formData, description: e.target.value })}
-                            className="mt-1 ui-textarea"
-                            placeholder="Courte description du produit..."
-                        />
-                    </div>
-
-                    <div className="rounded-xl border border-gray-200 p-4 space-y-4">
+                    <div className="rounded-2xl border border-brand-border bg-brand-accent/5 p-5 space-y-5">
                         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                             <div>
                                 <h4 className="text-base font-semibold text-gray-800">Extras du produit</h4>
-                                <p className="text-sm text-gray-500">Ajoutez des options additionnelles facturables.</p>
+                                <p className="text-sm text-gray-600">Organisez vos suppléments par groupe pour guider la sélection.</p>
                             </div>
-                            <button type="button" onClick={addExtraGroup} className="ui-btn-secondary py-2 px-3 text-sm">
-                                Ajouter un extra
+                            <button
+                                type="button"
+                                onClick={addExtraGroup}
+                                className="inline-flex items-center gap-1 rounded-full border border-brand-border bg-white/70 px-4 py-2 text-sm font-medium text-brand-primary hover:bg-white"
+                            >
+                                <span>+ Ajouter un extra</span>
                             </button>
                         </div>
                         {formData.extras.length === 0 ? (
-                            <p className="text-sm text-gray-500">Aucun extra n'est défini pour ce produit.</p>
+                            <div className="rounded-xl border border-dashed border-brand-border bg-white/60 p-4 text-sm text-gray-500">
+                                Aucun extra n'est défini pour ce produit.
+                            </div>
                         ) : (
-                            <div className="space-y-3">
+                            <div className="space-y-4">
                                 {formData.extras.map((extra, extraIndex) => (
-                                    <div key={extraIndex} className="rounded-lg border border-gray-200 p-3 space-y-3">
-                                        <div className="flex items-center gap-2">
-                                            <input
-                                                type="text"
-                                                value={extra.name}
-                                                onChange={event => handleExtraNameChange(extraIndex, event.target.value)}
-                                                placeholder="Nom de l'extra (ex: Sauces)"
-                                                className="ui-input flex-1"
-                                            />
+                                    <div
+                                        key={extraIndex}
+                                        className="rounded-2xl border border-brand-border bg-white/80 p-4 shadow-sm space-y-4"
+                                    >
+                                        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                                            <div className="flex flex-1 items-center gap-2">
+                                                <input
+                                                    type="text"
+                                                    value={extra.name}
+                                                    onChange={event => handleExtraNameChange(extraIndex, event.target.value)}
+                                                    placeholder="Nom de l'extra (ex: Sauces)"
+                                                    className="ui-input flex-1"
+                                                />
+                                                <span className="rounded-full bg-brand-accent/10 px-3 py-1 text-xs font-medium text-brand-primary">
+                                                    {extra.options.length} option{extra.options.length > 1 ? 's' : ''}
+                                                </span>
+                                            </div>
                                             <button
                                                 type="button"
                                                 onClick={() => removeExtraGroup(extraIndex)}
-                                                className="p-2 text-gray-400 hover:text-red-500"
+                                                className="inline-flex items-center gap-1 text-sm font-medium text-red-500 hover:text-red-600"
                                             >
                                                 <Trash2 size={16} />
+                                                Supprimer
                                             </button>
                                         </div>
-                                        <div className="space-y-2">
+                                        <div className="space-y-3">
+                                            <div className="grid grid-cols-1 gap-3 text-xs font-semibold uppercase tracking-wide text-gray-500 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_auto]">
+                                                <span>Nom de l'option</span>
+                                                <span>Prix additionnel</span>
+                                                <span className="hidden sm:block text-right">Action</span>
+                                            </div>
                                             {extra.options.map((option, optionIndex) => (
                                                 <div
                                                     key={optionIndex}
-                                                    className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_auto]"
+                                                    className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_auto]"
                                                 >
                                                     <input
                                                         type="text"
@@ -747,21 +781,24 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                                                         placeholder="Nom de l'option"
                                                         className="ui-input"
                                                     />
-                                                    <input
-                                                        type="number"
-                                                        min="0"
-                                                        step="0.01"
-                                                        value={option.price}
-                                                        onChange={event =>
-                                                            handleExtraOptionChange(extraIndex, optionIndex, 'price', event.target.value)
-                                                        }
-                                                        placeholder="Prix"
-                                                        className="ui-input"
-                                                    />
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-sm text-gray-500">COP</span>
+                                                        <input
+                                                            type="number"
+                                                            min="0"
+                                                            step="0.01"
+                                                            value={option.price}
+                                                            onChange={event =>
+                                                                handleExtraOptionChange(extraIndex, optionIndex, 'price', event.target.value)
+                                                            }
+                                                            placeholder="0.00"
+                                                            className="ui-input"
+                                                        />
+                                                    </div>
                                                     <button
                                                         type="button"
                                                         onClick={() => removeExtraOption(extraIndex, optionIndex)}
-                                                        className="p-2 text-gray-400 hover:text-red-500"
+                                                        className="justify-self-start rounded-full bg-red-50 p-2 text-red-500 hover:bg-red-100"
                                                     >
                                                         <Trash2 size={16} />
                                                     </button>
@@ -771,9 +808,9 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                                         <button
                                             type="button"
                                             onClick={() => addExtraOption(extraIndex)}
-                                            className="text-sm font-medium text-brand-primary hover:underline"
+                                            className="text-sm font-semibold text-brand-primary hover:underline"
                                         >
-                                            Ajouter une option
+                                            + Ajouter une option
                                         </button>
                                     </div>
                                 ))}
@@ -781,35 +818,37 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                         )}
                     </div>
 
-                    <div>
-                        <h4 className="text-md font-semibold text-gray-800 border-b pb-2 mb-2">Recette</h4>
-                        {formData.recipe.length === 0 && (
-                            <div className="text-center p-2 my-2 bg-red-50 border border-red-200 rounded-md">
-                                <p className="text-sm text-red-600">Un produit doit contenir au moins un ingrédient.</p>
-                            </div>
-                        )}
-                        <div className="space-y-2">
-                            {formData.recipe.map((item, index) => {
-                                const ingredientUnit = ingredients.find(i => i.id === item.ingredient_id)?.unite;
-                                const usageUnitLabel = ingredientUnit ? getUsageUnitLabel(ingredientUnit) : '';
+                    <div className="rounded-2xl border border-brand-border bg-brand-accent/5 p-4">
+                        <div className="flex flex-col gap-2">
+                            <h4 className="text-md font-semibold text-gray-800">Recette</h4>
+                            {formData.recipe.length === 0 && (
+                                <div className="text-center p-2 my-2 bg-red-50 border border-red-200 rounded-md">
+                                    <p className="text-sm text-red-600">Un produit doit contenir au moins un ingrédient.</p>
+                                </div>
+                            )}
+                            <div className="space-y-2">
+                                {formData.recipe.map((item, index) => {
+                                    const ingredientUnit = ingredients.find(i => i.id === item.ingredient_id)?.unite;
+                                    const usageUnitLabel = ingredientUnit ? getUsageUnitLabel(ingredientUnit) : '';
 
-                                return (
-                                    <div key={index} className="flex items-center gap-2">
-                                        <GripVertical className="text-gray-400 cursor-move" size={16}/>
-                                        <select value={item.ingredient_id} onChange={event => handleRecipeChange(index, 'ingredient_id', event)} className="ui-select flex-grow">
-                                            {ingredients.map(i => <option key={i.id} value={i.id}>{i.nom}</option>)}
-                                        </select>
-                                        <input type="number" placeholder="Qté" value={item.qte_utilisee} onChange={event => handleRecipeChange(index, 'qte_utilisee', event)} className="ui-input w-24" />
-                                        <span className="text-gray-500 text-sm w-12">{usageUnitLabel}</span>
-                                        <button type="button" onClick={() => removeRecipeItem(index)} className="p-1 text-red-500 hover:bg-red-100 rounded-full"><Trash2 size={16}/></button>
-                                    </div>
-                                );
-                            })}
+                                    return (
+                                        <div key={index} className="flex items-center gap-2">
+                                            <GripVertical className="text-gray-400 cursor-move" size={16}/>
+                                            <select value={item.ingredient_id} onChange={event => handleRecipeChange(index, 'ingredient_id', event)} className="ui-select flex-grow">
+                                                {ingredients.map(i => <option key={i.id} value={i.id}>{i.nom}</option>)}
+                                            </select>
+                                            <input type="number" placeholder="Qté" value={item.qte_utilisee} onChange={event => handleRecipeChange(index, 'qte_utilisee', event)} className="ui-input w-24" />
+                                            <span className="text-gray-500 text-sm w-12">{usageUnitLabel}</span>
+                                            <button type="button" onClick={() => removeRecipeItem(index)} className="p-1 text-red-500 hover:bg-red-100 rounded-full"><Trash2 size={16}/></button>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                            <button type="button" onClick={addRecipeItem} className="mt-2 text-sm font-semibold text-brand-primary hover:underline">+ Ajouter un ingrédient</button>
                         </div>
-                        <button type="button" onClick={addRecipeItem} className="mt-2 text-sm text-blue-600 hover:underline">Ajouter un ingrédient</button>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-700">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-brand-accent/10 border border-brand-border rounded-2xl p-4 text-sm text-gray-700">
                         <div>
                             <p className="text-xs uppercase tracking-wide text-gray-500">Coût de revient</p>
                             <p className="text-lg font-semibold text-gray-900">{formatCurrencyCOP(recipeCost)}</p>
