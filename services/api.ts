@@ -777,8 +777,34 @@ const mapTableRowWithMeta = async (row: SupabaseTableRow): Promise<Table> => {
   return mapTableRow(row, orderMeta);
 };
 
-const selectOrdersQuery = () =>
-  supabase
+type SelectOrdersQueryOptions = {
+  includeSelectedExtras?: boolean;
+};
+
+let supportsOrderItemSelectedExtrasColumn: boolean | null = null;
+
+const shouldIncludeOrderItemSelectedExtrasColumn = (
+  options?: SelectOrdersQueryOptions,
+): boolean => {
+  if (options?.includeSelectedExtras === false) {
+    return false;
+  }
+
+  if (options?.includeSelectedExtras === true) {
+    return true;
+  }
+
+  return supportsOrderItemSelectedExtrasColumn !== false;
+};
+
+const selectOrdersQuery = (options?: SelectOrdersQueryOptions) => {
+  const includeSelectedExtras = shouldIncludeOrderItemSelectedExtrasColumn(options);
+  const selectedExtrasColumn = includeSelectedExtras
+    ? `,
+          selected_extras`
+    : '';
+
+  return supabase
     .from('orders')
     .select(
       `
@@ -810,8 +836,7 @@ const selectOrdersQuery = () =>
           prix_unitaire,
           quantite,
           excluded_ingredients,
-          commentaire,
-          selected_extras,
+          commentaire${selectedExtrasColumn},
           estado,
           date_envoi
         ),
@@ -821,7 +846,8 @@ const selectOrdersQuery = () =>
         applied_promotions
       `,
     )
-    .order("date_creation", { ascending: false });
+    .order('date_creation', { ascending: false });
+};
 
 type SelectProductsQueryOptions = {
   orderBy?: { column: string; ascending?: boolean; nullsFirst?: boolean };
@@ -904,6 +930,9 @@ const isMissingBestSellerColumnError = (error: { message?: string } | null): boo
 const isMissingExtrasColumnError = (error: { message?: string } | null): boolean =>
   isMissingColumnError(error, 'extras');
 
+const isMissingOrderItemSelectedExtrasColumnError = (error: { message?: string } | null): boolean =>
+  isMissingColumnError(error, 'selected_extras');
+
 const runProductsQueryWithFallback = async <T>(
   executor: (
     query: ReturnType<typeof selectProductsQuery>,
@@ -936,6 +965,24 @@ const runProductsQueryWithFallback = async <T>(
       includeBestSellerColumns,
       includeExtrasColumn,
     );
+  }
+
+  return response;
+};
+
+const runOrdersQueryWithFallback = async <T>(
+  executor: (query: ReturnType<typeof selectOrdersQuery>) => Promise<SupabaseResponse<T>>,
+  options?: SelectOrdersQueryOptions,
+): Promise<SupabaseResponse<T>> => {
+  let includeSelectedExtras = shouldIncludeOrderItemSelectedExtrasColumn(options);
+  let response = await executor(selectOrdersQuery({ ...options, includeSelectedExtras }));
+
+  if (response.error && includeSelectedExtras && isMissingOrderItemSelectedExtrasColumnError(response.error)) {
+    supportsOrderItemSelectedExtrasColumn = false;
+    includeSelectedExtras = false;
+    response = await executor(selectOrdersQuery({ ...options, includeSelectedExtras }));
+  } else if (!response.error && includeSelectedExtras) {
+    supportsOrderItemSelectedExtrasColumn = true;
   }
 
   return response;
@@ -1011,7 +1058,9 @@ const resolvePaymentMethod = (method?: string | null): Order['payment_method'] |
 };
 
 const fetchOrderById = async (orderId: string): Promise<Order | null> => {
-  const response = await selectOrdersQuery().eq('id', orderId).maybeSingle();
+  const response = await runOrdersQueryWithFallback<SupabaseOrderRow | null>(query =>
+    query.eq('id', orderId).maybeSingle(),
+  );
   const row = unwrapMaybe<SupabaseOrderRow>(response as SupabaseResponse<SupabaseOrderRow | null>);
   return row ? mapOrderRow(row) : null;
 };
@@ -1380,8 +1429,12 @@ export const api = {
         fetchIngredients(),
         fetchCategories(),
         runProductsQueryWithFallback((query, _includeBestSellerColumns, _includeExtrasColumn) => query),
-        selectOrdersQuery().eq('statut', 'finalisee').gte('date_creation', businessDayIso),
-        selectOrdersQuery().eq('statut', 'finalisee').gte('date_creation', previousStartIso).lt('date_creation', endIso),
+        runOrdersQueryWithFallback(query =>
+          query.eq('statut', 'finalisee').gte('date_creation', businessDayIso),
+        ),
+        runOrdersQueryWithFallback(query =>
+          query.eq('statut', 'finalisee').gte('date_creation', previousStartIso).lt('date_creation', endIso),
+        ),
       ]);
 
     const todaysOrderRows = unwrap<SupabaseOrderRow[]>(todaysOrdersResponse as SupabaseResponse<SupabaseOrderRow[]>);
@@ -2088,7 +2141,7 @@ export const api = {
   },
 
   getKitchenOrders: async (): Promise<KitchenTicket[]> => {
-    const response = await selectOrdersQuery().eq('estado_cocina', 'recibido');
+    const response = await runOrdersQueryWithFallback(query => query.eq('estado_cocina', 'recibido'));
     const rows = unwrap<SupabaseOrderRow[]>(response as SupabaseResponse<SupabaseOrderRow[]>);
     const orders = rows.map(mapOrderRow);
 
@@ -2126,7 +2179,9 @@ export const api = {
   },
 
   getTakeawayOrders: async (): Promise<{ pending: Order[]; ready: Order[] }> => {
-    const response = await selectOrdersQuery().in('type', ['a_emporter', 'pedir_en_linea']);
+    const response = await runOrdersQueryWithFallback(query =>
+      query.in('type', ['a_emporter', 'pedir_en_linea']),
+    );
     const rows = unwrap<SupabaseOrderRow[]>(response as SupabaseResponse<SupabaseOrderRow[]>);
     const orders = rows.map(mapOrderRow);
     return {
@@ -2699,7 +2754,7 @@ export const api = {
   },
 
   getNotificationCounts: async (): Promise<NotificationCounts> => {
-    const response = await selectOrdersQuery();
+    const response = await runOrdersQueryWithFallback(query => query);
     const rows = unwrap<SupabaseOrderRow[]>(response as SupabaseResponse<SupabaseOrderRow[]>);
     const orders = rows.map(mapOrderRow);
 
@@ -2724,7 +2779,7 @@ export const api = {
     clearRoleLoginsBefore(startIso);
 
     const [ordersResponse, categories, ingredients, productRowsResponse] = await Promise.all([
-      selectOrdersQuery().eq('statut', 'finalisee'),
+      runOrdersQueryWithFallback(query => query.eq('statut', 'finalisee')),
       fetchCategories(),
       fetchIngredients(),
       runProductsQueryWithFallback((query, _includeBestSellerColumns, _includeExtrasColumn) => query),
@@ -2838,7 +2893,7 @@ export const api = {
   },
 
   getFinalizedOrders: async (): Promise<Order[]> => {
-    const response = await selectOrdersQuery().eq('statut', 'finalisee');
+    const response = await runOrdersQueryWithFallback(query => query.eq('statut', 'finalisee'));
     const rows = unwrap<SupabaseOrderRow[]>(response as SupabaseResponse<SupabaseOrderRow[]>);
     return rows.map(mapOrderRow);
   },
