@@ -631,7 +631,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                             )}
                         </div>
 
-                        <div className="grid grid-cols-5 gap-3 sm:gap-4 overflow-x-auto">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5 sm:gap-4">
                             {steps.map((step, index) => {
                                 const isActive = index === currentStep;
                                 const isFinalStep = index === steps.length - 1;
@@ -1116,8 +1116,70 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                             <span className="tracker-progress-glow" />
                         </div>
                     </div>
+                    <div className="flex flex-col gap-4 px-2 sm:px-0 lg:hidden">
+                        {steps.map((step, index) => {
+                            const isActive = index === currentStep;
+                            const isFinalStep = index === steps.length - 1;
+                            const isCompleted = index < currentStep || (isFinalStep && isOrderCompleted);
+                            const descriptionColor = isCompleted
+                                ? 'text-emerald-700/80'
+                                : isActive
+                                    ? 'text-amber-700/80'
+                                    : 'text-gray-500';
+                            const timestampColor = isCompleted
+                                ? 'text-emerald-600'
+                                : isActive
+                                    ? 'text-amber-700'
+                                    : 'text-gray-400';
+
+                            return (
+                                <div
+                                    key={`${step.name}-mobile`}
+                                    className={`flex items-start gap-3 rounded-2xl border px-4 py-3 shadow-sm ${
+                                        isCompleted
+                                            ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                                            : isActive
+                                                ? 'bg-amber-50 border-amber-200 text-amber-900'
+                                                : 'bg-white border-gray-200 text-gray-600'
+                                    }`}
+                                >
+                                    <div
+                                        className={`flex h-12 w-12 items-center justify-center rounded-2xl border-2 ${
+                                            isCompleted
+                                                ? 'bg-emerald-500/10 border-emerald-300 text-emerald-600'
+                                                : isActive
+                                                    ? 'bg-amber-500/10 border-amber-300 text-amber-600'
+                                                    : 'bg-gray-100 border-gray-200 text-gray-400'
+                                        }`}
+                                    >
+                                        <step.icon className="h-6 w-6" />
+                                    </div>
+                                    <div className="flex-1 space-y-1">
+                                        <div className="flex items-center gap-2">
+                                            <p className="text-sm font-semibold">{step.name}</p>
+                                            {isCompleted && (
+                                                <CheckCircle className="h-4 w-4 text-emerald-500" aria-hidden />
+                                            )}
+                                        </div>
+                                        <p className={`text-xs leading-snug ${descriptionColor}`}>{step.description}</p>
+                                        {isActive ? (
+                                            <p className={`text-xs font-semibold ${timestampColor}`}>
+                                                ⏱️ {getEstimatedTime(index)}
+                                            </p>
+                                        ) : (
+                                            getStepTimestamp(index) && (
+                                                <p className={`text-xs font-medium ${timestampColor}`}>
+                                                    ✓ {getStepTimestamp(index)}
+                                                </p>
+                                            )
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
                     <div
-                        className="flex items-start sm:items-center justify-between gap-3 sm:gap-4 px-2 overflow-x-auto"
+                        className="hidden lg:flex items-start sm:items-center justify-between gap-3 sm:gap-4 px-2"
                     >
                         {steps.map((step, index) => {
                             const isActive = index === currentStep;
