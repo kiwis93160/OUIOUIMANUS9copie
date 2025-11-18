@@ -987,6 +987,30 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                             {itemDescription && (
                                                                 <p className="my-0 text-sm leading-snug text-slate-600">{itemDescription}</p>
                                                             )}
+                                                            {item.selected_extras && item.selected_extras.length > 0 && (
+                                                                <div className="mt-2 rounded-2xl border border-slate-200 bg-slate-50/80 px-4 py-2 shadow-inner shadow-white/60">
+                                                                    <p className="text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-slate-400 mb-1">
+                                                                        Extras seleccionados
+                                                                    </p>
+                                                                    <ul className="space-y-1">
+                                                                        {item.selected_extras.map((extra, extraIndex) => (
+                                                                            <li
+                                                                                key={`${item.id}-tracker-extra-${extraIndex}`}
+                                                                                className="flex items-center justify-between gap-2 text-xs text-slate-600"
+                                                                            >
+                                                                                <span className="font-semibold text-slate-700">
+                                                                                    {extra.extraName}: {extra.optionName}
+                                                                                </span>
+                                                                                {typeof extra.price === 'number' && (
+                                                                                    <span className="font-bold text-slate-500">
+                                                                                        +{formatCurrencyCOP(extra.price)}
+                                                                                    </span>
+                                                                                )}
+                                                                            </li>
+                                                                        ))}
+                                                                    </ul>
+                                                                </div>
+                                                            )}
                                                             {trimmedComment && (
                                                                 <div className="my-0 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-sm italic text-amber-700 shadow-inner shadow-amber-200/60">
                                                                     « {trimmedComment} »
