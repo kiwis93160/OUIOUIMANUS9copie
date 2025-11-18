@@ -988,7 +988,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                                 <p className="my-0 text-sm leading-snug text-slate-600">{itemDescription}</p>
                                                             )}
                                                             {item.selected_extras && item.selected_extras.length > 0 && (
-                                                                <div className="mt-2 rounded-2xl border border-slate-200 bg-slate-50/80 px-4 py-2 shadow-inner shadow-white/60">
+                                                                <div className="mt-2 rounded-2xl border border-orange-200/40 bg-gradient-to-br from-orange-500/15 via-orange-400/10 to-rose-500/15 px-4 py-2 shadow-inner shadow-orange-500/20">
                                                                     <p className="text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-slate-400 mb-1">
                                                                         Extras seleccionados
                                                                     </p>

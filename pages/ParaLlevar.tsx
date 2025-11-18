@@ -129,6 +129,7 @@ const TakeawayCard: React.FC<{ order: Order, onValidate?: (orderId: string) => v
                                     <ul className="space-y-0.5">
                                         {order.items.map((item: OrderItem) => {
                                             const note = item.commentaire?.trim();
+                                            const hasExtras = Array.isArray(item.selected_extras) && item.selected_extras.length > 0;
                                             return (
                                                 <li key={item.id} className="flex items-stretch rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 shadow-sm overflow-hidden min-h-[3.5rem]">
                                                     <div className="flex flex-1 items-center justify-between gap-3 pr-3">
@@ -136,9 +137,28 @@ const TakeawayCard: React.FC<{ order: Order, onValidate?: (orderId: string) => v
                                                             <span className={`flex self-stretch w-12 shrink-0 items-center justify-center text-xl font-bold text-white shadow-md ${urgencyTone.quantityBackground} rounded-l-lg`} style={toneFillStyle}>
                                                                 {item.quantite}
                                                             </span>
-                                                            <span className="font-semibold text-gray-900 text-[clamp(1.1rem,2.1vw,1.3rem)] leading-snug break-words text-balance whitespace-normal [hyphens:auto] px-3 py-3">
-                                                                {item.nom_produit}
-                                                            </span>
+                                                            <div className="flex flex-col gap-1 px-3 py-3">
+                                                                <p className="font-semibold text-gray-900 text-[clamp(1.1rem,2.1vw,1.3rem)] leading-snug break-words text-balance whitespace-normal [hyphens:auto]">
+                                                                    {item.nom_produit}
+                                                                </p>
+                                                                {hasExtras && (
+                                                                    <div className="rounded-xl border border-orange-200/50 bg-orange-50/70 px-3 py-1.5 text-[11px] leading-snug text-gray-700">
+                                                                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-orange-500 mb-1">Extras</p>
+                                                                        <ul className="space-y-0.5">
+                                                                            {item.selected_extras!.map((extra, extraIndex) => (
+                                                                                <li key={`${item.id}-extra-${extraIndex}`} className="flex items-center justify-between gap-2">
+                                                                                    <span className="font-medium text-gray-800">
+                                                                                        {extra.extraName}: {extra.optionName}
+                                                                                    </span>
+                                                                                    {typeof extra.price === 'number' && (
+                                                                                        <span className="text-gray-600 font-semibold">+{formatCurrencyCOP(extra.price)}</span>
+                                                                                    )}
+                                                                                </li>
+                                                                            ))}
+                                                                        </ul>
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                         <span className="whitespace-nowrap text-sm font-semibold text-gray-900 sm:text-base">{formatCurrencyCOP(item.prix_unitaire * item.quantite)}</span>
                                                     </div>
