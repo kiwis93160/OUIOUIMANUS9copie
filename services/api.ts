@@ -106,7 +106,7 @@ type SupabaseOrderItemRow = {
   commentaire: string | null;
   estado: OrderItem['estado'];
   date_envoi: string | null;
-  selected_extras: SelectedProductExtraOption[] | null;
+  selected_extras?: SelectedProductExtraOption[] | null;
 };
 
 type SupabaseOrderRow = {
@@ -795,6 +795,36 @@ const shouldIncludeOrderItemSelectedExtrasColumn = (
   }
 
   return supportsOrderItemSelectedExtrasColumn !== false;
+};
+
+const runOrderItemsMutationWithSelectedExtrasFallback = async <T>(
+  executor: (includeSelectedExtras: boolean) => Promise<SupabaseResponse<T>>,
+): Promise<SupabaseResponse<T>> => {
+  let includeSelectedExtras = supportsOrderItemSelectedExtrasColumn !== false;
+  let response = await executor(includeSelectedExtras);
+
+  if (response.error && includeSelectedExtras && isMissingOrderItemSelectedExtrasColumnError(response.error)) {
+    supportsOrderItemSelectedExtrasColumn = false;
+    response = await executor(false);
+  } else if (!response.error && includeSelectedExtras) {
+    supportsOrderItemSelectedExtrasColumn = true;
+  }
+
+  return response;
+};
+
+const applyOrderItemSelectedExtras = <T extends { selected_extras?: SelectedProductExtraOption[] | null }>(
+  payload: T,
+  selectedExtras: SelectedProductExtraOption[] | null | undefined,
+  includeSelectedExtras: boolean,
+): T => {
+  if (includeSelectedExtras) {
+    payload.selected_extras = selectedExtras ?? [];
+  } else if ('selected_extras' in payload) {
+    delete payload.selected_extras;
+  }
+
+  return payload;
 };
 
 const selectOrdersQuery = (options?: SelectOrdersQueryOptions) => {
@@ -2277,14 +2307,22 @@ export const api = {
 
   addOrderItems: async (orderId: string, items: Omit<OrderItem, 'id'>[]): Promise<Order> => {
     const nowIso = new Date().toISOString();
-    const itemsWithOrderId = items.map(item => ({
-      ...item,
-      order_id: orderId,
-      estado: 'en_attente',
-      date_envoi: nowIso,
-    }));
+    await runOrderItemsMutationWithSelectedExtrasFallback(includeSelectedExtras => {
+      const itemsWithOrderId = items.map(item =>
+        applyOrderItemSelectedExtras(
+          {
+            ...item,
+            order_id: orderId,
+            estado: 'en_attente',
+            date_envoi: nowIso,
+          },
+          item.selected_extras,
+          includeSelectedExtras,
+        ),
+      );
 
-    await supabase.from('order_items').insert(itemsWithOrderId);
+      return supabase.from('order_items').insert(itemsWithOrderId) as Promise<SupabaseResponse<OrderItem[]>>;
+    });
 
     publishOrderChange();
     const updatedOrder = await fetchOrderById(orderId);
@@ -2310,33 +2348,48 @@ export const api = {
     const nowIso = new Date().toISOString();
 
     if (itemsToInsert.length > 0) {
-      await supabase.from('order_items').insert(
-        itemsToInsert.map(item => ({
-          ...item,
-          order_id: orderId,
-          estado: 'en_attente',
-          date_envoi: nowIso,
-        })),
+      await runOrderItemsMutationWithSelectedExtrasFallback(includeSelectedExtras =>
+        supabase.from('order_items').insert(
+          itemsToInsert.map(item =>
+            applyOrderItemSelectedExtras(
+              {
+                ...item,
+                order_id: orderId,
+                estado: 'en_attente',
+                date_envoi: nowIso,
+              },
+              item.selected_extras,
+              includeSelectedExtras,
+            ),
+          ),
+        ) as Promise<SupabaseResponse<OrderItem[]>>,
       );
     }
 
     if (itemsToUpdate.length > 0) {
       await Promise.all(
         itemsToUpdate.map(item =>
-          supabase
-            .from('order_items')
-            .update({
-              produit_id: item.produitRef,
-              nom_produit: item.nom_produit,
-              prix_unitaire: item.prix_unitaire,
-              quantite: item.quantite,
-              excluded_ingredients: item.excluded_ingredients ?? [],
-              commentaire: item.commentaire,
-              selected_extras: item.selected_extras ?? [],
-              estado: item.estado ?? 'en_attente',
-              date_envoi: item.date_envoi ? new Date(item.date_envoi).toISOString() : nowIso,
-            })
-            .eq('id', item.id),
+          runOrderItemsMutationWithSelectedExtrasFallback(includeSelectedExtras =>
+            supabase
+              .from('order_items')
+              .update(
+                applyOrderItemSelectedExtras(
+                  {
+                    produit_id: item.produitRef,
+                    nom_produit: item.nom_produit,
+                    prix_unitaire: item.prix_unitaire,
+                    quantite: item.quantite,
+                    excluded_ingredients: item.excluded_ingredients ?? [],
+                    commentaire: item.commentaire,
+                    estado: item.estado ?? 'en_attente',
+                    date_envoi: item.date_envoi ? new Date(item.date_envoi).toISOString() : nowIso,
+                  },
+                  item.selected_extras,
+                  includeSelectedExtras,
+                ),
+              )
+              .eq('id', item.id) as Promise<SupabaseResponse<OrderItem[]>>,
+          ),
         ),
       );
     }
@@ -2376,40 +2429,54 @@ export const api = {
       );
 
       if (itemsToInsert.length > 0) {
-        await supabase.from('order_items').insert(
-          itemsToInsert.map(item => ({
-            ...(isUuid(item.id) ? { id: item.id } : {}),
-            order_id: orderId,
-            produit_id: item.produitRef,
-            nom_produit: item.nom_produit,
-            prix_unitaire: item.prix_unitaire,
-            quantite: item.quantite,
-            excluded_ingredients: item.excluded_ingredients ?? [],
-            commentaire: item.commentaire ?? null,
-            selected_extras: item.selected_extras ?? [],
-            estado: item.estado ?? 'en_attente',
-            date_envoi: item.date_envoi ? new Date(item.date_envoi).toISOString() : null,
-          })),
+        await runOrderItemsMutationWithSelectedExtrasFallback(includeSelectedExtras =>
+          supabase.from('order_items').insert(
+            itemsToInsert.map(item =>
+              applyOrderItemSelectedExtras(
+                {
+                  ...(isUuid(item.id) ? { id: item.id } : {}),
+                  order_id: orderId,
+                  produit_id: item.produitRef,
+                  nom_produit: item.nom_produit,
+                  prix_unitaire: item.prix_unitaire,
+                  quantite: item.quantite,
+                  excluded_ingredients: item.excluded_ingredients ?? [],
+                  commentaire: item.commentaire ?? null,
+                  estado: item.estado ?? 'en_attente',
+                  date_envoi: item.date_envoi ? new Date(item.date_envoi).toISOString() : null,
+                },
+                item.selected_extras,
+                includeSelectedExtras,
+              ),
+            ),
+          ) as Promise<SupabaseResponse<OrderItem[]>>,
         );
       }
 
       if (itemsToUpdate.length > 0) {
         await Promise.all(
           itemsToUpdate.map(item =>
-            supabase
-              .from('order_items')
-              .update({
-                produit_id: item.produitRef,
-                nom_produit: item.nom_produit,
-                prix_unitaire: item.prix_unitaire,
-                quantite: item.quantite,
-                excluded_ingredients: item.excluded_ingredients ?? [],
-                commentaire: item.commentaire ?? null,
-                selected_extras: item.selected_extras ?? [],
-                estado: item.estado ?? 'en_attente',
-                date_envoi: item.date_envoi ? new Date(item.date_envoi).toISOString() : null,
-              })
-              .eq('id', item.id),
+            runOrderItemsMutationWithSelectedExtrasFallback(includeSelectedExtras =>
+              supabase
+                .from('order_items')
+                .update(
+                  applyOrderItemSelectedExtras(
+                    {
+                      produit_id: item.produitRef,
+                      nom_produit: item.nom_produit,
+                      prix_unitaire: item.prix_unitaire,
+                      quantite: item.quantite,
+                      excluded_ingredients: item.excluded_ingredients ?? [],
+                      commentaire: item.commentaire ?? null,
+                      estado: item.estado ?? 'en_attente',
+                      date_envoi: item.date_envoi ? new Date(item.date_envoi).toISOString() : null,
+                    },
+                    item.selected_extras,
+                    includeSelectedExtras,
+                  ),
+                )
+                .eq('id', item.id) as Promise<SupabaseResponse<OrderItem[]>>,
+            ),
           ),
         );
       }
@@ -2659,24 +2726,33 @@ export const api = {
     const orderRow = unwrap<SupabaseOrderRow>(insertResponse as SupabaseResponse<SupabaseOrderRow>);
 
     if (orderData.items.length > 0) {
-      const itemsToInsert = orderData.items.map(item => {
-        // Vérifier si produitRef est un UUID valide, sinon mettre null
-        const isValidUUID = item.produitRef && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item.produitRef);
-        
-        return {
-          order_id: orderRow.id,
-          produit_id: isValidUUID ? item.produitRef : null,
-          nom_produit: item.nom_produit,
-          prix_unitaire: item.prix_unitaire,
-          quantite: item.quantite,
-          excluded_ingredients: item.excluded_ingredients ?? [],
-          commentaire: item.commentaire,
-          selected_extras: item.selected_extras ?? [],
-          estado: item.estado ?? 'en_attente',
-          date_envoi: item.date_envoi ? new Date(item.date_envoi).toISOString() : null,
-        };
-      });
-      const insertResult = await supabase.from('order_items').insert(itemsToInsert);
+      const insertResult = await runOrderItemsMutationWithSelectedExtrasFallback(includeSelectedExtras =>
+        supabase
+          .from('order_items')
+          .insert(
+            orderData.items.map(item => {
+              const isValidUUID =
+                item.produitRef &&
+                /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item.produitRef);
+
+              return applyOrderItemSelectedExtras(
+                {
+                  order_id: orderRow.id,
+                  produit_id: isValidUUID ? item.produitRef : null,
+                  nom_produit: item.nom_produit,
+                  prix_unitaire: item.prix_unitaire,
+                  quantite: item.quantite,
+                  excluded_ingredients: item.excluded_ingredients ?? [],
+                  commentaire: item.commentaire,
+                  estado: item.estado ?? 'en_attente',
+                  date_envoi: item.date_envoi ? new Date(item.date_envoi).toISOString() : null,
+                },
+                item.selected_extras,
+                includeSelectedExtras,
+              );
+            }),
+          ) as Promise<SupabaseResponse<OrderItem[]>>,
+      );
       if (insertResult.error) {
         console.error('Error inserting order items:', insertResult.error);
         throw new Error(`Failed to insert order items: ${insertResult.error.message}`);
@@ -2964,19 +3040,29 @@ export const api = {
     const orderItems = Array.isArray(order.items) ? order.items : [];
     const itemsWithValidProduct = orderItems.filter(item => isValidUuid(item.produitRef));
     if (itemsWithValidProduct.length > 0) {
-      const itemsPayload = itemsWithValidProduct.map(item => ({
-        order_id: insertedOrder.id,
-        produit_id: item.produitRef,
-        nom_produit: item.nom_produit,
-        prix_unitaire: item.prix_unitaire,
-        quantite: item.quantite,
-        excluded_ingredients: item.excluded_ingredients || [],
-        commentaire: item.commentaire || null,
-        selected_extras: item.selected_extras ?? [],
-        estado: 'en_attente',
-      }));
+      const itemsResponse = await runOrderItemsMutationWithSelectedExtrasFallback(includeSelectedExtras => {
+        const payload = itemsWithValidProduct.map(item =>
+          applyOrderItemSelectedExtras(
+            {
+              order_id: insertedOrder.id,
+              produit_id: item.produitRef,
+              nom_produit: item.nom_produit,
+              prix_unitaire: item.prix_unitaire,
+              quantite: item.quantite,
+              excluded_ingredients: item.excluded_ingredients || [],
+              commentaire: item.commentaire || null,
+              estado: 'en_attente',
+            },
+            item.selected_extras,
+            includeSelectedExtras,
+          ),
+        );
 
-      const itemsResponse = await supabase.from('order_items').insert(itemsPayload).select('*');
+        return supabase
+          .from('order_items')
+          .insert(payload)
+          .select('*') as Promise<SupabaseResponse<SupabaseOrderItemRow[]>>;
+      });
       const items = unwrap<SupabaseOrderItemRow[]>(itemsResponse as SupabaseResponse<SupabaseOrderItemRow[]>);
       insertedItems.push(...items.map(mapOrderItemRow));
     }
