@@ -307,6 +307,12 @@ export interface ProductExtra {
   options: ProductExtraOption[];
 }
 
+export interface SelectedProductExtraOption {
+  extraName: string;
+  optionName: string;
+  price: number;
+}
+
 export interface Product {
   id: string;
   nom_produit: string;
@@ -351,6 +357,7 @@ export interface OrderItem {
   commentaire: string;
   estado: 'en_attente' | 'enviado' | 'annule';
   date_envoi?: number; // timestamp
+  selected_extras?: SelectedProductExtraOption[];
 }
 
 export interface Order {

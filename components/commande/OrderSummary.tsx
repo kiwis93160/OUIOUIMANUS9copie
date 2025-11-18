@@ -112,6 +112,20 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                                                 <MessageSquare size={12} /> Agregar un comentario
                                             </button>
                                         )}
+                                        {item.selected_extras && item.selected_extras.length > 0 && (
+                                            <ul className="mt-2 space-y-1 rounded-md bg-white/80 p-2 text-xs text-gray-800">
+                                                {item.selected_extras.map((extra, extraIndex) => (
+                                                    <li key={`${item.id}-extra-${extraIndex}`} className="flex justify-between">
+                                                        <span>
+                                                            {extra.extraName}: {extra.optionName}
+                                                        </span>
+                                                        <span className="font-semibold text-brand-secondary">
+                                                            {formatCurrencyCOP(extra.price)}
+                                                        </span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
                                     </div>
                                 ))
                             )}
@@ -141,6 +155,20 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                                         <p className="text-sm text-gray-700 mt-2">
                                             {formatCurrencyCOP(item.prix_unitaire)} /u
                                         </p>
+                                        {item.selected_extras && item.selected_extras.length > 0 && (
+                                            <ul className="mt-2 space-y-1 rounded-md bg-white/80 p-2 text-xs text-gray-800">
+                                                {item.selected_extras.map((extra, extraIndex) => (
+                                                    <li key={`${item.id}-sent-extra-${extraIndex}`} className="flex justify-between">
+                                                        <span>
+                                                            {extra.extraName}: {extra.optionName}
+                                                        </span>
+                                                        <span className="font-semibold text-brand-secondary">
+                                                            {formatCurrencyCOP(extra.price)}
+                                                        </span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
                                         {item.commentaire && (
                                             <p className="mt-2 text-sm italic text-gray-600 pl-2">"{item.commentaire}"</p>
                                         )}

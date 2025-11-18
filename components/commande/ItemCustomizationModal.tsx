@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Minus, Plus } from 'lucide-react';
 import Modal from '../Modal';
-import type { Product } from '../../types';
+import type { Product, SelectedProductExtraOption } from '../../types';
 import { formatCurrencyCOP } from '../../utils/formatIntegerAmount';
 
 export interface ItemCustomizationResult {
     quantity: number;
     comment: string;
+    selectedExtras: SelectedProductExtraOption[];
 }
 
 export interface ItemCustomizationModalProps {
@@ -24,6 +25,7 @@ const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
 }) => {
     const [quantity, setQuantity] = useState(1);
     const [comment, setComment] = useState('');
+    const [selectedExtrasState, setSelectedExtrasState] = useState<Record<string, string[]>>({});
 
     useEffect(() => {
         if (!isOpen) {
@@ -32,11 +34,33 @@ const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
 
         setQuantity(1);
         setComment('');
+        setSelectedExtrasState({});
     }, [isOpen, product?.id]);
 
     if (!product) {
         return null;
     }
+
+    const buildSelectedExtras = (): SelectedProductExtraOption[] => {
+        if (!product?.extras || product.extras.length === 0) {
+            return [];
+        }
+
+        return product.extras.flatMap(extra => {
+            const selectedNames = selectedExtrasState[extra.name] ?? [];
+            return extra.options
+                .filter(option => selectedNames.includes(option.name))
+                .map<SelectedProductExtraOption>(option => ({
+                    extraName: extra.name,
+                    optionName: option.name,
+                    price: option.price,
+                }));
+        });
+    };
+
+    const selectedExtras = buildSelectedExtras();
+    const extrasTotal = selectedExtras.reduce((sum, extra) => sum + extra.price, 0);
+    const unitPrice = product.prix_vente + extrasTotal;
 
     const handleDecrease = () => {
         setQuantity(prev => Math.max(1, prev - 1));
@@ -50,6 +74,26 @@ const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
         onSave({
             quantity,
             comment,
+            selectedExtras,
+        });
+    };
+
+    const toggleExtraOption = (extraName: string, optionName: string) => {
+        setSelectedExtrasState(prev => {
+            const current = new Set(prev[extraName] ?? []);
+            if (current.has(optionName)) {
+                current.delete(optionName);
+            } else {
+                current.add(optionName);
+            }
+
+            const next = { ...prev };
+            if (current.size > 0) {
+                next[extraName] = Array.from(current);
+            } else {
+                delete next[extraName];
+            }
+            return next;
         });
     };
 
@@ -63,6 +107,56 @@ const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
                 />
                 {product.description && (
                     <p className="text-gray-200 text-sm">{product.description}</p>
+                )}
+                {product.extras && product.extras.length > 0 && (
+                    <div className="space-y-3 rounded-xl border border-gray-700/60 bg-gray-900/40 p-4">
+                        <p className="text-sm font-semibold text-gray-100">Extras del producto</p>
+                        {product.extras.map(extra => (
+                            <div key={extra.name} className="space-y-2">
+                                <p className="text-xs uppercase tracking-wide text-gray-400">{extra.name}</p>
+                                <div className="space-y-2">
+                                    {extra.options.map(option => {
+                                        const isSelected = (selectedExtrasState[extra.name] ?? []).includes(option.name);
+                                        return (
+                                            <label
+                                                key={option.name}
+                                                className={`flex items-center justify-between rounded-lg border px-3 py-2 text-sm transition ${
+                                                    isSelected
+                                                        ? 'border-brand-primary bg-brand-primary/10 text-white'
+                                                        : 'border-gray-700 text-gray-200'
+                                                }`}
+                                            >
+                                                <span className="flex items-center gap-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="accent-brand-primary"
+                                                        checked={isSelected}
+                                                        onChange={() => toggleExtraOption(extra.name, option.name)}
+                                                    />
+                                                    {option.name}
+                                                </span>
+                                                <span className="text-xs font-semibold text-brand-primary">
+                                                    + {formatCurrencyCOP(option.price)}
+                                                </span>
+                                            </label>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        ))}
+                        {selectedExtras.length > 0 && (
+                            <div className="rounded-lg bg-black/30 p-3 text-sm text-gray-200">
+                                <p className="font-semibold">Extras seleccionados</p>
+                                <ul className="mt-2 space-y-1 text-xs text-gray-300">
+                                    {selectedExtras.map((extra, index) => (
+                                        <li key={`${extra.extraName}-${extra.optionName}-${index}`}>
+                                            {extra.extraName}: {extra.optionName} (+{formatCurrencyCOP(extra.price)})
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                    </div>
                 )}
                 <div>
                     <label className="block text-sm font-medium text-gray-200">Comentario</label>
@@ -99,9 +193,12 @@ const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
                         onClick={handleSave}
                         className="rounded-lg bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-2 px-6 font-semibold text-white shadow-md transition-all duration-300 hover:from-orange-600 hover:via-orange-700 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-orange-400/70 focus:ring-offset-2"
                     >
-                        Agregar ({formatCurrencyCOP(product.prix_vente * quantity)})
+                        Agregar ({formatCurrencyCOP(unitPrice * quantity)})
                     </button>
                 </div>
+                <p className="text-xs text-gray-400">
+                    Precio unitario: {formatCurrencyCOP(unitPrice)}
+                </p>
             </div>
         </Modal>
     );
