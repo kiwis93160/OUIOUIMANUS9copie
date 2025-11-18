@@ -181,29 +181,42 @@ export interface Database {
         Row: {
           id: string
           order_id: string
-          product_id: string
-          quantity: number
-          unit_price: number
-          subtotal: number
-          notes: string | null
+          produit_id: string
+          nom_produit: string
+          prix_unitaire: number
+          quantite: number
+          excluded_ingredients: string[] | null
+          commentaire: string | null
+          estado: 'en_attente' | 'enviado' | 'annule'
+          date_envoi: string | null
+          selected_extras: Json
           created_at: string
         }
         Insert: {
           id?: string
           order_id: string
-          product_id: string
-          quantity: number
-          unit_price: number
-          subtotal: number
-          notes?: string | null
-          created_at: string
+          produit_id: string
+          nom_produit: string
+          prix_unitaire: number
+          quantite: number
+          excluded_ingredients?: string[] | null
+          commentaire?: string | null
+          estado?: 'en_attente' | 'enviado' | 'annule'
+          date_envoi?: string | null
+          selected_extras?: Json
+          created_at?: string
         }
         Update: {
           id?: string
-          quantity?: number
-          unit_price?: number
-          subtotal?: number
-          notes?: string | null
+          produit_id?: string
+          nom_produit?: string
+          prix_unitaire?: number
+          quantite?: number
+          excluded_ingredients?: string[] | null
+          commentaire?: string | null
+          estado?: 'en_attente' | 'enviado' | 'annule'
+          date_envoi?: string | null
+          selected_extras?: Json
         }
       }
       sales: {
