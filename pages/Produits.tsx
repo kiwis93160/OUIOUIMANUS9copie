@@ -564,7 +564,7 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title={mode === 'add' ? 'Ajouter un Produit' : 'Modifier le Produit'} size="lg">
+        <Modal isOpen={isOpen} onClose={onClose} title={mode === 'add' ? 'Ajouter un Produit' : 'Modifier le Produit'} size="half">
             <form onSubmit={handleSubmit} className="space-y-4">
                  <div className="max-h-[65vh] overflow-y-auto pr-2 space-y-5">
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] md:items-stretch">
