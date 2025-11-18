@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { api } from '../services/api';
-import { KitchenTicket as KitchenTicketOrder } from '../types';
+import { KitchenTicket as KitchenTicketOrder, SelectedProductExtraOption } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import OrderTimer from '../components/OrderTimer';
 import { getOrderUrgencyStyles, getOrderUrgencyToneClasses } from '../utils/orderUrgency';
@@ -23,6 +23,17 @@ const computeNameSizeClass = (label: string) => {
     return 'text-[clamp(1.365rem,3.25vw,1.69rem)]';
 };
 
+const normalizeSelectedExtrasKey = (extras?: SelectedProductExtraOption[]) => {
+    if (!extras || extras.length === 0) {
+        return 'no_extras';
+    }
+
+    return extras
+        .map(extra => `${extra.extraName}:::${extra.optionName}:::${extra.price}`)
+        .sort()
+        .join('|');
+};
+
 const KitchenTicketCard: React.FC<{ order: KitchenTicketOrder; onReady: (orderId: string, ticketTimestamp?: number) => void; canMarkReady: boolean }> = ({ order, onReady, canMarkReady }) => {
 
     const timerStart = order.date_envoi_cuisine || Date.now();
@@ -36,6 +47,7 @@ const KitchenTicketCard: React.FC<{ order: KitchenTicketOrder; onReady: (orderId
             nom_produit: string;
             quantite: number;
             commentaire?: string;
+            selectedExtras?: SelectedProductExtraOption[];
         };
 
         const items: GroupedItem[] = [];
@@ -44,7 +56,8 @@ const KitchenTicketCard: React.FC<{ order: KitchenTicketOrder; onReady: (orderId
         order.items.forEach((item) => {
             const trimmedComment = item.commentaire?.trim();
             const commentKey = trimmedComment || 'no_comment';
-            const baseKey = `${item.produitRef}::${commentKey}`;
+            const extrasKey = normalizeSelectedExtrasKey(item.selected_extras);
+            const baseKey = `${item.produitRef}::${commentKey}::${extrasKey}`;
 
             if (trimmedComment) {
                 items.push({
@@ -52,6 +65,7 @@ const KitchenTicketCard: React.FC<{ order: KitchenTicketOrder; onReady: (orderId
                     nom_produit: item.nom_produit,
                     quantite: item.quantite,
                     commentaire: trimmedComment,
+                    selectedExtras: item.selected_extras,
                 });
                 return;
             }
@@ -68,6 +82,7 @@ const KitchenTicketCard: React.FC<{ order: KitchenTicketOrder; onReady: (orderId
                 key: baseKey,
                 nom_produit: item.nom_produit,
                 quantite: item.quantite,
+                selectedExtras: item.selected_extras,
             });
         });
 
@@ -139,21 +154,32 @@ const KitchenTicketCard: React.FC<{ order: KitchenTicketOrder; onReady: (orderId
                                         const note = item.commentaire?.trim();
                                         return (
                                             <li key={item.key} className="flex items-stretch rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 shadow-sm overflow-hidden min-h-[3.5rem]">
-                                                <div className="flex flex-1 items-center justify-between gap-3 pr-3">
-                                                    <div className="flex flex-1 items-center">
+                                                <div className="flex flex-1 flex-col gap-1 py-2 pr-3">
+                                                    <div className="flex items-center">
                                                         <span className={`flex self-stretch w-12 shrink-0 items-center justify-center text-xl font-bold text-white shadow-md ${urgencyTone.quantityBackground} rounded-l-lg`} style={toneFillStyle}>
                                                             {item.quantite}
                                                         </span>
-                                                        <span className="font-semibold text-gray-900 text-[clamp(1.1rem,2.1vw,1.3rem)] leading-snug break-words text-balance whitespace-normal [hyphens:auto] px-3 py-3">
+                                                        <span className="font-semibold text-gray-900 text-[clamp(1.1rem,2.1vw,1.3rem)] leading-snug break-words text-balance whitespace-normal [hyphens:auto] px-3">
                                                             {item.nom_produit}
                                                         </span>
                                                     </div>
+                                                    {item.selectedExtras && item.selectedExtras.length > 0 && (
+                                                        <ul className="ml-12 space-y-0.5 text-xs text-gray-600">
+                                                            {item.selectedExtras.map((extra, index) => (
+                                                                <li key={`${item.key}-extra-${index}`} className="flex items-center gap-1">
+                                                                    <span aria-hidden className="text-base leading-none text-gray-400">•</span>
+                                                                    <span className="font-medium text-gray-700">{extra.extraName}:</span>
+                                                                    <span className="text-gray-600">{extra.optionName}</span>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    )}
+                                                    {note && (
+                                                        <p className="ml-12 rounded-md border border-dashed border-blue-200 bg-blue-50 px-3 py-2 text-xs font-medium italic text-blue-800">
+                                                            {note}
+                                                        </p>
+                                                    )}
                                                 </div>
-                                                {note && (
-                                                    <p className="mt-2 rounded-md border border-dashed border-blue-200 bg-blue-50 px-3 py-2 text-xs font-medium italic text-blue-800 ml-14 mr-3">
-                                                        {note}
-                                                    </p>
-                                                )}
                                             </li>
                                         );
                                     })}
