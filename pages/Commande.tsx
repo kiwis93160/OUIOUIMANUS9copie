@@ -3,7 +3,7 @@ import type { MutableRefObject } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import { uploadPaymentReceipt } from '../services/cloudinary';
-import { Order, Product, Category, OrderItem, Ingredient } from '../types';
+import { Order, Product, Category, OrderItem, Ingredient, SelectedProductExtraOption } from '../types';
 import { ArrowLeft } from 'lucide-react';
 import PaymentModal from '../components/PaymentModal';
 import Modal from '../components/Modal';
@@ -42,6 +42,38 @@ const haveSameExcludedIngredients = (a: string[] = [], b: string[] = []) => {
     return sortedA.every((value, index) => value === sortedB[index]);
 };
 
+const normalizeSelectedExtras = (extras?: SelectedProductExtraOption[]) => {
+    if (!extras || extras.length === 0) {
+        return [] as string[];
+    }
+
+    return extras
+        .map(extra => `${extra.extraName}:::${extra.optionName}:::${extra.price}`)
+        .sort();
+};
+
+const haveSameSelectedExtras = (
+    a?: SelectedProductExtraOption[],
+    b?: SelectedProductExtraOption[],
+) => {
+    const normalizedA = normalizeSelectedExtras(a);
+    const normalizedB = normalizeSelectedExtras(b);
+
+    if (normalizedA.length !== normalizedB.length) {
+        return false;
+    }
+
+    return normalizedA.every((value, index) => value === normalizedB[index]);
+};
+
+const calculateExtrasTotal = (extras?: SelectedProductExtraOption[]) => {
+    if (!extras || extras.length === 0) {
+        return 0;
+    }
+
+    return extras.reduce((sum, extra) => sum + extra.price, 0);
+};
+
 export const mergeProductIntoPendingItems = (
     items: OrderItem[],
     product: Product,
@@ -54,6 +86,9 @@ export const mergeProductIntoPendingItems = (
     const sanitizedQuantity = Number.isFinite(result.quantity)
         ? Math.max(1, Math.floor(result.quantity))
         : 1;
+    const selectedExtras = result.selectedExtras ?? [];
+    const extrasTotal = calculateExtrasTotal(selectedExtras);
+    const unitPrice = product.prix_vente + extrasTotal;
 
     // Ne fusionner que les items sans commentaire pour éviter d'écraser un message existant
     const existingIndex = isCommentBlank
@@ -61,7 +96,8 @@ export const mergeProductIntoPendingItems = (
             item => item.produitRef === product.id
                 && item.estado === 'en_attente'
                 && normalizeComment(item.commentaire) === ''
-                && haveSameExcludedIngredients(item.excluded_ingredients ?? [], defaultExcludedIngredients),
+                && haveSameExcludedIngredients(item.excluded_ingredients ?? [], defaultExcludedIngredients)
+                && haveSameSelectedExtras(item.selected_extras, selectedExtras),
         )
         : -1;
 
@@ -77,11 +113,12 @@ export const mergeProductIntoPendingItems = (
         id: generateId(),
         produitRef: product.id,
         nom_produit: product.nom_produit,
-        prix_unitaire: product.prix_vente,
+        prix_unitaire: unitPrice,
         quantite: sanitizedQuantity,
         excluded_ingredients: [...defaultExcludedIngredients],
         commentaire: trimmedComment,
         estado: 'en_attente',
+        selected_extras: selectedExtras.length > 0 ? [...selectedExtras] : undefined,
     };
 
     return [...items, newItem];

@@ -4,6 +4,7 @@ export interface OrderItemsSnapshotEntry {
     quantite: number;
     commentaire: string;
     excludedIngredients: string[];
+    selectedExtrasKey: string;
 }
 
 export interface OrderItemsSnapshot {
@@ -22,6 +23,19 @@ const normalizeExcludedIngredients = (values?: string[] | null) => {
     return normalized;
 };
 
+const normalizeSelectedExtras = (values?: OrderItem['selected_extras']) => {
+    if (!values || values.length === 0) {
+        return '';
+    }
+
+    const normalized = values
+        .map(extra => `${extra.extraName}:::${extra.optionName}:::${extra.price}`)
+        .sort()
+        .join('|');
+
+    return normalized;
+};
+
 export const createOrderItemsSnapshot = (items: OrderItem[] = []): OrderItemsSnapshot => {
     const itemsById = new Map<string, OrderItemsSnapshotEntry>();
 
@@ -30,6 +44,7 @@ export const createOrderItemsSnapshot = (items: OrderItem[] = []): OrderItemsSna
             quantite: item.quantite,
             commentaire: normalizeComment(item.commentaire),
             excludedIngredients: normalizeExcludedIngredients(item.excluded_ingredients),
+            selectedExtrasKey: normalizeSelectedExtras(item.selected_extras),
         });
     }
 
@@ -67,6 +82,10 @@ export const areOrderItemSnapshotsEqual = (a: OrderItemsSnapshot, b: OrderItemsS
             if (leftItem.excludedIngredients[index] !== rightItem.excludedIngredients[index]) {
                 return false;
             }
+        }
+
+        if (leftItem.selectedExtrasKey !== rightItem.selectedExtrasKey) {
+            return false;
         }
     }
 

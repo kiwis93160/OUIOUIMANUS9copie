@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Product, Category, OrderItem, Order } from '../types';
+import { Product, Category, OrderItem, Order, SelectedProductExtraOption } from '../types';
 
 // Type pour les informations client
 
@@ -35,6 +35,7 @@ const createDeliveryFeeItem = (isFree: boolean = false): OrderItem => ({
     excluded_ingredients: [],
     commentaire: '',
     estado: 'en_attente',
+    selected_extras: [],
 });
 
 const isFreeShippingType = (type?: string | null) => (type ?? '').toLowerCase() === 'free_shipping';
@@ -44,6 +45,7 @@ interface SelectedProductState {
     commentaire?: string;
     quantite?: number;
     excluded_ingredients?: string[];
+    selected_extras?: SelectedProductExtraOption[];
 }
 
 interface ProductModalProps {
@@ -52,6 +54,38 @@ interface ProductModalProps {
     selectedProduct: SelectedProductState | null;
     onAddToCart: (item: OrderItem) => void;
 }
+
+const buildSelectionStateFromExtras = (extras?: SelectedProductExtraOption[]) => {
+    if (!extras || extras.length === 0) {
+        return {} as Record<string, string[]>;
+    }
+
+    return extras.reduce<Record<string, string[]>>((acc, extra) => {
+        const current = acc[extra.extraName] ?? [];
+        acc[extra.extraName] = [...current, extra.optionName];
+        return acc;
+    }, {});
+};
+
+const buildExtrasFromSelectionState = (
+    product: Product,
+    selection: Record<string, string[]>,
+): SelectedProductExtraOption[] => {
+    if (!product.extras || product.extras.length === 0) {
+        return [];
+    }
+
+    return product.extras.flatMap(extra => {
+        const selectedNames = selection[extra.name] ?? [];
+        return extra.options
+            .filter(option => selectedNames.includes(option.name))
+            .map<SelectedProductExtraOption>(option => ({
+                extraName: extra.name,
+                optionName: option.name,
+                price: option.price,
+            }));
+    });
+};
 
 const normalizeComment = (value?: string | null) => (value ?? '').trim();
 
@@ -69,34 +103,73 @@ const haveSameExcludedIngredients = (
     return normalizedA.every((value, index) => value === normalizedB[index]);
 };
 
+const normalizeSelectedExtras = (extras?: SelectedProductExtraOption[]) => {
+    if (!extras || extras.length === 0) {
+        return [] as string[];
+    }
+
+    return extras
+        .map(extra => `${extra.extraName}:::${extra.optionName}:::${extra.price}`)
+        .sort();
+};
+
+const haveSameSelectedExtras = (
+    a?: SelectedProductExtraOption[],
+    b?: SelectedProductExtraOption[],
+) => {
+    const normalizedA = normalizeSelectedExtras(a);
+    const normalizedB = normalizeSelectedExtras(b);
+
+    if (normalizedA.length !== normalizedB.length) {
+        return false;
+    }
+
+    return normalizedA.every((value, index) => value === normalizedB[index]);
+};
+
+const calculateExtrasTotal = (extras?: SelectedProductExtraOption[]) => {
+    if (!extras || extras.length === 0) {
+        return 0;
+    }
+
+    return extras.reduce((sum, extra) => sum + extra.price, 0);
+};
+
 const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, selectedProduct, onAddToCart }) => {
     const [quantity, setQuantity] = useState(1);
     const [comment, setComment] = useState('');
     const [excludedIngredients, setExcludedIngredients] = useState<string[]>([]);
-    
+    const [selectedExtrasState, setSelectedExtrasState] = useState<Record<string, string[]>>({});
+
     useEffect(() => {
         if (isOpen) {
             setQuantity(selectedProduct?.quantite || 1);
             setComment(selectedProduct?.commentaire || '');
             setExcludedIngredients(selectedProduct?.excluded_ingredients || []);
+            setSelectedExtrasState(buildSelectionStateFromExtras(selectedProduct?.selected_extras));
         }
     }, [isOpen, selectedProduct]);
-    
+
     if (!isOpen || !selectedProduct) return null;
-    
+
+    const selectedExtras = buildExtrasFromSelectionState(selectedProduct.product, selectedExtrasState);
+    const extrasTotal = calculateExtrasTotal(selectedExtras);
+    const unitPrice = selectedProduct.product.prix_vente + extrasTotal;
+
     const handleAddToCart = () => {
         const product = selectedProduct.product;
         onAddToCart({
             id: `oi${Date.now()}`,
             produitRef: product.id,
             nom_produit: product.nom_produit,
-            prix_unitaire: product.prix_vente,
+            prix_unitaire: unitPrice,
             quantite: quantity,
             commentaire: comment.trim() || undefined,
             excluded_ingredients: excludedIngredients.length > 0 ? excludedIngredients : undefined,
+            selected_extras: selectedExtras.length > 0 ? selectedExtras : undefined,
         });
     };
-    
+
     const toggleIngredient = (ingredient: string) => {
         if (excludedIngredients.includes(ingredient)) {
             setExcludedIngredients(excludedIngredients.filter(i => i !== ingredient));
@@ -104,7 +177,26 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, selectedPr
             setExcludedIngredients([...excludedIngredients, ingredient]);
         }
     };
-    
+
+    const toggleExtraOption = (extraName: string, optionName: string) => {
+        setSelectedExtrasState(prev => {
+            const current = new Set(prev[extraName] ?? []);
+            if (current.has(optionName)) {
+                current.delete(optionName);
+            } else {
+                current.add(optionName);
+            }
+
+            const next = { ...prev };
+            if (current.size > 0) {
+                next[extraName] = Array.from(current);
+            } else {
+                delete next[extraName];
+            }
+            return next;
+        });
+    };
+
     const ingredients = selectedProduct.product.ingredients?.split(',').map(i => i.trim()).filter(Boolean) || [];
     
     return (
@@ -166,6 +258,59 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, selectedPr
                         </div>
                     )}
 
+                    {selectedProduct.product.extras && selectedProduct.product.extras.length > 0 && (
+                        <div className="mb-4">
+                            <p className="font-bold text-gray-800 mb-2">Extras del producto</p>
+                            <div className="space-y-3">
+                                {selectedProduct.product.extras.map(extra => (
+                                    <div key={extra.name} className="rounded-lg border border-gray-200 p-3">
+                                        <p className="text-sm font-semibold text-gray-700">{extra.name}</p>
+                                        <div className="mt-2 space-y-2">
+                                            {extra.options.map(option => {
+                                                const isSelected = (selectedExtrasState[extra.name] ?? []).includes(option.name);
+                                                return (
+                                                    <label
+                                                        key={option.name}
+                                                        className={`flex items-center justify-between rounded-md border px-3 py-2 text-sm transition ${
+                                                            isSelected
+                                                                ? 'border-brand-primary bg-brand-primary/10 text-gray-900'
+                                                                : 'border-gray-200'
+                                                        }`}
+                                                    >
+                                                        <span className="flex items-center gap-2">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={isSelected}
+                                                                onChange={() => toggleExtraOption(extra.name, option.name)}
+                                                                className="accent-brand-primary"
+                                                            />
+                                                            {option.name}
+                                                        </span>
+                                                        <span className="text-xs font-semibold text-brand-primary">
+                                                            + {formatCurrencyCOP(option.price)}
+                                                        </span>
+                                                    </label>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            {selectedExtras.length > 0 && (
+                                <div className="mt-3 rounded-lg bg-orange-50 p-3 text-sm text-gray-700">
+                                    <p className="font-semibold">Extras seleccionados</p>
+                                    <ul className="mt-1 space-y-1 text-xs text-gray-600">
+                                        {selectedExtras.map((extra, index) => (
+                                            <li key={`${extra.extraName}-${extra.optionName}-${index}`}>
+                                                {extra.extraName}: {extra.optionName} (+{formatCurrencyCOP(extra.price)})
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                     <div className="mb-4">
                         <label htmlFor="comment" className="block font-bold text-gray-800 mb-2">Comentarios adicionales:</label>
                         <textarea
@@ -182,8 +327,11 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, selectedPr
                         onClick={handleAddToCart}
                         className="w-full rounded-lg bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-3 px-4 font-bold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:from-orange-600 hover:via-orange-700 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-orange-400/70 focus:ring-offset-2"
                     >
-                        Agregar al carrito - {formatCurrencyCOP(selectedProduct.product.prix_vente * quantity)}
+                        Agregar al carrito - {formatCurrencyCOP(unitPrice * quantity)}
                     </button>
+                    <p className="mt-2 text-xs text-gray-500">
+                        Precio unitario con extras: {formatCurrencyCOP(unitPrice)}
+                    </p>
                 </div>
             </div>
         </div>
@@ -371,7 +519,8 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
             product,
             quantite: 1,
             commentaire: existingItem?.commentaire,
-            excluded_ingredients: existingItem?.excluded_ingredients
+            excluded_ingredients: existingItem?.excluded_ingredients,
+            selected_extras: existingItem?.selected_extras,
         });
         setModalOpen(true);
     };
@@ -382,6 +531,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                 existing.produitRef === item.produitRef
                 && normalizeComment(existing.commentaire) === normalizeComment(item.commentaire)
                 && haveSameExcludedIngredients(existing.excluded_ingredients, item.excluded_ingredients)
+                && haveSameSelectedExtras(existing.selected_extras, item.selected_extras)
             );
 
             if (existingIndex > -1) {
@@ -739,6 +889,20 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                                               <p className="text-sm text-gray-700 font-semibold bg-gray-50 border-l-2 border-red-500/50 p-2 rounded">
                                                   🚫 Sin: {item.excluded_ingredients.join(', ')}
                                             </p>
+                                        )}
+                                        {item.selected_extras && item.selected_extras.length > 0 && (
+                                            <ul className="text-sm text-gray-700 bg-white/90 border border-orange-200 rounded-lg p-2 space-y-1">
+                                                {item.selected_extras.map((extra, extraIndex) => (
+                                                    <li key={`${item.id}-cart-extra-${extraIndex}`} className="flex justify-between">
+                                                        <span>
+                                                            ➕ {extra.extraName}: {extra.optionName}
+                                                        </span>
+                                                        <span className="font-semibold text-orange-700">
+                                                            {formatCurrencyCOP(extra.price)}
+                                                        </span>
+                                                    </li>
+                                                ))}
+                                            </ul>
                                         )}
                                     </div>
                                     <div className="flex flex-col items-center gap-2">

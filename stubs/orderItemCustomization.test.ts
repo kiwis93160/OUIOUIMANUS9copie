@@ -26,12 +26,14 @@ const createItem = (overrides: Partial<OrderItem> = {}): OrderItem => ({
     excluded_ingredients: [],
     commentaire: '',
     estado: 'en_attente',
+    selected_extras: [],
     ...overrides,
 });
 
 const createResult = (overrides: Partial<ItemCustomizationResult> = {}): ItemCustomizationResult => ({
     quantity: 1,
     comment: '',
+    selectedExtras: [],
     ...overrides,
 });
 
@@ -103,5 +105,33 @@ describe('mergeProductIntoPendingItems', () => {
 
         expect(updated).toHaveLength(1);
         expect(updated[0].quantite).toBe(1);
+    });
+
+    it('adds the price of selected extras to the unit price', () => {
+        const product = createProduct({ prix_vente: 1000 });
+        const extraSelection = [{ extraName: 'Salsa', optionName: 'BBQ', price: 250 }];
+        const updated = mergeProductIntoPendingItems(
+            [],
+            product,
+            createResult({ selectedExtras: extraSelection }),
+            () => 'generated-6',
+        );
+
+        expect(updated).toHaveLength(1);
+        expect(updated[0].prix_unitaire).toBe(1250);
+        expect(updated[0].selected_extras).toEqual(extraSelection);
+    });
+
+    it('does not merge items that have different selected extras', () => {
+        const product = createProduct();
+        const items = [createItem({ selected_extras: [{ extraName: 'Queso', optionName: 'Extra', price: 200 }] })];
+        const updated = mergeProductIntoPendingItems(
+            items,
+            product,
+            createResult({ selectedExtras: [{ extraName: 'Queso', optionName: 'Doble', price: 400 }] }),
+            () => 'generated-7',
+        );
+
+        expect(updated).toHaveLength(2);
     });
 });

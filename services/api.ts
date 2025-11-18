@@ -11,6 +11,7 @@ import {
   Category,
   Ingredient,
   OrderItem,
+  SelectedProductExtraOption,
   RecipeItem,
   DashboardStats,
   DashboardPeriod,
@@ -105,6 +106,7 @@ type SupabaseOrderItemRow = {
   commentaire: string | null;
   estado: OrderItem['estado'];
   date_envoi: string | null;
+  selected_extras: SelectedProductExtraOption[] | null;
 };
 
 type SupabaseOrderRow = {
@@ -519,6 +521,7 @@ const mapOrderItemRow = (row: SupabaseOrderItemRow): OrderItem => ({
   commentaire: row.commentaire ?? '',
   estado: row.estado,
   date_envoi: toTimestamp(row.date_envoi),
+  selected_extras: row.selected_extras ?? undefined,
 });
 
 const areArraysEqual = (a: string[], b: string[]): boolean => {
@@ -527,6 +530,26 @@ const areArraysEqual = (a: string[], b: string[]): boolean => {
   }
 
   return a.every((value, index) => value === b[index]);
+};
+
+const normalizeSelectedExtrasForComparison = (extras?: SelectedProductExtraOption[]) => {
+  if (!extras || extras.length === 0) {
+    return [] as string[];
+  }
+
+  return extras
+    .map(extra => `${extra.extraName}:::${extra.optionName}:::${extra.price}`)
+    .sort();
+};
+
+const areSelectedExtrasEqual = (
+  a?: SelectedProductExtraOption[],
+  b?: SelectedProductExtraOption[],
+): boolean => {
+  const normalizedA = normalizeSelectedExtrasForComparison(a);
+  const normalizedB = normalizeSelectedExtrasForComparison(b);
+
+  return areArraysEqual(normalizedA, normalizedB);
 };
 
 const areOrderItemsEquivalent = (a: OrderItem, b: OrderItem): boolean => {
@@ -544,7 +567,11 @@ const areOrderItemsEquivalent = (a: OrderItem, b: OrderItem): boolean => {
   const excludedIngredientsA = [...a.excluded_ingredients].sort();
   const excludedIngredientsB = [...b.excluded_ingredients].sort();
 
-  return areArraysEqual(excludedIngredientsA, excludedIngredientsB);
+  if (!areArraysEqual(excludedIngredientsA, excludedIngredientsB)) {
+    return false;
+  }
+
+  return areSelectedExtrasEqual(a.selected_extras, b.selected_extras);
 };
 
 const reorderOrderItems = (referenceItems: OrderItem[], itemsToReorder: OrderItem[]): OrderItem[] => {
@@ -784,6 +811,7 @@ const selectOrdersQuery = () =>
           quantite,
           excluded_ingredients,
           commentaire,
+          selected_extras,
           estado,
           date_envoi
         ),
@@ -2249,6 +2277,7 @@ export const api = {
               quantite: item.quantite,
               excluded_ingredients: item.excluded_ingredients ?? [],
               commentaire: item.commentaire,
+              selected_extras: item.selected_extras ?? [],
               estado: item.estado ?? 'en_attente',
               date_envoi: item.date_envoi ? new Date(item.date_envoi).toISOString() : nowIso,
             })
@@ -2302,6 +2331,7 @@ export const api = {
             quantite: item.quantite,
             excluded_ingredients: item.excluded_ingredients ?? [],
             commentaire: item.commentaire ?? null,
+            selected_extras: item.selected_extras ?? [],
             estado: item.estado ?? 'en_attente',
             date_envoi: item.date_envoi ? new Date(item.date_envoi).toISOString() : null,
           })),
@@ -2320,6 +2350,7 @@ export const api = {
                 quantite: item.quantite,
                 excluded_ingredients: item.excluded_ingredients ?? [],
                 commentaire: item.commentaire ?? null,
+                selected_extras: item.selected_extras ?? [],
                 estado: item.estado ?? 'en_attente',
                 date_envoi: item.date_envoi ? new Date(item.date_envoi).toISOString() : null,
               })
@@ -2585,6 +2616,7 @@ export const api = {
           quantite: item.quantite,
           excluded_ingredients: item.excluded_ingredients ?? [],
           commentaire: item.commentaire,
+          selected_extras: item.selected_extras ?? [],
           estado: item.estado ?? 'en_attente',
           date_envoi: item.date_envoi ? new Date(item.date_envoi).toISOString() : null,
         };
@@ -2885,6 +2917,7 @@ export const api = {
         quantite: item.quantite,
         excluded_ingredients: item.excluded_ingredients || [],
         commentaire: item.commentaire || null,
+        selected_extras: item.selected_extras ?? [],
         estado: 'en_attente',
       }));
 
@@ -2905,6 +2938,7 @@ export const api = {
         commentaire: item.commentaire ?? '',
         estado: item.estado ?? 'en_attente',
         date_envoi: item.date_envoi,
+        selected_extras: item.selected_extras ?? [],
       }));
 
     const orderedItems: OrderItem[] = [];
