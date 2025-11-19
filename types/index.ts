@@ -295,16 +295,20 @@ export interface Ingredient {
 export interface RecipeItem {
   ingredient_id: string;
   qte_utilisee: number; // en 'g', 'ml', ou 'unite' selon l'ingrédient
+  ingredient_name?: string;
 }
 
 export interface ProductExtraOption {
   name: string;
   price: number;
+  type?: 'custom' | 'ingredient';
+  ingredient_id?: string | null;
 }
 
 export interface ProductExtra {
   name: string;
   options: ProductExtraOption[];
+  isIngredientRemovalExtra?: boolean;
 }
 
 export interface SelectedProductExtraOption {
@@ -326,6 +330,7 @@ export interface Product {
   is_best_seller: boolean;
   best_seller_rank: number | null;
   extras?: ProductExtra[];
+  allow_ingredient_removal_extra?: boolean;
 }
 
 export interface Category {

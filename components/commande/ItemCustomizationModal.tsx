@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Minus, Plus } from 'lucide-react';
 import Modal from '../Modal';
 import type { Product, SelectedProductExtraOption } from '../../types';
 import { formatCurrencyCOP } from '../../utils/formatIntegerAmount';
+import { getDisplayableProductExtras } from '../../utils/productExtras';
 
 export interface ItemCustomizationResult {
     quantity: number;
     comment: string;
     selectedExtras: SelectedProductExtraOption[];
+    excludedIngredientIds: string[];
 }
 
 export interface ItemCustomizationModalProps {
@@ -26,6 +28,7 @@ const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
     const [quantity, setQuantity] = useState(1);
     const [comment, setComment] = useState('');
     const [selectedExtrasState, setSelectedExtrasState] = useState<Record<string, string[]>>({});
+    const [excludedIngredientIds, setExcludedIngredientIds] = useState<string[]>([]);
 
     useEffect(() => {
         if (!isOpen) {
@@ -35,11 +38,14 @@ const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
         setQuantity(1);
         setComment('');
         setSelectedExtrasState({});
+        setExcludedIngredientIds([]);
     }, [isOpen, product?.id]);
 
     if (!product) {
         return null;
     }
+
+    const displayExtras = useMemo(() => getDisplayableProductExtras(product), [product]);
 
     const buildSelectedExtras = (): SelectedProductExtraOption[] => {
         if (!product?.extras || product.extras.length === 0) {
@@ -75,7 +81,16 @@ const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
             quantity,
             comment,
             selectedExtras,
+            excludedIngredientIds,
         });
+    };
+
+    const toggleExcludedIngredient = (ingredientId: string) => {
+        setExcludedIngredientIds(prev =>
+            prev.includes(ingredientId)
+                ? prev.filter(id => id !== ingredientId)
+                : [...prev, ingredientId],
+        );
     };
 
     const toggleExtraOption = (extraName: string, optionName: string) => {
@@ -108,15 +123,18 @@ const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
                 {product.description && (
                     <p className="text-gray-200 text-sm">{product.description}</p>
                 )}
-                {product.extras && product.extras.length > 0 && (
+                {displayExtras.length > 0 && (
                     <div className="space-y-3 rounded-xl border border-gray-700/60 bg-gray-900/40 p-4">
                         <p className="text-sm font-semibold text-gray-100">Extras del producto</p>
-                        {product.extras.map(extra => (
+                        {displayExtras.map(extra => (
                             <div key={extra.name} className="space-y-2">
                                 <p className="text-xs uppercase tracking-wide text-gray-400">{extra.name}</p>
                                 <div className="space-y-2">
                                     {extra.options.map(option => {
-                                        const isSelected = (selectedExtrasState[extra.name] ?? []).includes(option.name);
+                                        const isRemovalExtra = Boolean(extra.isIngredientRemovalExtra);
+                                        const isSelected = isRemovalExtra
+                                            ? Boolean(option.ingredient_id && excludedIngredientIds.includes(option.ingredient_id))
+                                            : (selectedExtrasState[extra.name] ?? []).includes(option.name);
                                         return (
                                             <label
                                                 key={option.name}
@@ -131,13 +149,22 @@ const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
                                                         type="checkbox"
                                                         className="accent-brand-primary"
                                                         checked={isSelected}
-                                                        onChange={() => toggleExtraOption(extra.name, option.name)}
+                                                        disabled={isRemovalExtra && !option.ingredient_id}
+                                                        onChange={() => {
+                                                            if (isRemovalExtra && option.ingredient_id) {
+                                                                toggleExcludedIngredient(option.ingredient_id);
+                                                            } else {
+                                                                toggleExtraOption(extra.name, option.name);
+                                                            }
+                                                        }}
                                                     />
                                                     {option.name}
                                                 </span>
-                                                <span className="text-xs font-semibold text-brand-primary">
-                                                    + {formatCurrencyCOP(option.price)}
-                                                </span>
+                                                {option.price > 0 && (
+                                                    <span className="text-xs font-semibold text-brand-primary">
+                                                        + {formatCurrencyCOP(option.price)}
+                                                    </span>
+                                                )}
                                             </label>
                                         );
                                     })}

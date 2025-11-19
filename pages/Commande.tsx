@@ -89,6 +89,9 @@ export const mergeProductIntoPendingItems = (
     const selectedExtras = result.selectedExtras ?? [];
     const extrasTotal = calculateExtrasTotal(selectedExtras);
     const unitPrice = product.prix_vente + extrasTotal;
+    const resolvedExcludedIngredients = result.excludedIngredientIds?.length
+        ? [...result.excludedIngredientIds]
+        : [...defaultExcludedIngredients];
 
     // Ne fusionner que les items sans commentaire pour éviter d'écraser un message existant
     const existingIndex = isCommentBlank
@@ -96,7 +99,7 @@ export const mergeProductIntoPendingItems = (
             item => item.produitRef === product.id
                 && item.estado === 'en_attente'
                 && normalizeComment(item.commentaire) === ''
-                && haveSameExcludedIngredients(item.excluded_ingredients ?? [], defaultExcludedIngredients)
+                && haveSameExcludedIngredients(item.excluded_ingredients ?? [], resolvedExcludedIngredients)
                 && haveSameSelectedExtras(item.selected_extras, selectedExtras),
         )
         : -1;
@@ -115,7 +118,7 @@ export const mergeProductIntoPendingItems = (
         nom_produit: product.nom_produit,
         prix_unitaire: unitPrice,
         quantite: sanitizedQuantity,
-        excluded_ingredients: [...defaultExcludedIngredients],
+        excluded_ingredients: resolvedExcludedIngredients,
         commentaire: trimmedComment,
         estado: 'en_attente',
         selected_extras: selectedExtras.length > 0 ? [...selectedExtras] : undefined,
