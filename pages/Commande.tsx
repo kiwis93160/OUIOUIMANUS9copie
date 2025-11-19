@@ -11,6 +11,7 @@ import { createOrderItemsSnapshot, areOrderItemSnapshotsEqual, type OrderItemsSn
 import ProductGrid from '../components/commande/ProductGrid';
 import OrderSummary from '../components/commande/OrderSummary';
 import ItemCustomizationModal, { type ItemCustomizationResult } from '../components/commande/ItemCustomizationModal';
+import { createIngredientNameMap } from '../utils/ingredientNames';
 
 const isPersistedItemId = (value?: string) =>
     !!value && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
@@ -150,6 +151,7 @@ const Commande: React.FC = () => {
     const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
     const [isSendingToKitchen, setIsSendingToKitchen] = useState(false);
     const [selectedProductForCustomization, setSelectedProductForCustomization] = useState<Product | null>(null);
+    const ingredientNameMap = useMemo(() => createIngredientNameMap(ingredients), [ingredients]);
 
     const orderRef = useRef<Order | null>(order);
     const originalOrderRef = useRef<Order | null>(originalOrder);
@@ -780,6 +782,7 @@ const Commande: React.FC = () => {
                         hasPending={hasPendingItems}
                         orderStatus={order.estado_cocina}
                         editingCommentId={editingCommentId}
+                        ingredientNameMap={ingredientNameMap}
                     />
                 </div>
             </div>
