@@ -1036,50 +1036,48 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                             )}
                                                             {hasExtras && (
                                                                 <div className="mt-3 rounded-2xl border border-emerald-200/70 bg-emerald-50/90 p-3 shadow-inner shadow-emerald-100/70">
-                                                                    <p className="mb-2 flex items-center gap-2 text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-emerald-600">
-                                                                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600">
-                                                                            <PlusCircle size={14} />
+                                                                    <div className="flex items-start gap-3">
+                                                                        <span className="mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600">
+                                                                            <PlusCircle size={16} />
                                                                         </span>
-                                                                        Extras agregados
-                                                                    </p>
-                                                                    <div className="flex flex-wrap gap-2">
-                                                                        {item.selected_extras!.map((extra, extraIndex) => (
-                                                                            <div
-                                                                                key={`${item.id}-tracker-extra-${extraIndex}`}
-                                                                                className="inline-flex flex-1 min-w-[11rem] items-center gap-3 rounded-2xl border border-white/80 bg-white/90 px-3 py-2 text-xs font-semibold text-emerald-700 shadow-sm"
-                                                                            >
-                                                                                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600">
-                                                                                    +
+                                                                        <div className="flex flex-1 flex-wrap gap-2">
+                                                                            {item.selected_extras!.map((extra, extraIndex) => (
+                                                                                <div
+                                                                                    key={`${item.id}-tracker-extra-${extraIndex}`}
+                                                                                    className="inline-flex flex-1 min-w-[9rem] items-center gap-3 rounded-2xl border border-white/80 bg-white/95 px-3 py-2 text-xs font-semibold text-emerald-700 shadow-sm"
+                                                                                >
+                                                                                    <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-base text-emerald-600">
+                                                                                        +
+                                                                                    </div>
+                                                                                    <div className="flex-1">
+                                                                                        <p className="text-[0.55rem] uppercase tracking-[0.18em] text-emerald-500">{extra.extraName}</p>
+                                                                                        <p className="text-sm font-semibold text-emerald-700">{extra.optionName}</p>
+                                                                                    </div>
+                                                                                    {typeof extra.price === 'number' && extra.price > 0 && (
+                                                                                        <span className="text-sm font-bold text-emerald-600">{formatCurrencyCOP(extra.price)}</span>
+                                                                                    )}
                                                                                 </div>
-                                                                                <div className="flex-1">
-                                                                                    <p className="text-[0.55rem] uppercase tracking-[0.18em] text-emerald-500">{extra.extraName}</p>
-                                                                                    <p className="text-sm font-semibold text-emerald-700">{extra.optionName}</p>
-                                                                                </div>
-                                                                                {typeof extra.price === 'number' && extra.price > 0 && (
-                                                                                    <span className="text-sm font-bold text-emerald-600">{formatCurrencyCOP(extra.price)}</span>
-                                                                                )}
-                                                                            </div>
-                                                                        ))}
+                                                                            ))}
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             )}
                                                             {hasExcludedIngredients && (
                                                                 <div className="mt-3 rounded-2xl border border-rose-200/80 bg-rose-50/90 p-3 shadow-inner shadow-rose-100/70">
-                                                                    <p className="mb-2 flex items-center gap-2 text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-rose-500">
-                                                                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-rose-500/10 text-rose-600">
-                                                                            <Ban size={14} />
+                                                                    <div className="flex items-start gap-3">
+                                                                        <span className="mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-rose-500/10 text-rose-600">
+                                                                            <Ban size={16} />
                                                                         </span>
-                                                                        Sin ingredientes
-                                                                    </p>
-                                                                    <div className="flex flex-wrap gap-2">
-                                                                        {excludedIngredientLabels.map(label => (
-                                                                            <span
-                                                                                key={`${item.id}-tracker-excluded-${label}`}
-                                                                                className="inline-flex items-center gap-2 rounded-full border border-rose-200 bg-white px-3 py-1 text-xs font-semibold text-rose-600 shadow-sm"
-                                                                            >
-                                                                                🚫 {label}
-                                                                            </span>
-                                                                        ))}
+                                                                        <div className="flex flex-1 flex-wrap gap-2">
+                                                                            {excludedIngredientLabels.map(label => (
+                                                                                <span
+                                                                                    key={`${item.id}-tracker-excluded-${label}`}
+                                                                                    className="inline-flex items-center gap-2 rounded-full border border-rose-200 bg-white px-3 py-1 text-xs font-semibold text-rose-600 shadow-sm"
+                                                                                >
+                                                                                    🚫 {label}
+                                                                                </span>
+                                                                            ))}
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             )}
