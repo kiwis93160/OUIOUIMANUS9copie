@@ -87,9 +87,15 @@ const MainStatCard: React.FC<{
     );
 };
 
-const OpStatCard: React.FC<{ title: string; value: string | number; icon: React.ReactNode; onClick?: () => void }> = ({ title, value, icon, onClick }) => (
+const OpStatCard: React.FC<{
+    title: string;
+    value: string | number;
+    icon: React.ReactNode;
+    iconWrapperClassName?: string;
+    onClick?: () => void;
+}> = ({ title, value, icon, iconWrapperClassName, onClick }) => (
     <div className={`ui-card p-4 flex items-center space-x-3 min-w-0 ${onClick ? 'cursor-pointer hover:bg-gray-50' : ''}`} onClick={onClick}>
-        <div className="p-3 bg-gray-100 text-gray-600 rounded-lg">
+        <div className={iconWrapperClassName ?? 'p-3 bg-gray-100 text-gray-600 rounded-lg'}>
             {icon}
         </div>
         <div className="flex-1 min-w-0">
@@ -98,6 +104,23 @@ const OpStatCard: React.FC<{ title: string; value: string | number; icon: React.
         </div>
     </div>
 );
+
+type StockAlertVariant = 'neutral' | 'warning' | 'critical';
+
+const StockAlertIndicator: React.FC<{ variant: StockAlertVariant }> = ({ variant }) => {
+    const variantClass =
+        variant === 'critical'
+            ? 'bg-red-500 text-white border-red-600'
+            : variant === 'warning'
+                ? 'bg-yellow-500 text-white border-yellow-600'
+                : 'bg-gray-100 text-gray-400 border-gray-200';
+
+    return (
+        <div className={`rounded-full border-2 shadow-inner shadow-black/10 p-2 ${variantClass}`} title="Stock bas">
+            <AlertTriangle size={28} />
+        </div>
+    );
+};
 
 
 const PERIOD_CONFIG: Record<DashboardPeriod, { label: string; days: number }> = {
@@ -174,11 +197,12 @@ const Dashboard: React.FC = () => {
         const minimum = normalizeStockValue(ing.stock_minimum);
         return current > 0 && current < minimum;
     });
-    const stockAlertColor = outOfStockIngredients.length > 0
-        ? 'text-red-500'
+
+    const stockAlertVariant: StockAlertVariant = outOfStockIngredients.length > 0
+        ? 'critical'
         : lowStockIngredients.length > 0
-            ? 'text-yellow-500'
-            : 'text-gray-600';
+            ? 'warning'
+            : 'neutral';
 
     const PIE_COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF', '#FF4560', '#775DD0'];
     const pieData = pieChartMode === 'category' ? stats.ventesParCategorie : salesByProduct;
@@ -318,7 +342,8 @@ const Dashboard: React.FC = () => {
                 <OpStatCard
                     title="Ingredientes bajos"
                     value={stats.ingredientsStockBas.length}
-                    icon={<AlertTriangle size={48} className={stockAlertColor} />}
+                    icon={<StockAlertIndicator variant={stockAlertVariant} />}
+                    iconWrapperClassName="rounded-lg bg-transparent p-0"
                     onClick={() => setLowStockModalOpen(true)}
                 />
             </div>
