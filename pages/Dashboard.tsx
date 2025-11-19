@@ -159,6 +159,27 @@ const Dashboard: React.FC = () => {
     if (loading) return <div className="text-gray-800">Cargando datos del panel...</div>;
     if (!stats) return <div className="text-red-500">No fue posible cargar los datos.</div>;
 
+    const normalizeStockValue = (value: number | string | null | undefined) => {
+        if (typeof value === 'number') return value;
+        if (typeof value === 'string') {
+            const parsed = Number(value);
+            return Number.isFinite(parsed) ? parsed : 0;
+        }
+        return 0;
+    };
+
+    const outOfStockIngredients = stats.ingredientsStockBas.filter(ing => normalizeStockValue(ing.stock_actuel) <= 0);
+    const lowStockIngredients = stats.ingredientsStockBas.filter(ing => {
+        const current = normalizeStockValue(ing.stock_actuel);
+        const minimum = normalizeStockValue(ing.stock_minimum);
+        return current > 0 && current < minimum;
+    });
+    const stockAlertColor = outOfStockIngredients.length > 0
+        ? 'text-red-500'
+        : lowStockIngredients.length > 0
+            ? 'text-yellow-500'
+            : 'text-gray-600';
+
     const PIE_COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF', '#FF4560', '#775DD0'];
     const pieData = pieChartMode === 'category' ? stats.ventesParCategorie : salesByProduct;
     const hasPieData = pieData.length > 0;
@@ -297,7 +318,7 @@ const Dashboard: React.FC = () => {
                 <OpStatCard
                     title="Ingredientes bajos"
                     value={stats.ingredientsStockBas.length}
-                    icon={<AlertTriangle size={24} className={stats.ingredientsStockBas.length > 0 ? 'text-red-500' : 'text-gray-600'} />}
+                    icon={<AlertTriangle size={48} className={stockAlertColor} />}
                     onClick={() => setLowStockModalOpen(true)}
                 />
             </div>
@@ -346,14 +367,34 @@ const Dashboard: React.FC = () => {
 
             <Modal isOpen={isLowStockModalOpen} onClose={() => setLowStockModalOpen(false)} title="Ingredientes con inventario bajo">
                 {stats.ingredientsStockBas.length > 0 ? (
-                    <ul className="space-y-2">
-                        {stats.ingredientsStockBas.map(ing => (
-                            <li key={ing.id} className="flex justify-between items-center bg-red-50 p-3 rounded-lg">
-                                <span className="font-semibold text-red-800">{ing.nom}</span>
-                                <span className="font-bold text-red-600">{ing.stock_actuel} / {ing.stock_minimum} {ing.unite}</span>
-                            </li>
-                        ))}
-                    </ul>
+                    <div className="space-y-4">
+                        {outOfStockIngredients.length > 0 && (
+                            <div>
+                                <p className="text-sm font-semibold text-red-700 mb-2">Agotados</p>
+                                <ul className="space-y-2">
+                                    {outOfStockIngredients.map(ing => (
+                                        <li key={ing.id} className="flex justify-between items-center bg-red-50 p-3 rounded-lg">
+                                            <span className="font-semibold text-red-800">{ing.nom}</span>
+                                            <span className="font-bold text-red-600">{ing.stock_actuel} / {ing.stock_minimum} {ing.unite}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                        {lowStockIngredients.length > 0 && (
+                            <div>
+                                <p className="text-sm font-semibold text-yellow-700 mb-2">Debajo del mínimo</p>
+                                <ul className="space-y-2">
+                                    {lowStockIngredients.map(ing => (
+                                        <li key={ing.id} className="flex justify-between items-center bg-yellow-50 p-3 rounded-lg">
+                                            <span className="font-semibold text-yellow-800">{ing.nom}</span>
+                                            <span className="font-bold text-yellow-700">{ing.stock_actuel} / {ing.stock_minimum} {ing.unite}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                    </div>
                 ) : (
                     <p className="text-gray-600 text-center">No hay ingredientes con inventario bajo por el momento.</p>
                 )}
