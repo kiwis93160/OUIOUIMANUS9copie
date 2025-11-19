@@ -20,6 +20,7 @@ import { DEFAULT_SITE_CONTENT } from '../utils/siteContent';
 import { createHeroBackgroundStyle } from '../utils/siteStyleHelpers';
 import OrderConfirmationModal from '../components/OrderConfirmationModal';
 import CustomerOrderTracker from '../components/CustomerOrderTracker';
+import { getDisplayableProductExtras, mapExcludedIngredientIdsToNames } from '../utils/productExtras';
 
 const DOMICILIO_FEE = 8000;
 const DOMICILIO_ITEM_NAME = 'Domicilio';
@@ -138,14 +139,14 @@ const calculateExtrasTotal = (extras?: SelectedProductExtraOption[]) => {
 const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, selectedProduct, onAddToCart }) => {
     const [quantity, setQuantity] = useState(1);
     const [comment, setComment] = useState('');
-    const [excludedIngredients, setExcludedIngredients] = useState<string[]>([]);
+    const [excludedIngredientIds, setExcludedIngredientIds] = useState<string[]>([]);
     const [selectedExtrasState, setSelectedExtrasState] = useState<Record<string, string[]>>({});
 
     useEffect(() => {
         if (isOpen) {
             setQuantity(selectedProduct?.quantite || 1);
             setComment(selectedProduct?.commentaire || '');
-            setExcludedIngredients(selectedProduct?.excluded_ingredients || []);
+            setExcludedIngredientIds(selectedProduct?.excluded_ingredients || []);
             setSelectedExtrasState(buildSelectionStateFromExtras(selectedProduct?.selected_extras));
         }
     }, [isOpen, selectedProduct]);
@@ -155,6 +156,14 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, selectedPr
     const selectedExtras = buildExtrasFromSelectionState(selectedProduct.product, selectedExtrasState);
     const extrasTotal = calculateExtrasTotal(selectedExtras);
     const unitPrice = selectedProduct.product.prix_vente + extrasTotal;
+    const displayExtras = useMemo(
+        () => getDisplayableProductExtras(selectedProduct.product),
+        [selectedProduct.product],
+    );
+    const removalLabels = useMemo(
+        () => mapExcludedIngredientIdsToNames(selectedProduct.product, excludedIngredientIds),
+        [selectedProduct.product, excludedIngredientIds],
+    );
 
     const handleAddToCart = () => {
         const product = selectedProduct.product;
@@ -165,17 +174,17 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, selectedPr
             prix_unitaire: unitPrice,
             quantite: quantity,
             commentaire: comment.trim() || undefined,
-            excluded_ingredients: excludedIngredients.length > 0 ? excludedIngredients : undefined,
+            excluded_ingredients: excludedIngredientIds.length > 0 ? excludedIngredientIds : undefined,
             selected_extras: selectedExtras.length > 0 ? selectedExtras : undefined,
         });
     };
 
-    const toggleIngredient = (ingredient: string) => {
-        if (excludedIngredients.includes(ingredient)) {
-            setExcludedIngredients(excludedIngredients.filter(i => i !== ingredient));
-        } else {
-            setExcludedIngredients([...excludedIngredients, ingredient]);
-        }
+    const toggleExcludedIngredient = (ingredientId: string) => {
+        setExcludedIngredientIds(prev =>
+            prev.includes(ingredientId)
+                ? prev.filter(id => id !== ingredientId)
+                : [...prev, ingredientId],
+        );
     };
 
     const toggleExtraOption = (extraName: string, optionName: string) => {
@@ -197,8 +206,6 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, selectedPr
         });
     };
 
-    const ingredients = selectedProduct.product.ingredients?.split(',').map(i => i.trim()).filter(Boolean) || [];
-    
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
@@ -238,36 +245,19 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, selectedPr
                         </div>
                     </div>
                     
-                    {ingredients.length > 0 && (
-                        <div className="mb-4">
-                            <p className="font-bold text-gray-800 mb-2">Ingredientes:</p>
-                            <div className="space-y-2">
-                                {ingredients.map((ingredient, index) => (
-                                    <div key={index} className="flex items-center">
-                                        <input
-                                            type="checkbox"
-                                            id={`ingredient-${index}`}
-                                            checked={!excludedIngredients.includes(ingredient)}
-                                            onChange={() => toggleIngredient(ingredient)}
-                                            className="mr-2"
-                                        />
-                                        <label htmlFor={`ingredient-${index}`} className="text-gray-700">{ingredient}</label>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {selectedProduct.product.extras && selectedProduct.product.extras.length > 0 && (
+                    {displayExtras.length > 0 && (
                         <div className="mb-4">
                             <p className="font-bold text-gray-800 mb-2">Extras del producto</p>
                             <div className="space-y-3">
-                                {selectedProduct.product.extras.map(extra => (
+                                {displayExtras.map(extra => (
                                     <div key={extra.name} className="rounded-lg border border-gray-200 p-3">
                                         <p className="text-sm font-semibold text-gray-700">{extra.name}</p>
                                         <div className="mt-2 space-y-2">
                                             {extra.options.map(option => {
-                                                const isSelected = (selectedExtrasState[extra.name] ?? []).includes(option.name);
+                                                const isRemovalExtra = Boolean(extra.isIngredientRemovalExtra);
+                                                const isSelected = isRemovalExtra
+                                                    ? Boolean(option.ingredient_id && excludedIngredientIds.includes(option.ingredient_id))
+                                                    : (selectedExtrasState[extra.name] ?? []).includes(option.name);
                                                 return (
                                                     <label
                                                         key={option.name}
@@ -281,14 +271,23 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, selectedPr
                                                             <input
                                                                 type="checkbox"
                                                                 checked={isSelected}
-                                                                onChange={() => toggleExtraOption(extra.name, option.name)}
+                                                                disabled={isRemovalExtra && !option.ingredient_id}
+                                                                onChange={() => {
+                                                                    if (isRemovalExtra && option.ingredient_id) {
+                                                                        toggleExcludedIngredient(option.ingredient_id);
+                                                                    } else {
+                                                                        toggleExtraOption(extra.name, option.name);
+                                                                    }
+                                                                }}
                                                                 className="accent-brand-primary"
                                                             />
                                                             {option.name}
                                                         </span>
-                                                        <span className="text-xs font-semibold text-brand-primary">
-                                                            + {formatCurrencyCOP(option.price)}
-                                                        </span>
+                                                        {option.price > 0 && (
+                                                            <span className="text-xs font-semibold text-brand-primary">
+                                                                + {formatCurrencyCOP(option.price)}
+                                                            </span>
+                                                        )}
                                                     </label>
                                                 );
                                             })}
@@ -296,6 +295,12 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, selectedPr
                                     </div>
                                 ))}
                             </div>
+                            {removalLabels.length > 0 && (
+                                <div className="mt-3 rounded-lg bg-rose-50 p-3 text-sm text-gray-700">
+                                    <p className="font-semibold">Sin ingredientes</p>
+                                    <p className="text-xs text-gray-600">{removalLabels.join(', ')}</p>
+                                </div>
+                            )}
                             {selectedExtras.length > 0 && (
                                 <div className="mt-3 rounded-lg bg-orange-50 p-3 text-sm text-gray-700">
                                     <p className="font-semibold">Extras seleccionados</p>

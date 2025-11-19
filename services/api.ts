@@ -78,6 +78,7 @@ type SupabaseProductRow = {
   is_best_seller: boolean | null | undefined;
   best_seller_rank: number | null | undefined;
   extras: Product['extras'] | null | undefined;
+  allow_ingredient_removal_extra: boolean | null | undefined;
   product_recipes: SupabaseRecipeRow[] | null;
 };
 
@@ -372,13 +373,14 @@ const mapCategoryRow = (row: SupabaseCategoryRow): Category => ({
   nom: row.nom,
 });
 
-const mapRecipeRow = (row: SupabaseRecipeRow): RecipeItem => ({
+const mapRecipeRow = (row: SupabaseRecipeRow, ingredientMap?: Map<string, Ingredient>): RecipeItem => ({
   ingredient_id: row.ingredient_id,
   qte_utilisee: row.qte_utilisee,
+  ingredient_name: ingredientMap?.get(row.ingredient_id)?.nom,
 });
 
 const mapProductRow = (row: SupabaseProductRow, ingredientMap?: Map<string, Ingredient>): Product => {
-  const recipe = (row.product_recipes ?? []).map(mapRecipeRow);
+  const recipe = (row.product_recipes ?? []).map(recipeRow => mapRecipeRow(recipeRow, ingredientMap));
   const product: Product = {
     id: row.id,
     nom_produit: row.nom_produit,
@@ -391,6 +393,7 @@ const mapProductRow = (row: SupabaseProductRow, ingredientMap?: Map<string, Ingr
     is_best_seller: row.is_best_seller ?? false,
     best_seller_rank: row.best_seller_rank ?? null,
     extras: row.extras ?? undefined,
+    allow_ingredient_removal_extra: row.allow_ingredient_removal_extra ?? false,
   };
 
   if (ingredientMap) {
@@ -917,7 +920,8 @@ const buildProductSelectColumns = (
         prix_vente,
         categoria_id,
         estado,
-        image${bestSellerColumns}${extrasColumn}${recipeColumns}
+        image,
+        allow_ingredient_removal_extra${bestSellerColumns}${extrasColumn}${recipeColumns}
       `;
 };
 
@@ -1839,6 +1843,7 @@ export const api = {
       image: normalizedImage,
       is_best_seller: product.is_best_seller ?? false,
       best_seller_rank: product.is_best_seller ? product.best_seller_rank : null,
+      allow_ingredient_removal_extra: product.allow_ingredient_removal_extra ?? false,
     };
 
     const buildInsertPayload = (includeExtras: boolean) =>
@@ -1850,7 +1855,7 @@ export const api = {
       .from('products')
       .insert(buildInsertPayload(true))
       .select(
-        'id, nom_produit, description, prix_vente, categoria_id, estado, image, is_best_seller, best_seller_rank, extras',
+        'id, nom_produit, description, prix_vente, categoria_id, estado, image, allow_ingredient_removal_extra, is_best_seller, best_seller_rank, extras',
       )
       .single();
 
@@ -1859,7 +1864,7 @@ export const api = {
         .from('products')
         .insert(buildInsertPayload(false))
         .select(
-          'id, nom_produit, description, prix_vente, categoria_id, estado, image, is_best_seller, best_seller_rank',
+          'id, nom_produit, description, prix_vente, categoria_id, estado, image, allow_ingredient_removal_extra, is_best_seller, best_seller_rank',
         )
         .single();
     }
@@ -1909,6 +1914,7 @@ export const api = {
       categoria_id: product.categoria_id,
       estado: product.estado,
       image: imageUrl ?? null,
+      allow_ingredient_removal_extra: product.allow_ingredient_removal_extra ?? false,
     };
 
     const buildPayload = (includeExtras: boolean) =>
@@ -1917,14 +1923,14 @@ export const api = {
     let response = await supabase
       .from('products')
       .insert(buildPayload(true))
-      .select('id, nom_produit, description, prix_vente, categoria_id, estado, image, extras')
+      .select('id, nom_produit, description, prix_vente, categoria_id, estado, image, allow_ingredient_removal_extra, extras')
       .single();
 
     if (response.error && extrasPayload !== undefined && isMissingExtrasColumnError(response.error)) {
       response = await supabase
         .from('products')
         .insert(buildPayload(false))
-        .select('id, nom_produit, description, prix_vente, categoria_id, estado, image')
+        .select('id, nom_produit, description, prix_vente, categoria_id, estado, image, allow_ingredient_removal_extra')
         .single();
     }
 
@@ -1971,6 +1977,9 @@ export const api = {
     if (updates.prix_vente !== undefined) payload.prix_vente = updates.prix_vente;
     if (updates.categoria_id !== undefined) payload.categoria_id = updates.categoria_id;
     if (updates.estado !== undefined) payload.estado = updates.estado;
+    if (updates.allow_ingredient_removal_extra !== undefined) {
+      payload.allow_ingredient_removal_extra = updates.allow_ingredient_removal_extra;
+    }
     if (shouldUpdateExtras) {
       payload.extras = updates.extras && updates.extras.length > 0 ? updates.extras : null;
     }
