@@ -4,6 +4,7 @@ import { KitchenTicket as KitchenTicketOrder, SelectedProductExtraOption } from 
 import { useAuth } from '../contexts/AuthContext';
 import OrderTimer from '../components/OrderTimer';
 import { getOrderUrgencyStyles, getOrderUrgencyToneClasses } from '../utils/orderUrgency';
+import { createIngredientNameMap, mapIngredientIdsToNames, type IngredientNameMap } from '../utils/ingredientNames';
 
 const computeNameSizeClass = (label: string) => {
     const trimmedLength = label.trim().length;
@@ -34,7 +35,7 @@ const normalizeSelectedExtrasKey = (extras?: SelectedProductExtraOption[]) => {
         .join('|');
 };
 
-const KitchenTicketCard: React.FC<{ order: KitchenTicketOrder; onReady: (orderId: string, ticketTimestamp?: number) => void; canMarkReady: boolean }> = ({ order, onReady, canMarkReady }) => {
+const KitchenTicketCard: React.FC<{ order: KitchenTicketOrder; onReady: (orderId: string, ticketTimestamp?: number) => void; canMarkReady: boolean; ingredientNameMap?: IngredientNameMap }> = ({ order, onReady, canMarkReady, ingredientNameMap }) => {
 
     const timerStart = order.date_envoi_cuisine || Date.now();
     const urgencyStyles = getOrderUrgencyStyles(timerStart);
@@ -48,6 +49,7 @@ const KitchenTicketCard: React.FC<{ order: KitchenTicketOrder; onReady: (orderId
             quantite: number;
             commentaire?: string;
             selectedExtras?: SelectedProductExtraOption[];
+            excludedIngredientLabels?: string[];
         };
 
         const items: GroupedItem[] = [];
@@ -57,7 +59,11 @@ const KitchenTicketCard: React.FC<{ order: KitchenTicketOrder; onReady: (orderId
             const trimmedComment = item.commentaire?.trim();
             const commentKey = trimmedComment || 'no_comment';
             const extrasKey = normalizeSelectedExtrasKey(item.selected_extras);
-            const baseKey = `${item.produitRef}::${commentKey}::${extrasKey}`;
+            const excludedKey = item.excluded_ingredients && item.excluded_ingredients.length > 0
+                ? [...item.excluded_ingredients].sort().join('|')
+                : 'no_excluded';
+            const baseKey = `${item.produitRef}::${commentKey}::${extrasKey}::${excludedKey}`;
+            const excludedIngredientLabels = mapIngredientIdsToNames(item.excluded_ingredients, ingredientNameMap);
 
             if (trimmedComment) {
                 items.push({
@@ -66,6 +72,7 @@ const KitchenTicketCard: React.FC<{ order: KitchenTicketOrder; onReady: (orderId
                     quantite: item.quantite,
                     commentaire: trimmedComment,
                     selectedExtras: item.selected_extras,
+                    excludedIngredientLabels,
                 });
                 return;
             }
@@ -83,6 +90,7 @@ const KitchenTicketCard: React.FC<{ order: KitchenTicketOrder; onReady: (orderId
                 nom_produit: item.nom_produit,
                 quantite: item.quantite,
                 selectedExtras: item.selected_extras,
+                excludedIngredientLabels,
             });
         });
 
@@ -174,6 +182,11 @@ const KitchenTicketCard: React.FC<{ order: KitchenTicketOrder; onReady: (orderId
                                                             ))}
                                                         </ul>
                                                     )}
+                                                    {item.excludedIngredientLabels && item.excludedIngredientLabels.length > 0 && (
+                                                        <p className="ml-12 mt-1 rounded-md border border-red-200 bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">
+                                                            🚫 Sin: {item.excludedIngredientLabels.join(', ')}
+                                                        </p>
+                                                    )}
                                                     {note && (
                                                         <p className="ml-12 rounded-md border border-dashed border-blue-200 bg-blue-50 px-3 py-2 text-xs font-medium italic text-blue-800">
                                                             {note}
@@ -216,6 +229,7 @@ const Cuisine: React.FC = () => {
     // suggest these state definitions were missing or out of scope.
     const [orders, setOrders] = useState<KitchenTicketOrder[]>([]);
     const [loading, setLoading] = useState(true);
+    const [ingredientNameMap, setIngredientNameMap] = useState<IngredientNameMap>({});
     const { role } = useAuth();
 
     const canMarkReady = role?.permissions['/cocina'] === 'editor';
@@ -248,6 +262,25 @@ const Cuisine: React.FC = () => {
         };
     }, [fetchOrders]);
 
+    useEffect(() => {
+        let isMounted = true;
+        const loadIngredients = async () => {
+            try {
+                const data = await api.getIngredients();
+                if (isMounted) {
+                    setIngredientNameMap(createIngredientNameMap(data));
+                }
+            } catch (error) {
+                console.error("Failed to fetch ingredients", error);
+            }
+        };
+
+        loadIngredients();
+        return () => {
+            isMounted = false;
+        };
+    }, []);
+
     const handleMarkAsReady = async (orderId: string, ticketTimestamp?: number) => {
         try {
             await api.markOrderAsReady(orderId, ticketTimestamp);
@@ -267,7 +300,7 @@ const Cuisine: React.FC = () => {
             ) : (
                 <div className="mt-6 grid flex-1 grid-cols-1 justify-center gap-4 sm:[grid-template-columns:repeat(auto-fit,minmax(24rem,max-content))] sm:justify-start">
                     {orders.map(order => (
-                        <KitchenTicketCard key={order.ticketKey} order={order} onReady={handleMarkAsReady} canMarkReady={canMarkReady} />
+                        <KitchenTicketCard key={order.ticketKey} order={order} onReady={handleMarkAsReady} canMarkReady={canMarkReady} ingredientNameMap={ingredientNameMap} />
                     ))}
                 </div>
             )}
