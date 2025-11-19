@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, LayoutDashboard, X } from 'lucide-react';
+import { AlertTriangle, LayoutDashboard } from 'lucide-react';
 import { Product, Category } from '../../types';
 import { formatCurrencyCOP } from '../../utils/formatIntegerAmount';
 
@@ -176,7 +176,10 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
                                     </div>
                                 )}
                                 {hasStockIssue && stockStatus && (
-                                    <div className="absolute right-1.5 top-1.5 flex flex-col items-end" data-stock-popover="true">
+                                    <div
+                                        className="absolute left-1.5 right-1.5 top-1.5 flex flex-col items-end"
+                                        data-stock-popover="true"
+                                    >
                                         <button
                                             type="button"
                                             className={`flex items-center justify-center rounded-full border p-1.5 text-base shadow-sm transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white ${iconColorClasses}`}
@@ -193,78 +196,33 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
                                         </button>
                                         {activeStockProductId === product.id && (
                                             <div
-                                                className="z-20 mt-3 w-[min(20rem,calc(100vw-3rem))] rounded-2xl border border-gray-200 bg-white text-left shadow-2xl sm:w-80"
+                                                className="z-20 mt-2 w-full max-w-full rounded-xl border border-amber-200 bg-white/95 text-left text-sm shadow-xl backdrop-blur"
                                                 role="dialog"
                                                 aria-label={`Ingrédients à surveiller pour ${product.nom_produit}`}
+                                                onClick={(event) => {
+                                                    event.stopPropagation();
+                                                    event.preventDefault();
+                                                    closeStockPopover();
+                                                }}
                                             >
-                                                <div className="border-b px-4 py-3">
-                                                    <div className="flex items-start justify-between gap-3">
-                                                        <div>
-                                                            <p className="text-xs font-semibold uppercase tracking-wide text-amber-600">
-                                                                Ingrédients à surveiller
-                                                            </p>
-                                                            <p className="text-sm text-gray-600">
-                                                                Vérifiez le stock avant d'ajouter {product.nom_produit}.
-                                                            </p>
-                                                        </div>
-                                                        <button
-                                                            type="button"
-                                                            className="rounded-full p-1 text-gray-500 transition hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
-                                                            onClick={(event) => {
-                                                                event.stopPropagation();
-                                                                event.preventDefault();
-                                                                closeStockPopover();
-                                                            }}
-                                                            aria-label="Fermer les détails de stock"
-                                                        >
-                                                            <X size={16} />
-                                                        </button>
-                                                    </div>
-                                                    <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-gray-500">
-                                                        <span
-                                                            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
-                                                                stockStatus.hasOutOfStock
-                                                                    ? 'bg-red-100 text-red-700'
-                                                                    : 'bg-amber-100 text-amber-700'
-                                                            }`}
-                                                        >
-                                                            <AlertTriangle size={12} />
-                                                            {stockStatus.hasOutOfStock ? 'Rupture signalée' : 'Stock critique'}
-                                                        </span>
-                                                        <span>{stockStatus.affectedIngredients.length} ingrédient(s)</span>
-                                                    </div>
-                                                </div>
-                                                <div className="max-h-64 divide-y divide-gray-100 overflow-y-auto">
+                                                <div className="max-h-48 divide-y divide-gray-100 overflow-y-auto">
                                                     {stockStatus.affectedIngredients.map(ingredient => (
                                                         <div
                                                             key={`${product.id}-${ingredient.id}`}
-                                                            className="flex items-start justify-between gap-3 px-4 py-3 text-sm text-gray-700"
+                                                            className="flex items-center justify-between gap-3 px-3 py-2"
                                                         >
-                                                            <div className="min-w-0">
-                                                                <p className="font-semibold text-gray-900" title={ingredient.name}>
-                                                                    {ingredient.name}
-                                                                </p>
-                                                                <p className="text-xs text-gray-600">
-                                                                    Stock :{' '}
-                                                                    <span className="font-semibold text-gray-900">{ingredient.currentStock}</span>
-                                                                    {' '} / Min :{' '}
-                                                                    <span className="font-semibold text-gray-900">{ingredient.minimumStock}</span>
-                                                                </p>
-                                                            </div>
-                                                            <div className="flex flex-col items-end gap-1 text-xs text-gray-500">
-                                                                <span
-                                                                    className={`rounded-full px-2 py-0.5 font-semibold ${
-                                                                        ingredient.status === 'out'
-                                                                            ? 'bg-red-100 text-red-700'
-                                                                            : 'bg-amber-100 text-amber-700'
-                                                                    }`}
-                                                                >
-                                                                    {ingredient.status === 'out' ? 'Rupture' : 'Critique'}
-                                                                </span>
-                                                                <span className="text-[11px] uppercase tracking-wide">
-                                                                    Manque : {Math.max(ingredient.minimumStock - ingredient.currentStock, 0)}
-                                                                </span>
-                                                            </div>
+                                                            <span className="truncate font-medium text-gray-900" title={ingredient.name}>
+                                                                {ingredient.name}
+                                                            </span>
+                                                            <span
+                                                                className={`shrink-0 font-semibold ${
+                                                                    ingredient.status === 'out'
+                                                                        ? 'text-red-600'
+                                                                        : 'text-amber-600'
+                                                                }`}
+                                                            >
+                                                                {ingredient.currentStock} / {ingredient.minimumStock}
+                                                            </span>
                                                         </div>
                                                     ))}
                                                 </div>
