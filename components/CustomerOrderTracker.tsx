@@ -1040,7 +1040,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                                         {item.selected_extras!.map((extra, extraIndex) => (
                                                                             <p
                                                                                 key={`${item.id}-tracker-extra-${extraIndex}`}
-                                                                                className="flex flex-wrap items-center gap-2"
+                                                                                className="mb-1 flex flex-wrap items-center gap-2 last:mb-0"
                                                                             >
                                                                                 <span className="inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600">
                                                                                     <PlusCircle size={12} />
@@ -1061,7 +1061,10 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                                 <div className="mt-2 rounded-2xl border border-rose-200/80 bg-rose-50/90 px-3 py-2 shadow-inner shadow-rose-100/70">
                                                                     <div className="flex-1 space-y-0.5 text-sm font-semibold text-rose-600">
                                                                         {excludedIngredientLabels.map(label => (
-                                                                            <p key={`${item.id}-tracker-excluded-${label}`} className="flex items-center gap-2">
+                                                                            <p
+                                                                                key={`${item.id}-tracker-excluded-${label}`}
+                                                                                className="mb-1 flex items-center gap-2 last:mb-0"
+                                                                            >
                                                                                 <span className="inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-rose-500/10 text-rose-600">
                                                                                     <Ban size={12} />
                                                                                 </span>
