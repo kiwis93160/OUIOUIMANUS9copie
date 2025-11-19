@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import OrderTimer from '../components/OrderTimer';
 import { getOrderUrgencyStyles, getOrderUrgencyToneClasses } from '../utils/orderUrgency';
 import { createIngredientNameMap, mapIngredientIdsToNames, type IngredientNameMap } from '../utils/ingredientNames';
+import { PlusCircle } from 'lucide-react';
 
 const computeNameSizeClass = (label: string) => {
     const trimmedLength = label.trim().length;
@@ -175,12 +176,14 @@ const KitchenTicketCard: React.FC<{ order: KitchenTicketOrder; onReady: (orderId
                                                         </span>
                                                     </div>
                                                     {item.selectedExtras && item.selectedExtras.length > 0 && (
-                                                        <ul className="ml-12 space-y-0.5 text-xs text-gray-600">
+                                                        <ul className="ml-12 space-y-1 text-xs text-gray-600">
                                                             {item.selectedExtras.map((extra, index) => (
-                                                                <li key={`${item.key}-extra-${index}`} className="flex items-center gap-1">
-                                                                    <span aria-hidden className="text-base leading-none text-gray-400">•</span>
-                                                                    <span className="font-medium text-gray-700">{extra.extraName}:</span>
-                                                                    <span className="text-gray-600">{extra.optionName}</span>
+                                                                <li key={`${item.key}-extra-${index}`} className="flex items-center gap-2">
+                                                                    <span className="inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600">
+                                                                        <PlusCircle size={12} />
+                                                                    </span>
+                                                                    <span className="font-semibold text-emerald-700">{extra.extraName}:</span>
+                                                                    <span className="text-gray-700">{extra.optionName}</span>
                                                                 </li>
                                                             ))}
                                                         </ul>
