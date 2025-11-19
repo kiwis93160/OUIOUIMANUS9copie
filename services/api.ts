@@ -23,6 +23,7 @@ import {
   RoleLogin,
   SiteContent,
   WeeklySchedule,
+  IngredientUsageStat,
 } from '../types';
 import { ROLE_HOME_PAGE_META_KEY, ROLES, SITE_CUSTOMIZER_PERMISSION_KEY } from '../constants';
 import { resolveSiteContent, sanitizeSiteContentInput } from '../utils/siteContent';
@@ -406,6 +407,23 @@ const mapProductRow = (row: SupabaseProductRow, ingredientMap?: Map<string, Ingr
 const isUuid = (value?: string | null): value is string =>
   !!value && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
 
+const resolveExtraUsageQuantity = (
+  extra: SelectedProductExtraOption,
+  recipe: SupabaseProductRecipeUsageRow[] | undefined,
+): number => {
+  const explicitUsage = toNumber(extra.ingredient_usage);
+  if (explicitUsage !== undefined && explicitUsage > 0) {
+    return explicitUsage;
+  }
+
+  const recipeMatch = recipe?.find(entry => entry.ingredient_id === extra.ingredient_id);
+  if (recipeMatch && Number.isFinite(recipeMatch.qte_utilisee) && recipeMatch.qte_utilisee > 0) {
+    return recipeMatch.qte_utilisee;
+  }
+
+  return 1;
+};
+
 const deductIngredientsStockForOrderItems = async (items: OrderItem[]): Promise<void> => {
   const productItems = items.filter(item => isUuid(item.produitRef) && item.quantite > 0);
 
@@ -460,6 +478,25 @@ const deductIngredientsStockForOrderItems = async (items: OrderItem[]): Promise<
         recipeItem.ingredient_id,
         (consumptionMap.get(recipeItem.ingredient_id) ?? 0) + usage,
       );
+    }
+
+    if (item.selected_extras && item.selected_extras.length > 0) {
+      for (const extra of item.selected_extras) {
+        if (!extra.ingredient_id) {
+          continue;
+        }
+
+        const extraUsage = resolveExtraUsageQuantity(extra, recipe);
+        const usage = extraUsage * item.quantite;
+        if (!Number.isFinite(usage) || usage <= 0) {
+          continue;
+        }
+
+        consumptionMap.set(
+          extra.ingredient_id,
+          (consumptionMap.get(extra.ingredient_id) ?? 0) + usage,
+        );
+      }
     }
   }
 
@@ -679,6 +716,91 @@ const computeOrderFinancialSnapshot = (order: Order) => {
     totalDiscount,
     netRevenueFromItems,
     totalRevenue,
+  };
+};
+
+const resolveExtraUsageFromRecipe = (extra: SelectedProductExtraOption, recipe?: RecipeItem[]): number => {
+  const explicitUsage = toNumber(extra.ingredient_usage);
+  if (explicitUsage !== undefined && explicitUsage > 0) {
+    return explicitUsage;
+  }
+
+  const recipeMatch = recipe?.find(entry => entry.ingredient_id === extra.ingredient_id);
+  if (recipeMatch && Number.isFinite(recipeMatch.qte_utilisee) && recipeMatch.qte_utilisee > 0) {
+    return recipeMatch.qte_utilisee;
+  }
+
+  return 1;
+};
+
+const aggregateIngredientAdjustments = (
+  orders: Order[],
+  productMap: Map<string, Product>,
+  ingredientMap: Map<string, Ingredient>,
+): { extrasUsage: IngredientUsageStat[]; removedIngredients: IngredientUsageStat[] } => {
+  const extras = new Map<string, IngredientUsageStat>();
+  const removed = new Map<string, IngredientUsageStat>();
+
+  const ensureStatEntry = (
+    target: Map<string, IngredientUsageStat>,
+    ingredientId: string,
+    fallbackName: string,
+    unit?: Ingredient['unite'],
+  ) => {
+    if (!target.has(ingredientId)) {
+      target.set(ingredientId, {
+        ingredientId,
+        ingredientName: fallbackName,
+        unit,
+        totalQuantity: 0,
+        occurrences: 0,
+      });
+    }
+    return target.get(ingredientId)!;
+  };
+
+  orders.forEach(order => {
+    order.items.forEach(item => {
+      const quantity = Math.max(0, item.quantite);
+      if (quantity <= 0) {
+        return;
+      }
+
+      const product = productMap.get(item.produitRef);
+      const recipe = product?.recipe;
+
+      if (item.selected_extras) {
+        for (const extra of item.selected_extras) {
+          if (!extra.ingredient_id) {
+            continue;
+          }
+
+          const ingredient = ingredientMap.get(extra.ingredient_id);
+          const ingredientName = extra.ingredient_name ?? ingredient?.nom ?? extra.optionName;
+          const usagePerUnit = resolveExtraUsageFromRecipe(extra, recipe);
+          const stat = ensureStatEntry(extras, extra.ingredient_id, ingredientName, ingredient?.unite);
+          stat.totalQuantity += usagePerUnit * quantity;
+          stat.occurrences += quantity;
+        }
+      }
+
+      if (item.excluded_ingredients && item.excluded_ingredients.length > 0) {
+        for (const ingredientId of item.excluded_ingredients) {
+          const ingredient = ingredientMap.get(ingredientId);
+          const name = ingredient?.nom ?? 'Ingrédient retiré';
+          const stat = ensureStatEntry(removed, ingredientId, name, ingredient?.unite);
+          stat.occurrences += quantity;
+        }
+      }
+    });
+  });
+
+  const sortByOccurrences = (stats: IngredientUsageStat[]) =>
+    [...stats].sort((a, b) => b.occurrences - a.occurrences || b.totalQuantity - a.totalQuantity);
+
+  return {
+    extrasUsage: sortByOccurrences(Array.from(extras.values())),
+    removedIngredients: sortByOccurrences(Array.from(removed.values())),
   };
 };
 
@@ -1719,6 +1841,12 @@ export const api = {
       };
     });
 
+    const { extrasUsage, removedIngredients } = aggregateIngredientAdjustments(
+      currentPeriodOrders,
+      productMap,
+      ingredientMap,
+    );
+
     return {
       period,
       periodLabel: config.label,
@@ -1741,6 +1869,8 @@ export const api = {
       ventesParCategorie,
       recentOrders,
       bestSellerProducts,
+      extraIngredientsUsage: extrasUsage,
+      removedIngredients,
     };
   },
 
@@ -3095,6 +3225,12 @@ export const api = {
       category.products.sort((a, b) => b.quantity - a.quantity);
     });
 
+    const { extrasUsage, removedIngredients } = aggregateIngredientAdjustments(
+      orders,
+      productMap,
+      ingredientMap,
+    );
+
     const ingredientsStockBas = ingredients.filter(
       ingredient => ingredient.stock_actuel <= ingredient.stock_minimum,
     );
@@ -3111,6 +3247,8 @@ export const api = {
       ventesDuJour,
       totalPromotionsApplied,
       soldProducts: Array.from(soldProductsByCategory.values()),
+      extraIngredientsUsage: extrasUsage,
+      removedIngredients,
       lowStockIngredients: ingredientsStockBas,
       roleLogins: roleLoginsResult,
       roleLoginsUnavailable,

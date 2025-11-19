@@ -29,7 +29,7 @@ const normalizeSelectedExtras = (values?: OrderItem['selected_extras']) => {
     }
 
     const normalized = values
-        .map(extra => `${extra.extraName}:::${extra.optionName}:::${extra.price}`)
+        .map(extra => `${extra.extraName}:::${extra.optionName}:::${extra.price}:::${extra.ingredient_id ?? ''}`)
         .sort()
         .join('|');
 
