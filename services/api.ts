@@ -887,12 +887,30 @@ type SelectProductsQueryOptions = {
   includeBestSellerColumns?: boolean;
   includeRecipes?: boolean;
   includeExtras?: boolean;
+  includeAllowIngredientRemovalExtraColumn?: boolean;
+};
+
+let supportsAllowIngredientRemovalExtraColumn: boolean | null = null;
+
+const shouldIncludeAllowIngredientRemovalExtraColumn = (
+  options?: SelectProductsQueryOptions,
+): boolean => {
+  if (options?.includeAllowIngredientRemovalExtraColumn === false) {
+    return false;
+  }
+
+  if (options?.includeAllowIngredientRemovalExtraColumn === true) {
+    return true;
+  }
+
+  return supportsAllowIngredientRemovalExtraColumn !== false;
 };
 
 const buildProductSelectColumns = (
   includeBestSellerColumns: boolean,
   includeRecipes: boolean,
   includeExtras: boolean,
+  includeAllowIngredientRemovalColumn: boolean,
 ): string => {
   const bestSellerColumns = includeBestSellerColumns
     ? `,
@@ -913,6 +931,11 @@ const buildProductSelectColumns = (
         )`
     : '';
 
+  const allowIngredientRemovalColumn = includeAllowIngredientRemovalColumn
+    ? `,
+        allow_ingredient_removal_extra`
+    : '';
+
   return `
         id,
         nom_produit,
@@ -920,8 +943,7 @@ const buildProductSelectColumns = (
         prix_vente,
         categoria_id,
         estado,
-        image,
-        allow_ingredient_removal_extra${bestSellerColumns}${extrasColumn}${recipeColumns}
+        image${allowIngredientRemovalColumn}${bestSellerColumns}${extrasColumn}${recipeColumns}
       `;
 };
 
@@ -929,9 +951,18 @@ const selectProductsQuery = (options?: SelectProductsQueryOptions) => {
   const includeBestSellerColumns = options?.includeBestSellerColumns !== false;
   const includeRecipes = options?.includeRecipes !== false;
   const includeExtras = options?.includeExtras !== false;
+  const includeAllowIngredientRemovalColumn =
+    options?.includeAllowIngredientRemovalExtraColumn ?? shouldIncludeAllowIngredientRemovalExtraColumn(options);
   let query = supabase
     .from('products')
-    .select(buildProductSelectColumns(includeBestSellerColumns, includeRecipes, includeExtras));
+    .select(
+      buildProductSelectColumns(
+        includeBestSellerColumns,
+        includeRecipes,
+        includeExtras,
+        includeAllowIngredientRemovalColumn,
+      ),
+    );
 
   if (options?.orderBy) {
     query = query.order(options.orderBy.column, {
@@ -967,37 +998,82 @@ const isMissingExtrasColumnError = (error: { message?: string } | null): boolean
 const isMissingOrderItemSelectedExtrasColumnError = (error: { message?: string } | null): boolean =>
   isMissingColumnError(error, 'selected_extras');
 
+const isMissingAllowIngredientRemovalExtraColumnError = (error: { message?: string } | null): boolean =>
+  isMissingColumnError(error, 'allow_ingredient_removal_extra');
+
 const runProductsQueryWithFallback = async <T>(
   executor: (
     query: ReturnType<typeof selectProductsQuery>,
     includeBestSellerColumns: boolean,
     includeExtrasColumn: boolean,
+    includeAllowIngredientRemovalColumn: boolean,
   ) => Promise<SupabaseResponse<T>>,
   options?: Omit<SelectProductsQueryOptions, 'includeBestSellerColumns'>,
 ): Promise<SupabaseResponse<T>> => {
   let includeBestSellerColumns = true;
   let includeExtrasColumn = options?.includeExtras !== false;
+  let includeAllowIngredientRemovalColumn = shouldIncludeAllowIngredientRemovalExtraColumn(options);
   let response = await executor(
-    selectProductsQuery({ ...options, includeBestSellerColumns, includeExtras: includeExtrasColumn }),
+    selectProductsQuery({
+      ...options,
+      includeBestSellerColumns,
+      includeExtras: includeExtrasColumn,
+      includeAllowIngredientRemovalExtraColumn: includeAllowIngredientRemovalColumn,
+    }),
     includeBestSellerColumns,
     includeExtrasColumn,
+    includeAllowIngredientRemovalColumn,
   );
+
+  if (
+    response.error &&
+    includeAllowIngredientRemovalColumn &&
+    isMissingAllowIngredientRemovalExtraColumnError(response.error)
+  ) {
+    supportsAllowIngredientRemovalExtraColumn = false;
+    includeAllowIngredientRemovalColumn = false;
+    response = await executor(
+      selectProductsQuery({
+        ...options,
+        includeBestSellerColumns,
+        includeExtras: includeExtrasColumn,
+        includeAllowIngredientRemovalExtraColumn: includeAllowIngredientRemovalColumn,
+      }),
+      includeBestSellerColumns,
+      includeExtrasColumn,
+      includeAllowIngredientRemovalColumn,
+    );
+  } else if (!response.error && includeAllowIngredientRemovalColumn) {
+    supportsAllowIngredientRemovalExtraColumn = true;
+  }
 
   if (response.error && includeExtrasColumn && isMissingExtrasColumnError(response.error)) {
     includeExtrasColumn = false;
     response = await executor(
-      selectProductsQuery({ ...options, includeBestSellerColumns, includeExtras: includeExtrasColumn }),
+      selectProductsQuery({
+        ...options,
+        includeBestSellerColumns,
+        includeExtras: includeExtrasColumn,
+        includeAllowIngredientRemovalExtraColumn: includeAllowIngredientRemovalColumn,
+      }),
       includeBestSellerColumns,
       includeExtrasColumn,
+      includeAllowIngredientRemovalColumn,
     );
   }
 
   if (response.error && includeBestSellerColumns && isMissingBestSellerColumnError(response.error)) {
     includeBestSellerColumns = false;
     response = await executor(
-      selectProductsQuery({ ...options, includeBestSellerColumns, includeExtras: includeExtrasColumn }),
+      selectProductsQuery({
+        ...options,
+        includeBestSellerColumns,
+        includeExtras: includeExtrasColumn,
+        includeAllowIngredientRemovalExtraColumn: includeAllowIngredientRemovalColumn,
+      }),
       includeBestSellerColumns,
       includeExtrasColumn,
+      includeAllowIngredientRemovalColumn,
     );
   }
 
@@ -1834,7 +1910,7 @@ export const api = {
   addProduct: async (product: Omit<Product, 'id'>): Promise<Product> => {
     const normalizedImage = normalizeCloudinaryImageUrl(product.image);
     const extrasPayload = product.extras ? (product.extras.length > 0 ? product.extras : null) : product.extras;
-    const baseInsertPayload = {
+    const buildBaseInsertPayload = (includeAllowIngredientRemovalColumn: boolean) => ({
       nom_produit: product.nom_produit,
       description: product.description ?? null,
       prix_vente: product.prix_vente,
@@ -1843,30 +1919,50 @@ export const api = {
       image: normalizedImage,
       is_best_seller: product.is_best_seller ?? false,
       best_seller_rank: product.is_best_seller ? product.best_seller_rank : null,
-      allow_ingredient_removal_extra: product.allow_ingredient_removal_extra ?? false,
+      ...(includeAllowIngredientRemovalColumn
+        ? { allow_ingredient_removal_extra: product.allow_ingredient_removal_extra ?? false }
+        : {}),
+    });
+
+    const buildInsertPayload = (includeExtras: boolean, includeAllowIngredientRemovalColumn: boolean) => {
+      const payload = buildBaseInsertPayload(includeAllowIngredientRemovalColumn);
+      return includeExtras && extrasPayload !== undefined ? { ...payload, extras: extrasPayload } : payload;
     };
 
-    const buildInsertPayload = (includeExtras: boolean) =>
-      includeExtras && extrasPayload !== undefined
-        ? { ...baseInsertPayload, extras: extrasPayload }
-        : baseInsertPayload;
+    const buildInsertSelectColumns = (includeExtras: boolean, includeAllowIngredientRemovalColumn: boolean) =>
+      buildProductSelectColumns(true, false, includeExtras, includeAllowIngredientRemovalColumn);
 
+    let includeAllowIngredientRemovalColumn = supportsAllowIngredientRemovalExtraColumn !== false;
     let response = await supabase
       .from('products')
-      .insert(buildInsertPayload(true))
-      .select(
-        'id, nom_produit, description, prix_vente, categoria_id, estado, image, allow_ingredient_removal_extra, is_best_seller, best_seller_rank, extras',
-      )
+      .insert(buildInsertPayload(true, includeAllowIngredientRemovalColumn))
+      .select(buildInsertSelectColumns(true, includeAllowIngredientRemovalColumn))
       .single();
+
+    if (
+      response.error &&
+      includeAllowIngredientRemovalColumn &&
+      isMissingAllowIngredientRemovalExtraColumnError(response.error)
+    ) {
+      supportsAllowIngredientRemovalExtraColumn = false;
+      includeAllowIngredientRemovalColumn = false;
+      response = await supabase
+        .from('products')
+        .insert(buildInsertPayload(true, includeAllowIngredientRemovalColumn))
+        .select(buildInsertSelectColumns(true, includeAllowIngredientRemovalColumn))
+        .single();
+    }
 
     if (response.error && extrasPayload !== undefined && isMissingExtrasColumnError(response.error)) {
       response = await supabase
         .from('products')
-        .insert(buildInsertPayload(false))
-        .select(
-          'id, nom_produit, description, prix_vente, categoria_id, estado, image, allow_ingredient_removal_extra, is_best_seller, best_seller_rank',
-        )
+        .insert(buildInsertPayload(false, includeAllowIngredientRemovalColumn))
+        .select(buildInsertSelectColumns(false, includeAllowIngredientRemovalColumn))
         .single();
+    }
+
+    if (!response.error && includeAllowIngredientRemovalColumn) {
+      supportsAllowIngredientRemovalExtraColumn = true;
     }
 
     const productRow = unwrap<SupabaseProductRow>(response as SupabaseResponse<SupabaseProductRow>);
@@ -1907,31 +2003,57 @@ export const api = {
     }
 
     const extrasPayload = product.extras ? (product.extras.length > 0 ? product.extras : null) : product.extras;
-    const basePayload = {
+    const buildBasePayload = (includeAllowIngredientRemovalColumn: boolean) => ({
       nom_produit: product.nom_produit,
       description: product.description ?? null,
       prix_vente: product.prix_vente,
       categoria_id: product.categoria_id,
       estado: product.estado,
       image: imageUrl ?? null,
-      allow_ingredient_removal_extra: product.allow_ingredient_removal_extra ?? false,
+      ...(includeAllowIngredientRemovalColumn
+        ? { allow_ingredient_removal_extra: product.allow_ingredient_removal_extra ?? false }
+        : {}),
+    });
+
+    const buildPayload = (includeExtras: boolean, includeAllowIngredientRemovalColumn: boolean) => {
+      const payload = buildBasePayload(includeAllowIngredientRemovalColumn);
+      return includeExtras && extrasPayload !== undefined ? { ...payload, extras: extrasPayload } : payload;
     };
 
-    const buildPayload = (includeExtras: boolean) =>
-      includeExtras && extrasPayload !== undefined ? { ...basePayload, extras: extrasPayload } : basePayload;
+    const buildSelectColumns = (includeExtras: boolean, includeAllowIngredientRemovalColumn: boolean) =>
+      buildProductSelectColumns(false, false, includeExtras, includeAllowIngredientRemovalColumn);
 
+    let includeAllowIngredientRemovalColumn = supportsAllowIngredientRemovalExtraColumn !== false;
     let response = await supabase
       .from('products')
-      .insert(buildPayload(true))
-      .select('id, nom_produit, description, prix_vente, categoria_id, estado, image, allow_ingredient_removal_extra, extras')
+      .insert(buildPayload(true, includeAllowIngredientRemovalColumn))
+      .select(buildSelectColumns(true, includeAllowIngredientRemovalColumn))
       .single();
+
+    if (
+      response.error &&
+      includeAllowIngredientRemovalColumn &&
+      isMissingAllowIngredientRemovalExtraColumnError(response.error)
+    ) {
+      supportsAllowIngredientRemovalExtraColumn = false;
+      includeAllowIngredientRemovalColumn = false;
+      response = await supabase
+        .from('products')
+        .insert(buildPayload(true, includeAllowIngredientRemovalColumn))
+        .select(buildSelectColumns(true, includeAllowIngredientRemovalColumn))
+        .single();
+    }
 
     if (response.error && extrasPayload !== undefined && isMissingExtrasColumnError(response.error)) {
       response = await supabase
         .from('products')
-        .insert(buildPayload(false))
-        .select('id, nom_produit, description, prix_vente, categoria_id, estado, image, allow_ingredient_removal_extra')
+        .insert(buildPayload(false, includeAllowIngredientRemovalColumn))
+        .select(buildSelectColumns(false, includeAllowIngredientRemovalColumn))
         .single();
+    }
+
+    if (!response.error && includeAllowIngredientRemovalColumn) {
+      supportsAllowIngredientRemovalExtraColumn = true;
     }
 
     const productRow = unwrap<SupabaseProductRow>(response as SupabaseResponse<SupabaseProductRow>);
@@ -1970,14 +2092,17 @@ export const api = {
       imageUrl = null; // Explicitly remove image
     }
 
-    const payload: Record<string, unknown> = {};
+    let payload: Record<string, unknown> = {};
     const shouldUpdateExtras = updates.extras !== undefined;
+    const includeAllowIngredientRemovalColumn = supportsAllowIngredientRemovalExtraColumn !== false;
+    const shouldUpdateAllowIngredientRemoval =
+      includeAllowIngredientRemovalColumn && updates.allow_ingredient_removal_extra !== undefined;
     if (updates.nom_produit !== undefined) payload.nom_produit = updates.nom_produit;
     if (updates.description !== undefined) payload.description = updates.description;
     if (updates.prix_vente !== undefined) payload.prix_vente = updates.prix_vente;
     if (updates.categoria_id !== undefined) payload.categoria_id = updates.categoria_id;
     if (updates.estado !== undefined) payload.estado = updates.estado;
-    if (updates.allow_ingredient_removal_extra !== undefined) {
+    if (shouldUpdateAllowIngredientRemoval) {
       payload.allow_ingredient_removal_extra = updates.allow_ingredient_removal_extra;
     }
     if (shouldUpdateExtras) {
@@ -1989,13 +2114,34 @@ export const api = {
       const performUpdate = (updatePayload: Record<string, unknown>) =>
         supabase.from('products').update(updatePayload).eq('id', productId);
 
-      let updateResponse = await performUpdate(payload);
+      let currentPayload = { ...payload };
+      let updateResponse = await performUpdate(currentPayload);
       let updateError = updateResponse.error;
 
+      if (
+        updateError &&
+        shouldUpdateAllowIngredientRemoval &&
+        'allow_ingredient_removal_extra' in currentPayload &&
+        isMissingAllowIngredientRemovalExtraColumnError(updateError)
+      ) {
+        supportsAllowIngredientRemovalExtraColumn = false;
+        const { allow_ingredient_removal_extra, ...fallbackPayload } = currentPayload;
+        currentPayload = fallbackPayload;
+        if (Object.keys(currentPayload).length > 0) {
+          updateResponse = await performUpdate(currentPayload);
+          updateError = updateResponse.error;
+        } else {
+          updateError = null;
+        }
+      } else if (!updateError && shouldUpdateAllowIngredientRemoval) {
+        supportsAllowIngredientRemovalExtraColumn = true;
+      }
+
       if (updateError && shouldUpdateExtras && isMissingExtrasColumnError(updateError)) {
-        const { extras, ...fallbackPayload } = payload;
-        if (Object.keys(fallbackPayload).length > 0) {
-          updateResponse = await performUpdate(fallbackPayload);
+        const { extras, ...fallbackPayload } = currentPayload;
+        currentPayload = fallbackPayload;
+        if (Object.keys(currentPayload).length > 0) {
+          updateResponse = await performUpdate(currentPayload);
           updateError = updateResponse.error;
         } else {
           updateError = null;
