@@ -4,7 +4,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import { uploadPaymentReceipt } from '../services/cloudinary';
 import { Order, Product, Category, OrderItem, Ingredient, SelectedProductExtraOption } from '../types';
-import { ArrowLeft } from 'lucide-react';
 import PaymentModal from '../components/PaymentModal';
 import Modal from '../components/Modal';
 import { createOrderItemsSnapshot, areOrderItemSnapshotsEqual, type OrderItemsSnapshot } from '../utils/orderSync';
@@ -779,15 +778,6 @@ const Commande: React.FC = () => {
         <div className="grid grid-cols-1 gap-2 lg:grid-cols-[minmax(0,2.4fr)_minmax(0,1fr)] lg:items-start min-h-screen">
             {/* Menu Section */}
             <div className="flex h-full flex-col overflow-hidden">
-                <div className="p-2">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                        <button onClick={handleExitAttempt} className="ui-btn-dark text-sm px-3 py-1.5" title="Retour au plan de salle">
-                            <ArrowLeft size={18} />
-                            <span>Retour plan de salle</span>
-                        </button>
-                        <h2 className="text-xl font-semibold text-gray-900">Table {order.table_nom}</h2>
-                    </div>
-                </div>
                 <ProductGrid
                     filteredProducts={filteredProducts}
                     quantities={productQuantitiesInCart}
@@ -798,6 +788,7 @@ const Commande: React.FC = () => {
                     handleProductPointerDown={handleProductPointerDown}
                     handleProductKeyDown={handleProductKeyDown}
                     productStockStatuses={productStockStatuses}
+                    onNavigateToPlan={handleExitAttempt}
                 />
             </div>
 

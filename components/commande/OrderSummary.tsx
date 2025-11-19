@@ -3,6 +3,7 @@ import { Check, DollarSign, MessageSquare, MinusCircle, PlusCircle, Send } from 
 import type { Order, OrderItem } from '../../types';
 import { formatCurrencyCOP } from '../../utils/formatIntegerAmount';
 import { mapIngredientIdsToNames, type IngredientNameMap } from '../../utils/ingredientNames';
+import { formatTableLabelForOrder } from '../../utils/tableName';
 
 const isFreeShippingType = (type?: string | null) => (type ?? '').toLowerCase() === 'free_shipping';
 
@@ -62,10 +63,19 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
         );
     };
 
+    const tableLabel = formatTableLabelForOrder(order.table_nom);
+
     return (
         <div className={`ui-card flex flex-col ${className ?? ''}`}>
             <div className="p-4 border-b">
-                <h2 className="text-2xl font-semibold text-brand-secondary">Pedido</h2>
+                <h2 className="text-2xl font-semibold text-brand-secondary">
+                    Pedido
+                    {tableLabel && (
+                        <span className="ml-2 text-lg font-semibold lowercase text-brand-secondary/80">
+                            {tableLabel}
+                        </span>
+                    )}
+                </h2>
             </div>
             <div className="flex-1 space-y-3 overflow-y-auto p-4">
                 {totalItemsCount === 0 ? (

@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, X } from 'lucide-react';
+import { AlertTriangle, LayoutDashboard, X } from 'lucide-react';
 import { Product, Category } from '../../types';
 import { formatCurrencyCOP } from '../../utils/formatIntegerAmount';
 
@@ -17,6 +17,7 @@ export interface ProductGridProps {
         product: Product,
     ) => (event: React.KeyboardEvent<HTMLDivElement>) => void;
     productStockStatuses: ProductStockStatusMap;
+    onNavigateToPlan: () => void;
 }
 
 export type ProductStockIssueStatus = 'low' | 'out';
@@ -47,6 +48,7 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
     handleProductPointerDown,
     handleProductKeyDown,
     productStockStatuses,
+    onNavigateToPlan,
 }) => {
     const [activeStockProductId, setActiveStockProductId] = useState<string | null>(null);
 
@@ -93,31 +95,44 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
 
     return (
         <div className="flex flex-1 flex-col overflow-hidden">
-            <div className="border-b border-gray-200/30 p-2">
-                <div className="flex items-center gap-2 overflow-x-auto pb-2">
-                    <button
-                        onClick={() => onSelectCategory('all')}
-                        className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-semibold whitespace-nowrap transition ${
-                            activeCategoryId === 'all'
-                                ? 'bg-brand-primary text-brand-secondary shadow'
-                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                        }`}
-                    >
-                        Tous
-                    </button>
-                    {categories.map((cat) => (
+            <div className="border-b border-gray-200/30 p-3">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto pb-1">
                         <button
-                            key={cat.id}
-                            onClick={() => onSelectCategory(cat.id)}
+                            onClick={() => onSelectCategory('all')}
                             className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-semibold whitespace-nowrap transition ${
-                                activeCategoryId === cat.id
+                                activeCategoryId === 'all'
                                     ? 'bg-brand-primary text-brand-secondary shadow'
                                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                             }`}
                         >
-                            {cat.nom}
+                            Tous
                         </button>
-                    ))}
+                        {categories.map((cat) => (
+                            <button
+                                key={cat.id}
+                                onClick={() => onSelectCategory(cat.id)}
+                                className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-semibold whitespace-nowrap transition ${
+                                    activeCategoryId === cat.id
+                                        ? 'bg-brand-primary text-brand-secondary shadow'
+                                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                }`}
+                            >
+                                {cat.nom}
+                            </button>
+                        ))}
+                    </div>
+                    <div className="flex w-full justify-end sm:w-auto">
+                        <button
+                            type="button"
+                            onClick={onNavigateToPlan}
+                            className="inline-flex items-center gap-2 rounded-full border border-brand-primary px-4 py-2 text-sm font-semibold text-brand-primary transition hover:bg-brand-primary hover:text-brand-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+                            title="Plan de salle"
+                        >
+                            <LayoutDashboard size={16} />
+                            <span>Plan de salle</span>
+                        </button>
+                    </div>
                 </div>
             </div>
             <div className="flex-1 overflow-y-auto p-2">
@@ -178,51 +193,81 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
                                         </button>
                                         {activeStockProductId === product.id && (
                                             <div
-                                                className="z-20 mt-2 w-64 max-w-[calc(100vw-3rem)] rounded-2xl border border-gray-200 bg-white p-3 text-left shadow-2xl sm:w-72"
+                                                className="z-20 mt-3 w-[min(20rem,calc(100vw-3rem))] rounded-2xl border border-gray-200 bg-white text-left shadow-2xl sm:w-80"
                                                 role="dialog"
                                                 aria-label={`Ingrédients à surveiller pour ${product.nom_produit}`}
                                             >
-                                                <div className="flex items-start justify-between gap-2">
-                                                    <p className="text-sm font-semibold text-gray-900">Ingrédients à surveiller</p>
-                                                    <button
-                                                        type="button"
-                                                        className="text-gray-500 transition hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
-                                                        onClick={(event) => {
-                                                            event.stopPropagation();
-                                                            event.preventDefault();
-                                                            closeStockPopover();
-                                                        }}
-                                                        aria-label="Fermer les détails de stock"
-                                                    >
-                                                        <X size={16} />
-                                                    </button>
+                                                <div className="border-b px-4 py-3">
+                                                    <div className="flex items-start justify-between gap-3">
+                                                        <div>
+                                                            <p className="text-xs font-semibold uppercase tracking-wide text-amber-600">
+                                                                Ingrédients à surveiller
+                                                            </p>
+                                                            <p className="text-sm text-gray-600">
+                                                                Vérifiez le stock avant d'ajouter {product.nom_produit}.
+                                                            </p>
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            className="rounded-full p-1 text-gray-500 transition hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+                                                            onClick={(event) => {
+                                                                event.stopPropagation();
+                                                                event.preventDefault();
+                                                                closeStockPopover();
+                                                            }}
+                                                            aria-label="Fermer les détails de stock"
+                                                        >
+                                                            <X size={16} />
+                                                        </button>
+                                                    </div>
+                                                    <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-gray-500">
+                                                        <span
+                                                            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                                                                stockStatus.hasOutOfStock
+                                                                    ? 'bg-red-100 text-red-700'
+                                                                    : 'bg-amber-100 text-amber-700'
+                                                            }`}
+                                                        >
+                                                            <AlertTriangle size={12} />
+                                                            {stockStatus.hasOutOfStock ? 'Rupture signalée' : 'Stock critique'}
+                                                        </span>
+                                                        <span>{stockStatus.affectedIngredients.length} ingrédient(s)</span>
+                                                    </div>
                                                 </div>
-                                                <ul className="mt-2 space-y-2 text-sm text-gray-700">
+                                                <div className="max-h-64 divide-y divide-gray-100 overflow-y-auto">
                                                     {stockStatus.affectedIngredients.map(ingredient => (
-                                                        <li
+                                                        <div
                                                             key={`${product.id}-${ingredient.id}`}
-                                                            className="flex items-start justify-between gap-2 rounded-xl bg-gray-50 p-2"
+                                                            className="flex items-start justify-between gap-3 px-4 py-3 text-sm text-gray-700"
                                                         >
                                                             <div className="min-w-0">
                                                                 <p className="font-semibold text-gray-900" title={ingredient.name}>
                                                                     {ingredient.name}
                                                                 </p>
                                                                 <p className="text-xs text-gray-600">
-                                                                    Stock : {ingredient.currentStock} / Min : {ingredient.minimumStock}
+                                                                    Stock :{' '}
+                                                                    <span className="font-semibold text-gray-900">{ingredient.currentStock}</span>
+                                                                    {' '} / Min :{' '}
+                                                                    <span className="font-semibold text-gray-900">{ingredient.minimumStock}</span>
                                                                 </p>
                                                             </div>
-                                                            <span
-                                                                className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${
-                                                                    ingredient.status === 'out'
-                                                                        ? 'bg-red-100 text-red-700'
-                                                                        : 'bg-amber-100 text-amber-700'
-                                                                }`}
-                                                            >
-                                                                {ingredient.status === 'out' ? 'Rupture' : 'Critique'}
-                                                            </span>
-                                                        </li>
+                                                            <div className="flex flex-col items-end gap-1 text-xs text-gray-500">
+                                                                <span
+                                                                    className={`rounded-full px-2 py-0.5 font-semibold ${
+                                                                        ingredient.status === 'out'
+                                                                            ? 'bg-red-100 text-red-700'
+                                                                            : 'bg-amber-100 text-amber-700'
+                                                                    }`}
+                                                                >
+                                                                    {ingredient.status === 'out' ? 'Rupture' : 'Critique'}
+                                                                </span>
+                                                                <span className="text-[11px] uppercase tracking-wide">
+                                                                    Manque : {Math.max(ingredient.minimumStock - ingredient.currentStock, 0)}
+                                                                </span>
+                                                            </div>
+                                                        </div>
                                                     ))}
-                                                </ul>
+                                                </div>
                                             </div>
                                         )}
                                     </div>
