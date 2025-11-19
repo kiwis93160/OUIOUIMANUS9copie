@@ -436,15 +436,15 @@ const ParaLlevar: React.FC = () => {
         }
 
         setSavingSchedule(true);
-        setConfigFeedback(null);
+        setScheduleFeedback(null);
         try {
             await updateSchedule(editingSchedule);
-            setConfigFeedback({ message: 'Horarios actualizados con éxito.', tone: 'success' });
+            setScheduleFeedback({ message: 'Horarios actualizados con éxito.', tone: 'success' });
             setIsScheduleModalOpen(false);
         } catch (error) {
             console.error('Failed to update online ordering schedule', error);
             const message = error instanceof Error ? error.message : 'No fue posible actualizar la configuración.';
-            setConfigFeedback({ message, tone: 'error' });
+            setScheduleFeedback({ message, tone: 'error' });
         } finally {
             setSavingSchedule(false);
         }
@@ -466,25 +466,6 @@ const ParaLlevar: React.FC = () => {
         setDraftConfirmationPhone('');
         setDraftReportPhone('');
     }, []);
-
-    const handleContactSubmit = useCallback(async () => {
-        setSavingContactConfig(true);
-        setConfigFeedback(null);
-        try {
-            await updateSchedule(editingSchedule);
-            setScheduleFeedback({ message: 'Horarios actualizados con éxito.', tone: 'success' });
-            setIsScheduleModalOpen(false);
-        } catch (error) {
-            console.error('Failed to update online ordering schedule', error);
-            const message = error instanceof Error ? error.message : 'No fue posible actualizar la configuración.';
-            setScheduleFeedback({ message, tone: 'error' });
-        } finally {
-            setSavingSchedule(false);
-        }
-    }, [
-        editingSchedule,
-        updateSchedule,
-    ]);
 
     const handleOpenContactModal = useCallback(() => {
         setDraftSupportPhone(editingSupportPhone);
