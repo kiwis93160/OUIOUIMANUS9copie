@@ -2529,7 +2529,10 @@ export const api = {
       }
     }
 
-    const couvertsCandidate = options?.couverts ?? tableRow.couverts ?? null;
+    const couvertsCandidate =
+      options?.couverts ??
+      tableRow.couverts ??
+      (Number.isInteger(tableRow.capacite) && tableRow.capacite > 0 ? tableRow.capacite : null);
     if (!Number.isInteger(couvertsCandidate) || couvertsCandidate <= 0) {
       throw new Error('Le nombre de couverts sélectionné est requis pour ouvrir la table.');
     }
