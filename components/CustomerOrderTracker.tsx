@@ -617,7 +617,9 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                         {getPromotionIcon(promotion)}
                     </div>
                     <div className="flex-1 px-2.5 flex items-center justify-between min-w-0 gap-2 h-full">
-                        <p className="font-bold text-white text-sm sm:text-base leading-tight truncate">{promotion.name}</p>
+                        <p className="font-bold text-white text-sm sm:text-base leading-tight truncate mb-px">
+                            {promotion.name}
+                        </p>
                         <span className="text-sm sm:text-base font-bold text-white whitespace-nowrap shrink-0">
                             -{formatCurrencyCOP(discountAmount)}
                         </span>
