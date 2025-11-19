@@ -2,6 +2,7 @@ import React from 'react';
 import { Check, DollarSign, MessageSquare, MinusCircle, PlusCircle, Send } from 'lucide-react';
 import type { Order, OrderItem } from '../../types';
 import { formatCurrencyCOP } from '../../utils/formatIntegerAmount';
+import { mapIngredientIdsToNames, type IngredientNameMap } from '../../utils/ingredientNames';
 
 const isFreeShippingType = (type?: string | null) => (type ?? '').toLowerCase() === 'free_shipping';
 
@@ -26,6 +27,7 @@ export interface OrderSummaryProps {
     orderStatus: Order["estado_cocina"];
     editingCommentId: string | null;
     className?: string;
+    ingredientNameMap?: IngredientNameMap;
 }
 
 const OrderSummary: React.FC<OrderSummaryProps> = ({
@@ -44,8 +46,21 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
     orderStatus,
     editingCommentId,
     className,
+    ingredientNameMap,
 }) => {
     const totalItemsCount = categorizedItems.pending.length + categorizedItems.sent.length;
+    const renderExcludedIngredients = (item: OrderItem) => {
+        const excludedLabels = mapIngredientIdsToNames(item.excluded_ingredients, ingredientNameMap);
+        if (excludedLabels.length === 0) {
+            return null;
+        }
+
+        return (
+            <p className="mt-2 rounded-md bg-white/80 p-2 text-xs font-semibold text-red-600">
+                🚫 Sin: {excludedLabels.join(', ')}
+            </p>
+        );
+    };
 
     return (
         <div className={`ui-card flex flex-col ${className ?? ''}`}>
@@ -126,6 +141,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                                                 ))}
                                             </ul>
                                         )}
+                                        {renderExcludedIngredients(item)}
                                     </div>
                                 ))
                             )}
@@ -169,6 +185,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                                                 ))}
                                             </ul>
                                         )}
+                                        {renderExcludedIngredients(item)}
                                         {item.commentaire && (
                                             <p className="mt-2 text-sm italic text-gray-600 pl-2">"{item.commentaire}"</p>
                                         )}

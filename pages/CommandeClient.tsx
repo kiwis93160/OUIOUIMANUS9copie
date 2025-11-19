@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Product, Category, OrderItem, Order, SelectedProductExtraOption } from '../types';
+import { Product, Category, OrderItem, Order, SelectedProductExtraOption, Ingredient } from '../types';
 
 // Type pour les informations client
 
@@ -21,6 +21,7 @@ import { createHeroBackgroundStyle } from '../utils/siteStyleHelpers';
 import OrderConfirmationModal from '../components/OrderConfirmationModal';
 import CustomerOrderTracker from '../components/CustomerOrderTracker';
 import { getDisplayableProductExtras, mapExcludedIngredientIdsToNames } from '../utils/productExtras';
+import { createIngredientNameMap, mapIngredientIdsToNames } from '../utils/ingredientNames';
 
 const DOMICILIO_FEE = 8000;
 const DOMICILIO_ITEM_NAME = 'Domicilio';
@@ -358,6 +359,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
     );
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
+    const [ingredients, setIngredients] = useState<Ingredient[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [activeCategoryId, setActiveCategoryId] = useState('all');
@@ -412,12 +414,14 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [productsData, categoriesData] = await Promise.all([
+                const [productsData, categoriesData, ingredientsData] = await Promise.all([
                     api.getProducts(),
-                    api.getCategories()
+                    api.getCategories(),
+                    api.getIngredients(),
                 ]);
                 setProducts(productsData);
                 setCategories(categoriesData);
+                setIngredients(ingredientsData);
                 
                 // Fetch order history from localStorage
                 try {
@@ -445,6 +449,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
         if (activeCategoryId === 'all') return products;
         return products.filter(p => p.categoria_id === activeCategoryId);
     }, [products, activeCategoryId]);
+    const ingredientNameMap = useMemo(() => createIngredientNameMap(ingredients), [ingredients]);
 
     const [orderTotals, setOrderTotals] = useState({
         subtotal: 0,
@@ -876,11 +881,13 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                     </div>
                 ) : (
                     <div className="flex-1 overflow-y-auto pr-2 -mr-2">
-                        {cart.map((item) => (
-                            <div
-                                key={item.id}
-                                className="group relative mb-3 rounded-lg bg-gradient-to-r from-orange-400 to-red-400 border-2 border-orange-500 px-4 py-4 text-white shadow-md transition-shadow hover:shadow-lg"
-                            >
+                        {cart.map((item) => {
+                            const excludedIngredientLabels = mapIngredientIdsToNames(item.excluded_ingredients, ingredientNameMap);
+                            return (
+                                <div
+                                    key={item.id}
+                                    className="group relative mb-3 rounded-lg bg-gradient-to-r from-orange-400 to-red-400 border-2 border-orange-500 px-4 py-4 text-white shadow-md transition-shadow hover:shadow-lg"
+                                >
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="flex-1 space-y-2">                                        <p className="text-[clamp(1rem,2vw,1.3rem)] leading-snug text-white break-words text-balance whitespace-normal [hyphens:auto]">                                          {item?.nom_produit || 'Article inconnu'}
                                         </p>
@@ -890,9 +897,9 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                                                 💬 {item.commentaire}
                                             </p>
                                         )}
-                                        {item.excluded_ingredients && item.excluded_ingredients.length > 0 && (
-                                              <p className="text-sm text-gray-700 font-semibold bg-gray-50 border-l-2 border-red-500/50 p-2 rounded">
-                                                  🚫 Sin: {item.excluded_ingredients.join(', ')}
+                                        {excludedIngredientLabels.length > 0 && (
+                                            <p className="text-sm text-gray-700 font-semibold bg-gray-50 border-l-2 border-red-500/50 p-2 rounded">
+                                                🚫 Sin: {excludedIngredientLabels.join(', ')}
                                             </p>
                                         )}
                                         {item.selected_extras && item.selected_extras.length > 0 && (
@@ -931,8 +938,9 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                                </div>
+                            );
+                        })}
                     </div>
                 )}
 
