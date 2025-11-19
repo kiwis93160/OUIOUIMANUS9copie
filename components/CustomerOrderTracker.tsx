@@ -1,8 +1,24 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { api } from '../services/api';
 import { Order } from '../types';
-import { CheckCircle, ChefHat, FileText, PackageCheck, User, MapPin, Receipt, Phone, Tag, TruckIcon, Percent, Gift } from 'lucide-react';
+import {
+    CheckCircle,
+    ChefHat,
+    FileText,
+    PackageCheck,
+    User,
+    MapPin,
+    Receipt,
+    Phone,
+    Tag,
+    TruckIcon,
+    Percent,
+    Gift,
+    PlusCircle,
+    Ban,
+} from 'lucide-react';
 import { formatCurrencyCOP } from '../utils/formatIntegerAmount';
+import { createIngredientNameMap, mapIngredientIdsToNames, type IngredientNameMap } from '../utils/ingredientNames';
 import {
     clearActiveCustomerOrder,
     getActiveCustomerOrder,
@@ -97,6 +113,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
     const [productDescriptions, setProductDescriptions] = useState<Record<string, string>>({});
     const [isReceiptPreviewError, setReceiptPreviewError] = useState(false);
     const [clientInfoHeight, setClientInfoHeight] = useState<number | null>(null);
+    const [ingredientNameMap, setIngredientNameMap] = useState<IngredientNameMap>({});
 
     const receiptUrl = order?.receipt_url ?? '';
     const normalizedSupportPhone = (supportPhoneNumber ?? '').trim();
@@ -364,6 +381,33 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
 
     const heroProgressRef = useRef<HTMLDivElement | null>(null);
     const clientInfoRef = useRef<HTMLDivElement | null>(null);
+    const hasFetchedIngredientsRef = useRef(false);
+
+    useEffect(() => {
+        if (hasFetchedIngredientsRef.current) {
+            return;
+        }
+
+        let isMounted = true;
+
+        const fetchIngredients = async () => {
+            try {
+                const ingredients = await api.getIngredients();
+                if (isMounted) {
+                    setIngredientNameMap(createIngredientNameMap(ingredients));
+                    hasFetchedIngredientsRef.current = true;
+                }
+            } catch (error) {
+                console.error('Error fetching tracker ingredients:', error);
+            }
+        };
+
+        fetchIngredients();
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     const stepCount = Math.max(steps.length - 1, 1);
     const isOrderCompleted = Boolean(
@@ -962,6 +1006,9 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                         const isFreeShipping = isDomicilio && item.prix_unitaire === 0;
                                         const itemDescription = productDescriptions[item.produitRef] || null;
                                         const trimmedComment = typeof item.commentaire === 'string' && item.commentaire.trim().length > 0 ? item.commentaire.trim() : null;
+                                        const excludedIngredientLabels = mapIngredientIdsToNames(item.excluded_ingredients, ingredientNameMap);
+                                        const hasExtras = Array.isArray(item.selected_extras) && item.selected_extras.length > 0;
+                                        const hasExcludedIngredients = excludedIngredientLabels.length > 0;
 
                                         return (
                                             <div
@@ -987,29 +1034,53 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                             {itemDescription && (
                                                                 <p className="my-0 text-sm leading-snug text-slate-600">{itemDescription}</p>
                                                             )}
-                                                            {item.selected_extras && item.selected_extras.length > 0 && (
-                                                                <div className="mt-2">
-                                                                    <p className="text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-slate-400 mb-1">
-                                                                        Extras seleccionados
+                                                            {hasExtras && (
+                                                                <div className="mt-3 rounded-2xl border border-emerald-200/70 bg-emerald-50/90 p-3 shadow-inner shadow-emerald-100/70">
+                                                                    <p className="mb-2 flex items-center gap-2 text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-emerald-600">
+                                                                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600">
+                                                                            <PlusCircle size={14} />
+                                                                        </span>
+                                                                        Extras agregados
                                                                     </p>
-                                                                    <ul className="space-y-1 text-xs text-slate-600">
-                                                                        {item.selected_extras.map((extra, extraIndex) => (
-                                                                            <li
+                                                                    <div className="flex flex-wrap gap-2">
+                                                                        {item.selected_extras!.map((extra, extraIndex) => (
+                                                                            <div
                                                                                 key={`${item.id}-tracker-extra-${extraIndex}`}
-                                                                                className="flex flex-wrap items-baseline gap-2"
+                                                                                className="inline-flex flex-1 min-w-[11rem] items-center gap-3 rounded-2xl border border-white/80 bg-white/90 px-3 py-2 text-xs font-semibold text-emerald-700 shadow-sm"
                                                                             >
-                                                                                <span className="font-semibold text-slate-700">
-                                                                                    {extra.extraName}
-                                                                                </span>
-                                                                                <span className="text-slate-500">{extra.optionName}</span>
-                                                                                {typeof extra.price === 'number' && (
-                                                                                    <span className="font-semibold text-slate-600">
-                                                                                        +{formatCurrencyCOP(extra.price)}
-                                                                                    </span>
+                                                                                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600">
+                                                                                    +
+                                                                                </div>
+                                                                                <div className="flex-1">
+                                                                                    <p className="text-[0.55rem] uppercase tracking-[0.18em] text-emerald-500">{extra.extraName}</p>
+                                                                                    <p className="text-sm font-semibold text-emerald-700">{extra.optionName}</p>
+                                                                                </div>
+                                                                                {typeof extra.price === 'number' && extra.price > 0 && (
+                                                                                    <span className="text-sm font-bold text-emerald-600">{formatCurrencyCOP(extra.price)}</span>
                                                                                 )}
-                                                                            </li>
+                                                                            </div>
                                                                         ))}
-                                                                    </ul>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                            {hasExcludedIngredients && (
+                                                                <div className="mt-3 rounded-2xl border border-rose-200/80 bg-rose-50/90 p-3 shadow-inner shadow-rose-100/70">
+                                                                    <p className="mb-2 flex items-center gap-2 text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-rose-500">
+                                                                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-rose-500/10 text-rose-600">
+                                                                            <Ban size={14} />
+                                                                        </span>
+                                                                        Sin ingredientes
+                                                                    </p>
+                                                                    <div className="flex flex-wrap gap-2">
+                                                                        {excludedIngredientLabels.map(label => (
+                                                                            <span
+                                                                                key={`${item.id}-tracker-excluded-${label}`}
+                                                                                className="inline-flex items-center gap-2 rounded-full border border-rose-200 bg-white px-3 py-1 text-xs font-semibold text-rose-600 shadow-sm"
+                                                                            >
+                                                                                🚫 {label}
+                                                                            </span>
+                                                                        ))}
+                                                                    </div>
                                                                 </div>
                                                             )}
                                                             {trimmedComment && (
