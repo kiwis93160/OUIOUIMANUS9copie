@@ -177,22 +177,30 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, selectedPr
         }
     }, [isOpen, selectedProduct]);
 
-    if (!isOpen || !selectedProduct) return null;
+    const product = selectedProduct?.product ?? null;
+    const displayExtras = useMemo(() => {
+        if (!product) {
+            return [];
+        }
+        return getDisplayableProductExtras(product);
+    }, [product]);
+    const removalLabels = useMemo(() => {
+        if (!product) {
+            return [];
+        }
+        return mapExcludedIngredientIdsToNames(product, excludedIngredientIds);
+    }, [product, excludedIngredientIds]);
 
-    const selectedExtras = buildExtrasFromSelectionState(selectedProduct.product, selectedExtrasState);
+    if (!isOpen || !selectedProduct || !product) return null;
+
+    const selectedExtras = buildExtrasFromSelectionState(product, selectedExtrasState);
     const extrasTotal = calculateExtrasTotal(selectedExtras);
-    const unitPrice = selectedProduct.product.prix_vente + extrasTotal;
-    const displayExtras = useMemo(
-        () => getDisplayableProductExtras(selectedProduct.product),
-        [selectedProduct.product],
-    );
-    const removalLabels = useMemo(
-        () => mapExcludedIngredientIdsToNames(selectedProduct.product, excludedIngredientIds),
-        [selectedProduct.product, excludedIngredientIds],
-    );
+    const unitPrice = product.prix_vente + extrasTotal;
 
     const handleAddToCart = () => {
-        const product = selectedProduct.product;
+        if (!product) {
+            return;
+        }
         onAddToCart({
             id: `oi${Date.now()}`,
             produitRef: product.id,
@@ -239,7 +247,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, selectedPr
                 <div className="p-6">
                     <div className="flex justify-between items-start mb-4">
                         <h2 className="text-[clamp(1.1rem,2.3vw,1.5rem)] font-bold leading-snug text-gray-800 break-words text-balance whitespace-normal [hyphens:auto]">
-                            {selectedProduct.product.nom_produit}
+                            {product.nom_produit}
                         </h2>
                         <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -248,12 +256,12 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, selectedPr
                         </button>
                     </div>
                     
-                    <img src={selectedProduct.product.image} alt={selectedProduct.product.nom_produit} className="w-full h-48 object-cover rounded-lg mb-4" />
-                    
-                    <p className="text-gray-600 mb-4">{selectedProduct.product.description}</p>
-                    
+                    <img src={product.image} alt={product.nom_produit} className="w-full h-48 object-cover rounded-lg mb-4" />
+
+                    <p className="text-gray-600 mb-4">{product.description}</p>
+
                     <div className="mb-4">
-                        <p className="font-bold text-gray-800 mb-2">Precio: {formatCurrencyCOP(selectedProduct.product.prix_vente)}</p>
+                        <p className="font-bold text-gray-800 mb-2">Precio: {formatCurrencyCOP(product.prix_vente)}</p>
                         
                         <div className="flex items-center mt-2">
                             <button 
