@@ -957,7 +957,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                                             key={item.id}
                                             className="group relative rounded-2xl border border-orange-200 bg-gradient-to-br from-orange-50 via-orange-100 to-orange-50 px-4 py-4 text-gray-900 shadow-lg shadow-orange-100/60"
                                         >
-                                            <div className="flex flex-col gap-3">
+                                            <div className="flex flex-col">
                                                 <div className="flex items-start justify-between gap-3">
                                                     <p className="flex-1 text-[clamp(1rem,2vw,1.3rem)] font-semibold leading-snug text-gray-900 break-words text-balance whitespace-normal [hyphens:auto]">
                                                         {item?.nom_produit || 'Artículo'}
@@ -982,7 +982,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                                                 </div>
 
                                                 {item.commentaire && (
-                                                    <p className="text-sm text-gray-700 bg-white/70 border-l-2 border-orange-300/70 p-2 rounded">
+                                                    <p className="mt-3 text-sm text-gray-700 bg-white/70 border-l-2 border-orange-300/70 p-2 rounded">
                                                         💬 {item.commentaire}
                                                     </p>
                                                 )}
@@ -998,7 +998,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                                                                 <span>
                                                                     ➕ {extra.extraName}: {extra.optionName}
                                                                 </span>
-                                                                <span className="font-semibold text-orange-700">
+                                                                <span className="font-semibold text-gray-900">
                                                                     {formatCurrencyCOP(extra.price)}
                                                                 </span>
                                                             </li>
@@ -1006,8 +1006,8 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                                                     </ul>
                                                 )}
 
-                                                <div className="flex justify-end">
-                                                    <span className="text-lg font-bold text-orange-700">
+                                                <div className="mt-4 flex justify-end">
+                                                    <span className="text-lg font-bold text-gray-900">
                                                         {formatCurrencyCOP(item.prix_unitaire)}
                                                     </span>
                                                 </div>
@@ -1035,50 +1035,6 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                     </div>
                 )}
                 <div className="mt-auto pt-4 border-t border-gray-200">
-                    {/* Promo Code Input */}
-                    <div className="mb-4">
-                        <label htmlFor="promoCode" className="block text-sm font-medium text-gray-700 mb-2">
-                            Código de Promoción:
-                        </label>
-                        <div className="flex space-x-2">
-                            <input
-                                type="text"
-                                id="promoCode"
-                                value={promoCode}
-                                onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                                placeholder="Ingresa tu código"
-                                className="flex-1 border border-gray-300 rounded-md shadow-sm p-2 uppercase" 
-                            />
-    
-                            <button
-                                type="button"
-                                onClick={handleApplyPromoCode}
-                                disabled={validatingPromoCode || !promoCode.trim() || appliedPromoCode === promoCode}
-                                aria-busy={validatingPromoCode}
-                                className="rounded-md bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 px-4 py-2 font-bold text-white shadow-sm transition-all duration-300 hover:from-orange-600 hover:via-orange-700 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-orange-400 disabled:cursor-not-allowed disabled:opacity-50"
-                            >
-                                {validatingPromoCode ? 'Validando…' : 'Confirmar'}
-                            </button>
-                        </div>
-                        {promoCodeError && (
-                            <p className="mt-2 text-sm text-red-600">{promoCodeError}</p>
-                        )}
-                        {appliedPromoCode && (
-                            <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-md flex items-center justify-between">
-                                <span className="text-sm text-green-700 font-medium">
-                                    ✓ Código "{appliedPromoCode}" aplicado
-                                </span>
-                                <button
-                                    type="button"
-                                    onClick={handleRemovePromoCode}
-                                    className="text-red-500 hover:text-red-700 text-sm font-medium"
-                                >
-                                    Eliminar
-                                </button>
-                            </div>
-                        )}
-                    </div>
-
                     {/* Affichage détaillé des promotions appliquées */}
                     {orderTotals.appliedPromotions && orderTotals.appliedPromotions.length > 0 && (
                         <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
@@ -1112,8 +1068,52 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                         </div>
                     )}
                     <div className="flex justify-between items-center mb-3">
-                        <p className="text-lg font-bold text-gray-800">Total:</p>
+                        <p className="text-lg font-bold text-gray-800">Gran total:</p>
                         <p className="text-3xl font-bold text-brand-primary">{formatCurrencyCOP(total)}</p>
+                    </div>
+
+                    {/* Promo Code Input */}
+                    <div className="mt-6">
+                        <label htmlFor="promoCode" className="block text-sm font-medium text-gray-700 mb-2">
+                            Código de Promoción:
+                        </label>
+                        <div className="flex gap-2">
+                            <input
+                                type="text"
+                                id="promoCode"
+                                value={promoCode}
+                                onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                                placeholder="Ingresa tu código"
+                                className="flex-1 border border-gray-300 rounded-md shadow-sm p-2 uppercase"
+                            />
+
+                            <button
+                                type="button"
+                                onClick={handleApplyPromoCode}
+                                disabled={validatingPromoCode || !promoCode.trim() || appliedPromoCode === promoCode}
+                                aria-busy={validatingPromoCode}
+                                className="rounded-md bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 px-4 py-2 font-bold text-white shadow-sm transition-all duration-300 hover:from-orange-600 hover:via-orange-700 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-orange-400 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                {validatingPromoCode ? 'Validando…' : 'Confirmar'}
+                            </button>
+                        </div>
+                        {promoCodeError && (
+                            <p className="mt-2 text-sm text-red-600">{promoCodeError}</p>
+                        )}
+                        {appliedPromoCode && (
+                            <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-md flex items-center justify-between">
+                                <span className="text-sm text-green-700 font-medium">
+                                    ✓ Código "{appliedPromoCode}" aplicado
+                                </span>
+                                <button
+                                    type="button"
+                                    onClick={handleRemovePromoCode}
+                                    className="text-red-500 hover:text-red-700 text-sm font-medium"
+                                >
+                                    Eliminar
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     <form onSubmit={handleSubmitOrder} className="space-y-4">
