@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 import { uploadProductImage, resolveProductImageUrl } from '../services/cloudinary';
-import { Product, Category, Ingredient, RecipeItem, ProductExtra } from '../types';
+import { Product, Category, Ingredient, RecipeItem, ProductExtra, ProductExtraOption } from '../types';
 import Modal from '../components/Modal';
 import { PlusCircle, Edit, Trash2, Search, Settings, GripVertical, CheckCircle, Clock, XCircle, Upload, HelpCircle } from 'lucide-react';
 import { formatCurrencyCOP, formatIntegerAmount } from '../utils/formatIntegerAmount';
@@ -300,6 +300,8 @@ const ProductCard: React.FC<{ product: Product; category?: Category; onEdit: () 
 type ProductExtraOptionFormState = {
     name: string;
     price: string;
+    mode: 'custom' | 'ingredient';
+    ingredientId?: string;
 };
 
 type ProductExtraFormState = {
@@ -318,6 +320,7 @@ type ProductFormState = {
     is_best_seller: boolean;
     best_seller_rank: number | null;
     extras: ProductExtraFormState[];
+    allow_ingredient_removal_extra: boolean;
 };
 
 const convertExtrasToFormState = (extras?: ProductExtra[] | null): ProductExtraFormState[] => {
@@ -327,19 +330,49 @@ const convertExtrasToFormState = (extras?: ProductExtra[] | null): ProductExtraF
         options: extra.options.map(option => ({
             name: option.name,
             price: option.price.toString(),
+            mode: option.type === 'ingredient' || option.ingredient_id ? 'ingredient' : 'custom',
+            ingredientId: option.ingredient_id ?? '',
         })),
     }));
 };
 
-const sanitizeExtras = (extras: ProductExtraFormState[]): ProductExtra[] => {
+const sanitizeExtras = (
+    extras: ProductExtraFormState[],
+    ingredientMap: Map<string, Ingredient>,
+): ProductExtra[] => {
     return extras
         .map(extra => ({
             name: extra.name.trim(),
             options: extra.options
-                .map(option => ({
-                    name: option.name.trim(),
-                    price: Number.parseFloat(option.price.replace(',', '.')) || 0,
-                }))
+                .map(option => {
+                    const price = Number.parseFloat(option.price.replace(',', '.')) || 0;
+                    if (option.mode === 'ingredient') {
+                        const ingredient = option.ingredientId ? ingredientMap.get(option.ingredientId) : undefined;
+                        const label = ingredient?.nom?.trim() ?? '';
+                        if (!label) {
+                            return null;
+                        }
+                        return {
+                            name: label,
+                            price,
+                            type: 'ingredient' as const,
+                            ingredient_id: option.ingredientId ?? null,
+                        };
+                    }
+
+                    const label = option.name.trim();
+                    if (!label) {
+                        return null;
+                    }
+
+                    return {
+                        name: label,
+                        price,
+                        type: 'custom' as const,
+                        ingredient_id: null,
+                    };
+                })
+                .filter((option): option is ProductExtraOption => Boolean(option))
                 .filter(option => option.name),
         }))
         .filter(extra => extra.name && extra.options.length > 0);
@@ -357,6 +390,7 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
         is_best_seller: product?.is_best_seller ?? false,
         best_seller_rank: product?.best_seller_rank ?? null,
         extras: convertExtrasToFormState(product?.extras),
+        allow_ingredient_removal_extra: product?.allow_ingredient_removal_extra ?? false,
     });
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [isSubmitting, setSubmitting] = useState(false);
@@ -375,6 +409,7 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
             is_best_seller: product?.is_best_seller ?? false,
             best_seller_rank: product?.best_seller_rank ?? null,
             extras: convertExtrasToFormState(product?.extras),
+            allow_ingredient_removal_extra: product?.allow_ingredient_removal_extra ?? false,
         });
         setImageFile(null);
     }, [isOpen, product, categories]);
@@ -478,7 +513,13 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
             ...prev,
             extras: prev.extras.map((extra, idx) =>
                 idx === extraIndex
-                    ? { ...extra, options: [...extra.options, { name: '', price: '' }] }
+                    ? {
+                        ...extra,
+                        options: [
+                            ...extra.options,
+                            { name: '', price: '', mode: 'custom', ingredientId: '' },
+                        ],
+                    }
                     : extra,
             ),
         }));
@@ -505,9 +546,32 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
             ...prev,
             extras: prev.extras.map((extra, idx) => {
                 if (idx !== extraIndex) return extra;
-                const options = extra.options.map((option, optIdx) =>
-                    optIdx === optionIndex ? { ...option, [field]: value } : option,
-                );
+                const options = extra.options.map((option, optIdx) => {
+                    if (optIdx !== optionIndex) {
+                        return option;
+                    }
+
+                    if (field === 'mode') {
+                        const nextMode = value as ProductExtraOptionFormState['mode'];
+                        return {
+                            ...option,
+                            mode: nextMode,
+                            ingredientId: nextMode === 'ingredient' ? '' : undefined,
+                            name: nextMode === 'ingredient' ? '' : option.name,
+                        };
+                    }
+
+                    if (field === 'ingredientId') {
+                        const ingredientName = value ? ingredientMap.get(value)?.nom ?? '' : '';
+                        return {
+                            ...option,
+                            ingredientId: value,
+                            name: ingredientName || option.name,
+                        };
+                    }
+
+                    return { ...option, [field]: value };
+                });
                 return { ...extra, options };
             }),
         }));
@@ -537,7 +601,7 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                 imageUrl = await uploadProductImage(imageFile, formData.nom_produit);
             }
 
-            const sanitizedExtras = sanitizeExtras(formData.extras);
+            const sanitizedExtras = sanitizeExtras(formData.extras, ingredientMap);
             const finalData = {
                 ...formData,
                 extras: sanitizedExtras,
@@ -728,6 +792,25 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                                 <span>+ Ajouter un extra</span>
                             </button>
                         </div>
+                        <div className="rounded-xl border border-dashed border-brand-border/70 bg-white/70 p-4 text-sm text-gray-700 space-y-2">
+                            <label className="flex items-center gap-2 font-medium">
+                                <input
+                                    type="checkbox"
+                                    className="h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary"
+                                    checked={formData.allow_ingredient_removal_extra}
+                                    onChange={event =>
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            allow_ingredient_removal_extra: event.target.checked,
+                                        }))
+                                    }
+                                />
+                                <span>Permettre aux clients de retirer des ingrédients</span>
+                            </label>
+                            <p className="text-xs text-gray-500">
+                                Active un groupe d'extra automatique qui liste les ingrédients de la recette pour que les clients puissent en retirer un sans frais.
+                            </p>
+                        </div>
                         {formData.extras.length === 0 ? (
                             <div className="rounded-xl border border-dashed border-brand-border bg-white/60 p-4 text-sm text-gray-500">
                                 Aucun extra n'est défini pour ce produit.
@@ -762,25 +845,63 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                                             </button>
                                         </div>
                                         <div className="space-y-3">
-                                            <div className="grid grid-cols-1 gap-3 text-xs font-semibold uppercase tracking-wide text-gray-500 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_auto]">
-                                                <span>Nom de l'option</span>
+                                            <div className="grid grid-cols-1 gap-3 text-xs font-semibold uppercase tracking-wide text-gray-500 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)_minmax(0,1fr)_auto]">
+                                                <span>Type d'option</span>
+                                                <span>Nom / Ingrédient</span>
                                                 <span>Prix additionnel</span>
                                                 <span className="hidden sm:block text-right">Action</span>
                                             </div>
                                             {extra.options.map((option, optionIndex) => (
                                                 <div
                                                     key={optionIndex}
-                                                    className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_auto]"
+                                                    className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)_minmax(0,1fr)_auto]"
                                                 >
-                                                    <input
-                                                        type="text"
-                                                        value={option.name}
+                                                    <select
+                                                        value={option.mode}
                                                         onChange={event =>
-                                                            handleExtraOptionChange(extraIndex, optionIndex, 'name', event.target.value)
+                                                            handleExtraOptionChange(extraIndex, optionIndex, 'mode', event.target.value)
                                                         }
-                                                        placeholder="Nom de l'option"
-                                                        className="ui-input"
-                                                    />
+                                                        className="ui-select"
+                                                    >
+                                                        <option value="custom">Texte libre</option>
+                                                        <option value="ingredient">Ingrédient du stock</option>
+                                                    </select>
+                                                    {option.mode === 'ingredient' ? (
+                                                        <select
+                                                            value={option.ingredientId ?? ''}
+                                                            onChange={event =>
+                                                                handleExtraOptionChange(
+                                                                    extraIndex,
+                                                                    optionIndex,
+                                                                    'ingredientId',
+                                                                    event.target.value,
+                                                                )
+                                                            }
+                                                            className="ui-select"
+                                                        >
+                                                            <option value="">Sélectionner un ingrédient</option>
+                                                            {ingredients.map(ingredient => (
+                                                                <option key={ingredient.id} value={ingredient.id}>
+                                                                    {ingredient.nom}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    ) : (
+                                                        <input
+                                                            type="text"
+                                                            value={option.name}
+                                                            onChange={event =>
+                                                                handleExtraOptionChange(
+                                                                    extraIndex,
+                                                                    optionIndex,
+                                                                    'name',
+                                                                    event.target.value,
+                                                                )
+                                                            }
+                                                            placeholder="Nom de l'option"
+                                                            className="ui-input"
+                                                        />
+                                                    )}
                                                     <div className="flex items-center gap-2">
                                                         <span className="text-sm text-gray-500">COP</span>
                                                         <input
