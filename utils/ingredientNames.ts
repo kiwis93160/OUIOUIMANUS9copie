@@ -24,6 +24,9 @@ export const mapIngredientIdsToNames = (
     }
 
     return ingredientIds
-        .map(id => nameMap[id])
+        .map((id) => {
+            const resolvedLabel = nameMap[id];
+            return resolvedLabel ?? id;
+        })
         .filter((label): label is string => Boolean(label));
 };
