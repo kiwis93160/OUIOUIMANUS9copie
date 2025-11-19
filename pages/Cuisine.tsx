@@ -135,11 +135,11 @@ const KitchenTicketCard: React.FC<{ order: KitchenTicketOrder; onReady: (orderId
     return (
         <div className={`relative flex h-full flex-col overflow-hidden rounded-2xl ${urgencyTone.cardBorder} text-gray-900 transition-colors duration-300 ${urgencyStyles.background}`} style={toneBorderStyle}>
             <span aria-hidden className={`absolute inset-y-0 left-0 w-1 ${urgencyTone.timerBackground}`} style={toneFillStyle} />
-            <header className="border-b border-gray-200 px-5 pt-3 pb-2">
+            <header className="border-b border-gray-200 px-5 pt-3 pb-1">
                 <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
                     <div className="min-w-0">
-                        <h4 className="truncate text-base font-semibold leading-tight text-gray-900 sm:text-lg md:text-xl">{displayName}</h4>
-                        <p className="text-xs text-gray-500">
+                        <h4 className="truncate text-base font-semibold leading-tight text-gray-900 sm:text-lg md:text-xl mb-0">{displayName}</h4>
+                        <p className="text-xs text-gray-500 leading-tight mt-0">
                             Pedido a las {sentAtFormatted}
                         </p>
                     </div>
