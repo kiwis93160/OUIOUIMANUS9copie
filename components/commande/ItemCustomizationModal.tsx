@@ -41,11 +41,15 @@ const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
         setExcludedIngredientIds([]);
     }, [isOpen, product?.id]);
 
+    const displayExtras = useMemo(() => (
+        product
+            ? getDisplayableProductExtras(product)
+            : []
+    ), [product]);
+
     if (!product) {
         return null;
     }
-
-    const displayExtras = useMemo(() => getDisplayableProductExtras(product), [product]);
 
     const buildSelectedExtras = (): SelectedProductExtraOption[] => {
         if (!product?.extras || product.extras.length === 0) {
