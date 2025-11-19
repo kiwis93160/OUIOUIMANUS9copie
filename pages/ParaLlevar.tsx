@@ -9,6 +9,7 @@ import { formatCurrencyCOP } from '../utils/formatIntegerAmount';
 import useSiteContent, { DEFAULT_SITE_CONTENT } from '../hooks/useSiteContent';
 import useOnlineOrderingSchedules from '../hooks/useOnlineOrderingSchedules';
 import { isWithinWeeklySchedule } from '../utils/weeklyScheduleUtils';
+import { createIngredientNameMap, mapIngredientIdsToNames, type IngredientNameMap } from '../utils/ingredientNames';
 
 type PhoneConfigKey = 'support' | 'confirmation' | 'report';
 
@@ -38,7 +39,13 @@ const PHONE_CONFIG_ORDER: PhoneConfigKey[] = ['support', 'confirmation', 'report
 type ConfigFeedback = { message: string; tone: 'success' | 'error' };
 
 
-const TakeawayCard: React.FC<{ order: Order, onValidate?: (orderId: string) => void, onDeliver?: (orderId: string) => void, isProcessing?: boolean }> = ({ order, onValidate, onDeliver, isProcessing }) => {
+const TakeawayCard: React.FC<{
+    order: Order,
+    onValidate?: (orderId: string) => void,
+    onDeliver?: (orderId: string) => void,
+    isProcessing?: boolean,
+    ingredientNameMap?: IngredientNameMap,
+}> = ({ order, onValidate, onDeliver, isProcessing, ingredientNameMap }) => {
     const [isReceiptVisible, setIsReceiptVisible] = useState(false);
 
     const displayName = order.table_nom || `Pedido #${order.id.slice(-6)}`;
@@ -130,6 +137,8 @@ const TakeawayCard: React.FC<{ order: Order, onValidate?: (orderId: string) => v
                                         {order.items.map((item: OrderItem) => {
                                             const note = item.commentaire?.trim();
                                             const hasExtras = Array.isArray(item.selected_extras) && item.selected_extras.length > 0;
+                                            const excludedIngredientLabels = mapIngredientIdsToNames(item.excluded_ingredients, ingredientNameMap);
+                                            const hasExcludedIngredients = excludedIngredientLabels.length > 0;
                                             return (
                                                 <li key={item.id} className="flex items-stretch rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 shadow-sm overflow-hidden min-h-[3.5rem]">
                                                     <div className="flex flex-1 items-center justify-between gap-3 pr-3">
@@ -156,6 +165,14 @@ const TakeawayCard: React.FC<{ order: Order, onValidate?: (orderId: string) => v
                                                                                 </li>
                                                                             ))}
                                                                         </ul>
+                                                                    </div>
+                                                                )}
+                                                                {hasExcludedIngredients && (
+                                                                    <div className="rounded-xl border border-red-200/60 bg-red-50/80 px-3 py-1.5 text-[11px] leading-snug text-gray-700">
+                                                                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-red-500 mb-1">Sin</p>
+                                                                        <p className="text-xs font-semibold text-red-600">
+                                                                            🚫 {excludedIngredientLabels.join(', ')}
+                                                                        </p>
                                                                     </div>
                                                                 )}
                                                             </div>
@@ -298,6 +315,7 @@ const ParaLlevar: React.FC = () => {
     const [draftConfirmationPhone, setDraftConfirmationPhone] = useState('');
     const [draftReportPhone, setDraftReportPhone] = useState('');
     const [savingContactConfig, setSavingContactConfig] = useState(false);
+    const [ingredientNameMap, setIngredientNameMap] = useState<IngredientNameMap>({});
 
     useEffect(() => {
         if (typeof window === 'undefined') {
@@ -348,6 +366,25 @@ const ParaLlevar: React.FC = () => {
         setEditingWhatsappPhone(siteContent.onlineOrdering.confirmationWhatsappNumber ?? '');
         setEditingReportWhatsappPhone(siteContent.onlineOrdering.reportWhatsappNumber ?? '');
     }, [siteContent]);
+
+    useEffect(() => {
+        let isMounted = true;
+        const loadIngredients = async () => {
+            try {
+                const data = await api.getIngredients();
+                if (isMounted) {
+                    setIngredientNameMap(createIngredientNameMap(data));
+                }
+            } catch (error) {
+                console.error('Failed to fetch ingredients', error);
+            }
+        };
+
+        loadIngredients();
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     const resolvedContent = siteContent ?? DEFAULT_SITE_CONTENT;
     const phoneDisplayValues = useMemo<Record<PhoneConfigKey, string>>(() => ({
@@ -782,7 +819,13 @@ const ParaLlevar: React.FC = () => {
                     <h2 className="text-lg sm:text-xl font-bold mb-4 text-center text-blue-700">Pendientes de validación ({pendingOrders.length})</h2>
                     <div className="space-y-4">
                         {pendingOrders.length > 0 ? pendingOrders.map(order => (
-                            <TakeawayCard key={order.id} order={order} onValidate={handleValidate} isProcessing={processingOrderId === order.id} />
+                            <TakeawayCard
+                                key={order.id}
+                                order={order}
+                                onValidate={handleValidate}
+                                isProcessing={processingOrderId === order.id}
+                                ingredientNameMap={ingredientNameMap}
+                            />
                         )) : <p className="text-center text-gray-500 py-8">No hay pedidos para validar.</p>}
                     </div>
                 </div>
@@ -792,7 +835,13 @@ const ParaLlevar: React.FC = () => {
                     <h2 className="text-lg sm:text-xl font-bold mb-4 text-center text-green-700">Pedidos listos ({readyOrders.length})</h2>
                     <div className="space-y-4">
                         {readyOrders.length > 0 ? readyOrders.map(order => (
-                            <TakeawayCard key={order.id} order={order} onDeliver={handleDeliver} isProcessing={processingOrderId === order.id} />
+                            <TakeawayCard
+                                key={order.id}
+                                order={order}
+                                onDeliver={handleDeliver}
+                                isProcessing={processingOrderId === order.id}
+                                ingredientNameMap={ingredientNameMap}
+                            />
                         )) : <p className="text-center text-gray-500 py-8">No hay pedidos listos.</p>}
                     </div>
                 </div>
