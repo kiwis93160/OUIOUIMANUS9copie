@@ -20,7 +20,11 @@ import { DEFAULT_SITE_CONTENT } from '../utils/siteContent';
 import { createHeroBackgroundStyle } from '../utils/siteStyleHelpers';
 import OrderConfirmationModal from '../components/OrderConfirmationModal';
 import CustomerOrderTracker from '../components/CustomerOrderTracker';
-import { getDisplayableProductExtras, mapExcludedIngredientIdsToNames } from '../utils/productExtras';
+import {
+    getDisplayableProductExtras,
+    mapExcludedIngredientIdsToNames,
+    mapSelectedExtrasFromState,
+} from '../utils/productExtras';
 import { createIngredientNameMap, mapIngredientIdsToNames } from '../utils/ingredientNames';
 
 const DOMICILIO_FEE = 8000;
@@ -79,22 +83,7 @@ const buildSelectionStateFromExtras = (extras?: SelectedProductExtraOption[]) =>
 const buildExtrasFromSelectionState = (
     product: Product,
     selection: Record<string, string[]>,
-): SelectedProductExtraOption[] => {
-    if (!product.extras || product.extras.length === 0) {
-        return [];
-    }
-
-    return product.extras.flatMap(extra => {
-        const selectedNames = selection[extra.name] ?? [];
-        return extra.options
-            .filter(option => selectedNames.includes(option.name))
-            .map<SelectedProductExtraOption>(option => ({
-                extraName: extra.name,
-                optionName: option.name,
-                price: option.price,
-            }));
-    });
-};
+): SelectedProductExtraOption[] => mapSelectedExtrasFromState(product, selection);
 
 const normalizeComment = (value?: string | null) => (value ?? '').trim();
 
@@ -118,7 +107,7 @@ const normalizeSelectedExtras = (extras?: SelectedProductExtraOption[]) => {
     }
 
     return extras
-        .map(extra => `${extra.extraName}:::${extra.optionName}:::${extra.price}`)
+        .map(extra => `${extra.extraName}:::${extra.optionName}:::${extra.price}:::${extra.ingredient_id ?? ''}`)
         .sort();
 };
 

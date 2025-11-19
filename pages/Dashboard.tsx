@@ -234,6 +234,8 @@ const Dashboard: React.FC = () => {
     const revenuePerClientTrend = computePercentChange(revenuePerClient, revenuePerClientPrecedent);
     const clientsTrend = computePercentChange(stats.clientsPeriode, stats.clientsPeriodePrecedente);
     const averageDailyRevenueTrend = computePercentChange(averageDailyRevenue, averageDailyRevenuePrecedent);
+    const topExtraIngredients = stats.extraIngredientsUsage.slice(0, 5);
+    const topRemovedIngredients = stats.removedIngredients.slice(0, 5);
 
     return (
         <div className="space-y-6">
@@ -388,6 +390,48 @@ const Dashboard: React.FC = () => {
                         No hay datos para el periodo seleccionado.
                     </div>
                 )}
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <div className="ui-card p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Ingredientes agregados como extra</h3>
+                    {topExtraIngredients.length > 0 ? (
+                        <ul className="space-y-2 text-sm text-gray-700">
+                            {topExtraIngredients.map(extra => (
+                                <li key={extra.ingredientId} className="flex items-center justify-between rounded-md bg-gray-50 px-3 py-2">
+                                    <div>
+                                        <p className="font-semibold text-gray-900">{extra.ingredientName}</p>
+                                        <p className="text-xs text-gray-500">{extra.occurrences} selección(es)</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="font-bold text-brand-primary">{extra.totalQuantity.toFixed(2)} {extra.unit ?? ''}</p>
+                                        <p className="text-xs text-gray-500">Cantidad total añadida</p>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p className="text-sm text-gray-600">Aún no se han agregado ingredientes extra en este periodo.</p>
+                    )}
+                </div>
+
+                <div className="ui-card p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Ingredientes pedidos sin</h3>
+                    {topRemovedIngredients.length > 0 ? (
+                        <ul className="space-y-2 text-sm text-gray-700">
+                            {topRemovedIngredients.map(ingredient => (
+                                <li key={ingredient.ingredientId} className="flex items-center justify-between rounded-md bg-gray-50 px-3 py-2">
+                                    <div>
+                                        <p className="font-semibold text-gray-900">{ingredient.ingredientName}</p>
+                                        <p className="text-xs text-gray-500">{ingredient.occurrences} pedido(s) sin este ingrediente</p>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p className="text-sm text-gray-600">No se registraron ingredientes removidos en el periodo.</p>
+                    )}
+                </div>
             </div>
 
             <Modal isOpen={isLowStockModalOpen} onClose={() => setLowStockModalOpen(false)} title="Ingredientes con inventario bajo">

@@ -31,7 +31,7 @@ const normalizeSelectedExtrasKey = (extras?: SelectedProductExtraOption[]) => {
     }
 
     return extras
-        .map(extra => `${extra.extraName}:::${extra.optionName}:::${extra.price}`)
+        .map(extra => `${extra.extraName}:::${extra.optionName}:::${extra.price}:::${extra.ingredient_id ?? ''}`)
         .sort()
         .join('|');
 };

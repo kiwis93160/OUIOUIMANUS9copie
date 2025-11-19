@@ -100,6 +100,26 @@ const ReportModal: React.FC<ReportModalProps> = ({ isOpen, onClose, whatsappNumb
         }
         parts.push('---');
 
+        parts.push('*Ingredientes extra agregados*');
+        if (reportData.extraIngredientsUsage.length === 0) {
+          parts.push('No se registraron extras durante el día.');
+        } else {
+          reportData.extraIngredientsUsage.slice(0, 5).forEach(extra => {
+            const unitLabel = extra.unit ? ` ${extra.unit}` : '';
+            parts.push(`- ${extra.ingredientName}: ${extra.occurrences} selección(es), ${extra.totalQuantity.toFixed(2)}${unitLabel}`);
+          });
+        }
+
+        parts.push('*Ingredientes pedidos sin*');
+        if (reportData.removedIngredients.length === 0) {
+          parts.push('No se retiraron ingredientes en los pedidos.');
+        } else {
+          reportData.removedIngredients.slice(0, 5).forEach(ingredient => {
+            parts.push(`- ${ingredient.ingredientName}: ${ingredient.occurrences} pedido(s)`);
+          });
+        }
+        parts.push('---');
+
         parts.push(`*Inicios de sesión desde las 05:00*`);
         if (reportData.roleLoginsUnavailable) {
           parts.push('Inicios de sesión no disponibles en este dispositivo.');
@@ -214,6 +234,48 @@ const ReportModal: React.FC<ReportModalProps> = ({ isOpen, onClose, whatsappNumb
                                             <p className="mt-1 text-xl font-bold">{formatCurrencyCOP(report.totalPromotionsApplied ?? 0)}</p>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                                    <h4 className="font-semibold text-gray-800 mb-2">Ingredientes agregados como extra</h4>
+                                    {report.extraIngredientsUsage.length > 0 ? (
+                                        <ul className="space-y-2 text-sm text-gray-700">
+                                            {report.extraIngredientsUsage.slice(0, 5).map(extra => (
+                                                <li key={extra.ingredientId} className="flex items-center justify-between rounded-md bg-slate-50 px-3 py-2">
+                                                    <div>
+                                                        <p className="font-semibold text-gray-900">{extra.ingredientName}</p>
+                                                        <p className="text-xs text-gray-500">{extra.occurrences} selección(es)</p>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className="font-bold text-brand-primary">{extra.totalQuantity.toFixed(2)} {extra.unit ?? ''}</p>
+                                                        <p className="text-xs text-gray-500">Cantidad total añadida</p>
+                                                    </div>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    ) : (
+                                        <p className="text-sm text-gray-600">No se registraron extras durante el día.</p>
+                                    )}
+                                </div>
+
+                                <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                                    <h4 className="font-semibold text-gray-800 mb-2">Ingredientes pedidos sin</h4>
+                                    {report.removedIngredients.length > 0 ? (
+                                        <ul className="space-y-2 text-sm text-gray-700">
+                                            {report.removedIngredients.slice(0, 5).map(ingredient => (
+                                                <li key={ingredient.ingredientId} className="flex items-center justify-between rounded-md bg-slate-50 px-3 py-2">
+                                                    <div>
+                                                        <p className="font-semibold text-gray-900">{ingredient.ingredientName}</p>
+                                                        <p className="text-xs text-gray-500">{ingredient.occurrences} pedido(s) sin este ingrediente</p>
+                                                    </div>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    ) : (
+                                        <p className="text-sm text-gray-600">No se retiraron ingredientes en los pedidos.</p>
+                                    )}
                                 </div>
                             </div>
 

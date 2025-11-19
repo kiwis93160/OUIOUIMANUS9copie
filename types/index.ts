@@ -315,6 +315,9 @@ export interface SelectedProductExtraOption {
   extraName: string;
   optionName: string;
   price: number;
+  ingredient_id?: string | null;
+  ingredient_name?: string | null;
+  ingredient_usage?: number | null;
 }
 
 export interface Product {
@@ -450,8 +453,10 @@ export interface DashboardStats {
     ingredientsStockBas: Ingredient[];
     ventesPeriodeSeries: PeriodSalesChartPoint[];
     ventesParCategorie: SalesDataPoint[];
-    recentOrders: Order[];
-    bestSellerProducts: Product[];
+  recentOrders: Order[];
+  bestSellerProducts: Product[];
+  extraIngredientsUsage: IngredientUsageStat[];
+  removedIngredients: IngredientUsageStat[];
 }
 
 export interface NotificationCounts {
@@ -484,10 +489,20 @@ export interface DailyReport {
     panierMoyen: number;
     ventesDuJour: number;
     totalPromotionsApplied: number;
-    soldProducts: SoldProductsByCategory[];
-    lowStockIngredients: Ingredient[];
-    roleLogins: RoleLogin[];
-    roleLoginsUnavailable?: boolean;
+  soldProducts: SoldProductsByCategory[];
+  extraIngredientsUsage: IngredientUsageStat[];
+  removedIngredients: IngredientUsageStat[];
+  lowStockIngredients: Ingredient[];
+  roleLogins: RoleLogin[];
+  roleLoginsUnavailable?: boolean;
+}
+
+export interface IngredientUsageStat {
+  ingredientId: string;
+  ingredientName: string;
+  unit?: Ingredient['unite'];
+  totalQuantity: number;
+  occurrences: number;
 }
 
 export interface Sale {

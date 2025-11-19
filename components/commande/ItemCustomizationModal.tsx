@@ -3,7 +3,7 @@ import { Minus, Plus } from 'lucide-react';
 import Modal from '../Modal';
 import type { Product, SelectedProductExtraOption } from '../../types';
 import { formatCurrencyCOP } from '../../utils/formatIntegerAmount';
-import { getDisplayableProductExtras } from '../../utils/productExtras';
+import { getDisplayableProductExtras, mapSelectedExtrasFromState } from '../../utils/productExtras';
 
 export interface ItemCustomizationResult {
     quantity: number;
@@ -52,20 +52,11 @@ const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
     }
 
     const buildSelectedExtras = (): SelectedProductExtraOption[] => {
-        if (!product?.extras || product.extras.length === 0) {
+        if (!product) {
             return [];
         }
 
-        return product.extras.flatMap(extra => {
-            const selectedNames = selectedExtrasState[extra.name] ?? [];
-            return extra.options
-                .filter(option => selectedNames.includes(option.name))
-                .map<SelectedProductExtraOption>(option => ({
-                    extraName: extra.name,
-                    optionName: option.name,
-                    price: option.price,
-                }));
-        });
+        return mapSelectedExtrasFromState(product, selectedExtrasState);
     };
 
     const selectedExtras = buildSelectedExtras();
