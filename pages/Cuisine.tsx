@@ -138,7 +138,7 @@ const KitchenTicketCard: React.FC<{ order: KitchenTicketOrder; onReady: (orderId
             <header className="border-b border-gray-200 px-5 pt-3 pb-2">
                 <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
                     <div className="min-w-0">
-                        <h4 className="mb-3 truncate text-base font-semibold leading-tight text-gray-900 sm:text-lg md:text-xl">{displayName}</h4>
+                        <h4 className="truncate text-base font-semibold leading-tight text-gray-900 sm:text-lg md:text-xl">{displayName}</h4>
                         <p className="text-xs text-gray-500">
                             Pedido a las {sentAtFormatted}
                         </p>
