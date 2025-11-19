@@ -3384,7 +3384,15 @@ export const api = {
       if (isValidUuid(originalItem.produitRef)) {
         const nextInserted = insertedQueue.shift();
         if (nextInserted) {
-          orderedItems.push(nextInserted);
+          const mergedSelectedExtras =
+            nextInserted.selected_extras && nextInserted.selected_extras.length > 0
+              ? nextInserted.selected_extras
+              : originalItem.selected_extras ?? [];
+
+          orderedItems.push({
+            ...nextInserted,
+            selected_extras: mergedSelectedExtras,
+          });
         }
       } else {
         const supplemental = supplementalItems.shift();
