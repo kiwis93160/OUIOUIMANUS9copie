@@ -176,17 +176,17 @@ const KitchenTicketCard: React.FC<{ order: KitchenTicketOrder; onReady: (orderId
                                                         </span>
                                                     </div>
                                                     {item.selectedExtras && item.selectedExtras.length > 0 && (
-                                                        <ul className="ml-12 space-y-1 text-xs text-gray-600">
+                                                        <div className="ml-12 mt-1 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-800 space-y-1">
                                                             {item.selectedExtras.map((extra, index) => (
-                                                                <li key={`${item.key}-extra-${index}`} className="flex items-center gap-2">
+                                                                <div key={`${item.key}-extra-${index}`} className="flex items-center gap-2">
                                                                     <span className="inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600">
                                                                         <PlusCircle size={12} />
                                                                     </span>
                                                                     <span className="font-semibold text-emerald-700">{extra.extraName}:</span>
-                                                                    <span className="text-gray-700">{extra.optionName}</span>
-                                                                </li>
+                                                                    <span className="text-emerald-800">{extra.optionName}</span>
+                                                                </div>
                                                             ))}
-                                                        </ul>
+                                                        </div>
                                                     )}
                                                     {excludedIngredientLabels.length > 0 && (
                                                         <p className="ml-12 mt-1 rounded-md border border-red-200 bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">
