@@ -363,6 +363,7 @@ export interface OrderItem {
   estado: 'en_attente' | 'enviado' | 'annule';
   date_envoi?: number; // timestamp
   selected_extras?: SelectedProductExtraOption[];
+  addedAt?: number; // timestamp used to keep cart order stable
 }
 
 export interface Order {

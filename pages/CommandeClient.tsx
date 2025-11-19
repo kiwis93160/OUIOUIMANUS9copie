@@ -42,6 +42,26 @@ const createDeliveryFeeItem = (isFree: boolean = false): OrderItem => ({
 
 const isFreeShippingType = (type?: string | null) => (type ?? '').toLowerCase() === 'free_shipping';
 
+const DEFAULT_CATEGORY_NAME = 'Otros';
+
+const CATEGORY_ACCENT_STYLES = [
+    {
+        dot: 'bg-orange-400',
+        badge: 'from-orange-500/90 via-amber-500/90 to-red-500/90 text-white shadow-orange-200/50',
+        card: 'border-orange-200/70 shadow-orange-200/60',
+    },
+    {
+        dot: 'bg-rose-400',
+        badge: 'from-rose-500/90 via-pink-500/90 to-fuchsia-500/90 text-white shadow-rose-200/60',
+        card: 'border-rose-200/70 shadow-rose-200/60',
+    },
+    {
+        dot: 'bg-emerald-400',
+        badge: 'from-emerald-500/90 via-teal-500/90 to-cyan-500/90 text-white shadow-emerald-200/60',
+        card: 'border-emerald-200/70 shadow-emerald-200/60',
+    },
+];
+
 interface SelectedProductState {
     product: Product;
     commentaire?: string;
@@ -55,6 +75,11 @@ interface ProductModalProps {
     onClose: () => void;
     selectedProduct: SelectedProductState | null;
     onAddToCart: (item: OrderItem) => void;
+}
+
+interface CartCategoryGroup {
+    name: string;
+    items: OrderItem[];
 }
 
 const buildSelectionStateFromExtras = (extras?: SelectedProductExtraOption[]) => {
@@ -177,6 +202,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, selectedPr
             commentaire: comment.trim() || undefined,
             excluded_ingredients: excludedIngredientIds.length > 0 ? excludedIngredientIds : undefined,
             selected_extras: selectedExtras.length > 0 ? selectedExtras : undefined,
+            addedAt: Date.now(),
         });
     };
 
@@ -450,6 +476,51 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
         return products.filter(p => p.categoria_id === activeCategoryId);
     }, [products, activeCategoryId]);
     const ingredientNameMap = useMemo(() => createIngredientNameMap(ingredients), [ingredients]);
+    const categoriesById = useMemo(
+        () =>
+            categories.reduce<Record<string, Category>>((acc, category) => {
+                acc[category.id] = category;
+                return acc;
+            }, {}),
+        [categories],
+    );
+    const productCategoryMap = useMemo(
+        () =>
+            products.reduce<Record<string, Category | undefined>>((acc, product) => {
+                acc[product.id] = categoriesById[product.categoria_id];
+                return acc;
+            }, {}),
+        [products, categoriesById],
+    );
+    const sortedCartItems = useMemo(() => {
+        return cart
+            .map((item, index) => ({ item, index }))
+            .sort((a, b) => {
+                const timeA = a.item.addedAt ?? 0;
+                const timeB = b.item.addedAt ?? 0;
+                if (timeA === timeB) {
+                    return a.index - b.index;
+                }
+                return timeA - timeB;
+            })
+            .map(entry => entry.item);
+    }, [cart]);
+    const groupedCartItems = useMemo(() => {
+        if (sortedCartItems.length === 0) {
+            return [] as CartCategoryGroup[];
+        }
+        const groups: CartCategoryGroup[] = [];
+        sortedCartItems.forEach(item => {
+            const categoryName = productCategoryMap[item.produitRef]?.nom ?? DEFAULT_CATEGORY_NAME;
+            const lastGroup = groups[groups.length - 1];
+            if (lastGroup && lastGroup.name === categoryName) {
+                lastGroup.items.push(item);
+            } else {
+                groups.push({ name: categoryName, items: [item] });
+            }
+        });
+        return groups;
+    }, [sortedCartItems, productCategoryMap]);
 
     const [orderTotals, setOrderTotals] = useState({
         subtotal: 0,
@@ -536,12 +607,13 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
     };
 
     const handleAddToCart = useCallback((item: OrderItem) => {
+        const itemWithTimestamp = item.addedAt ? item : { ...item, addedAt: Date.now() };
         setCart(prevCart => {
             const existingIndex = prevCart.findIndex(existing =>
-                existing.produitRef === item.produitRef
-                && normalizeComment(existing.commentaire) === normalizeComment(item.commentaire)
-                && haveSameExcludedIngredients(existing.excluded_ingredients, item.excluded_ingredients)
-                && haveSameSelectedExtras(existing.selected_extras, item.selected_extras)
+                existing.produitRef === itemWithTimestamp.produitRef
+                && normalizeComment(existing.commentaire) === normalizeComment(itemWithTimestamp.commentaire)
+                && haveSameExcludedIngredients(existing.excluded_ingredients, itemWithTimestamp.excluded_ingredients)
+                && haveSameSelectedExtras(existing.selected_extras, itemWithTimestamp.selected_extras)
             );
 
             if (existingIndex > -1) {
@@ -549,14 +621,14 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                 const existingItem = newCart[existingIndex];
                 newCart[existingIndex] = {
                     ...existingItem,
-                    quantite: existingItem.quantite + item.quantite,
-                    commentaire: item.commentaire ?? existingItem.commentaire,
-                    excluded_ingredients: item.excluded_ingredients ?? existingItem.excluded_ingredients,
+                    quantite: existingItem.quantite + itemWithTimestamp.quantite,
+                    commentaire: itemWithTimestamp.commentaire ?? existingItem.commentaire,
+                    excluded_ingredients: itemWithTimestamp.excluded_ingredients ?? existingItem.excluded_ingredients,
                 };
                 return newCart;
             }
 
-            return [...prevCart, item];
+            return [...prevCart, itemWithTimestamp];
         });
         setModalOpen(false);
     }, [setCart, setModalOpen]);
@@ -593,7 +665,13 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
     }, [setCart]);
 
     const handleReorder = (order: Order) => {
-        const itemsToReorder = order.items.filter(item => !isDeliveryFeeItem(item));
+        const baseTimestamp = Date.now();
+        const itemsToReorder = order.items
+            .filter(item => !isDeliveryFeeItem(item))
+            .map((item, index) => ({
+                ...item,
+                addedAt: baseTimestamp + index,
+            }));
         setCart(itemsToReorder);
     };
 
@@ -880,69 +958,102 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                         <p>Tu carrito está vacío.</p>
                     </div>
                 ) : (
-                    <div className="flex-1 overflow-y-auto pr-2 -mr-2">
-                        {cart.map((item) => {
-                            const excludedIngredientLabels = mapIngredientIdsToNames(item.excluded_ingredients, ingredientNameMap);
+                    <div className="flex-1 overflow-y-auto pr-2 -mr-2 space-y-6">
+                        {groupedCartItems.map((group, groupIndex) => {
+                            const accent = CATEGORY_ACCENT_STYLES[groupIndex % CATEGORY_ACCENT_STYLES.length];
                             return (
-                                <div
-                                    key={item.id}
-                                    className="group relative mb-3 rounded-lg bg-gradient-to-r from-orange-400 to-red-400 border-2 border-orange-500 px-4 py-4 text-white shadow-md transition-shadow hover:shadow-lg"
-                                >
-                                <div className="flex items-start justify-between gap-3">
-                                    <div className="flex-1 space-y-2">                                        <p className="text-[clamp(1rem,2vw,1.3rem)] leading-snug text-white break-words text-balance whitespace-normal [hyphens:auto]">                                          {item?.nom_produit || 'Article inconnu'}
-                                        </p>
-
-                                        {item.commentaire && (
-                                            <p className="text-sm text-gray-600 italic bg-gray-50 border-l-2 border-brand-primary/50 p-2 rounded">
-                                                💬 {item.commentaire}
-                                            </p>
-                                        )}
-                                        {excludedIngredientLabels.length > 0 && (
-                                            <p className="text-sm text-gray-700 font-semibold bg-gray-50 border-l-2 border-red-500/50 p-2 rounded">
-                                                🚫 Sin: {excludedIngredientLabels.join(', ')}
-                                            </p>
-                                        )}
-                                        {item.selected_extras && item.selected_extras.length > 0 && (
-                                            <ul className="text-sm text-gray-700 bg-white/90 border border-orange-200 rounded-lg p-2 space-y-1">
-                                                {item.selected_extras.map((extra, extraIndex) => (
-                                                    <li key={`${item.id}-cart-extra-${extraIndex}`} className="flex justify-between">
-                                                        <span>
-                                                            ➕ {extra.extraName}: {extra.optionName}
-                                                        </span>
-                                                        <span className="font-semibold text-orange-700">
-                                                            {formatCurrencyCOP(extra.price)}
-                                                        </span>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        )}
-                                    </div>
-                                    <div className="flex flex-col items-center gap-2">
-
-                                        <div className="flex items-center gap-2 rounded-full bg-white px-2 py-1 text-sm font-semibold border border-gray-300 text-gray-800">
-                                            <button
-                                                onClick={() => handleCartItemQuantityChange(item.id, -1)}
-                                                className="rounded-full p-1 transition hover:bg-gray-200"
-                                                aria-label="Disminuir cantidad"
-                                            >
-                                                <Minus size={14} />
-                                            </button>
-                                            <span className="min-w-[1.5rem] text-center text-base font-bold text-gray-800">{item.quantite}</span>
-                                            <button
-                                                onClick={() => handleCartItemQuantityChange(item.id, 1)}
-                                                className="rounded-full p-1 transition hover:bg-gray-200"
-                                                aria-label="Aumentar cantidad"
-                                            >
-                                                <Plus size={14} />
-                                            </button>
+                                <div key={`${group.name}-${groupIndex}`} className="pb-1">
+                                    <div
+                                        className={`mb-3 flex items-center justify-between rounded-2xl border px-4 py-2 text-[0.7rem] font-semibold uppercase tracking-[0.3em] bg-gradient-to-r ${accent.badge}`}
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <span className={`h-2.5 w-2.5 rounded-full ${accent.dot}`} />
+                                            <span>{group.name}</span>
                                         </div>
+                                        <span className="text-[0.6rem] font-bold opacity-80">
+                                            {group.items.length} {group.items.length === 1 ? 'producto' : 'productos'}
+                                        </span>
                                     </div>
-                                </div>
+
+                                    <div className="space-y-3">
+                                        {group.items.map(item => {
+                                            const excludedIngredientLabels = mapIngredientIdsToNames(item.excluded_ingredients, ingredientNameMap);
+                                            return (
+                                                <div
+                                                    key={item.id}
+                                                    className={`group relative rounded-2xl border bg-white/95 px-4 py-4 text-gray-900 shadow-lg transition-shadow hover:shadow-xl ${accent.card}`}
+                                                >
+                                                    <div className="flex items-start justify-between gap-3">
+                                                        <div className="flex-1 space-y-2">
+                                                            <p className="text-[clamp(1rem,2vw,1.3rem)] font-semibold leading-snug text-gray-900 break-words text-balance whitespace-normal [hyphens:auto]">
+                                                                {item?.nom_produit || 'Artículo'}
+                                                            </p>
+
+                                                            {item.commentaire && (
+                                                                <p className="text-sm text-gray-700 bg-slate-50 border-l-2 border-orange-300/70 p-2 rounded">
+                                                                    💬 {item.commentaire}
+                                                                </p>
+                                                            )}
+                                                            {excludedIngredientLabels.length > 0 && (
+                                                                <p className="text-sm font-semibold text-red-700 bg-red-50 border-l-2 border-red-400/70 p-2 rounded">
+                                                                    🚫 Sin: {excludedIngredientLabels.join(', ')}
+                                                                </p>
+                                                            )}
+                                                            {item.selected_extras && item.selected_extras.length > 0 && (
+                                                                <ul className="text-sm text-gray-700 bg-amber-50 border border-amber-200 rounded-lg p-2 space-y-1">
+                                                                    {item.selected_extras.map((extra, extraIndex) => (
+                                                                        <li key={`${item.id}-cart-extra-${extraIndex}`} className="flex justify-between">
+                                                                            <span>
+                                                                                ➕ {extra.extraName}: {extra.optionName}
+                                                                            </span>
+                                                                            <span className="font-semibold text-orange-700">
+                                                                                {formatCurrencyCOP(extra.price)}
+                                                                            </span>
+                                                                        </li>
+                                                                    ))}
+                                                                </ul>
+                                                            )}
+                                                        </div>
+                                                        <div className="flex flex-col items-end gap-2">
+                                                            <span className="text-base font-bold text-gray-900">
+                                                                {formatCurrencyCOP(item.prix_unitaire)}
+                                                            </span>
+                                                            <div className="flex items-center gap-2 rounded-full bg-gray-50 px-2 py-1 text-sm font-semibold border border-gray-200 text-gray-800">
+                                                                <button
+                                                                    onClick={() => handleCartItemQuantityChange(item.id, -1)}
+                                                                    className="rounded-full p-1 transition hover:bg-gray-200"
+                                                                    aria-label="Disminuir cantidad"
+                                                                >
+                                                                    <Minus size={14} />
+                                                                </button>
+                                                                <span className="min-w-[1.5rem] text-center text-base font-bold text-gray-900">{item.quantite}</span>
+                                                                <button
+                                                                    onClick={() => handleCartItemQuantityChange(item.id, 1)}
+                                                                    className="rounded-full p-1 transition hover:bg-gray-200"
+                                                                    aria-label="Aumentar cantidad"
+                                                                >
+                                                                    <Plus size={14} />
+                                                                </button>
+                                                            </div>
+                                                            <button
+                                                                onClick={() => handleRemoveCartItem(item.id)}
+                                                                className="text-gray-400 transition hover:text-red-500"
+                                                                aria-label="Eliminar producto"
+                                                            >
+                                                                <Trash2 size={16} />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
                             );
                         })}
                     </div>
                 )}
+
 
                 {cart.length > 0 && orderType === 'pedir_en_linea' && (
                     <div className="flex items-center justify-between py-3 border-b border-gray-200 last:border-b-0">
