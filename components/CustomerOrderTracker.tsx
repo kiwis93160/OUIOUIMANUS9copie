@@ -1040,23 +1040,17 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                                         <span className="mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600">
                                                                             <PlusCircle size={16} />
                                                                         </span>
-                                                                        <div className="flex flex-1 flex-wrap gap-2">
+                                                                        <div className="flex-1 space-y-1 text-sm font-semibold text-emerald-700">
                                                                             {item.selected_extras!.map((extra, extraIndex) => (
-                                                                                <div
-                                                                                    key={`${item.id}-tracker-extra-${extraIndex}`}
-                                                                                    className="inline-flex flex-1 min-w-[9rem] items-center gap-3 rounded-2xl border border-white/80 bg-white/95 px-3 py-2 text-xs font-semibold text-emerald-700 shadow-sm"
-                                                                                >
-                                                                                    <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-base text-emerald-600">
-                                                                                        +
-                                                                                    </div>
-                                                                                    <div className="flex-1">
-                                                                                        <p className="text-[0.55rem] uppercase tracking-[0.18em] text-emerald-500">{extra.extraName}</p>
-                                                                                        <p className="text-sm font-semibold text-emerald-700">{extra.optionName}</p>
-                                                                                    </div>
+                                                                                <p key={`${item.id}-tracker-extra-${extraIndex}`} className="flex flex-wrap items-center gap-1">
+                                                                                    <span className="text-[0.55rem] uppercase tracking-[0.2em] text-emerald-500">
+                                                                                        {extra.extraName}
+                                                                                    </span>
+                                                                                    <span className="text-emerald-700">{extra.optionName}</span>
                                                                                     {typeof extra.price === 'number' && extra.price > 0 && (
-                                                                                        <span className="text-sm font-bold text-emerald-600">{formatCurrencyCOP(extra.price)}</span>
+                                                                                        <span className="text-xs font-bold text-emerald-600">(+{formatCurrencyCOP(extra.price)})</span>
                                                                                     )}
-                                                                                </div>
+                                                                                </p>
                                                                             ))}
                                                                         </div>
                                                                     </div>
@@ -1068,14 +1062,12 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                                         <span className="mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-rose-500/10 text-rose-600">
                                                                             <Ban size={16} />
                                                                         </span>
-                                                                        <div className="flex flex-1 flex-wrap gap-2">
+                                                                        <div className="flex-1 space-y-1 text-sm font-semibold text-rose-600">
                                                                             {excludedIngredientLabels.map(label => (
-                                                                                <span
-                                                                                    key={`${item.id}-tracker-excluded-${label}`}
-                                                                                    className="inline-flex items-center gap-2 rounded-full border border-rose-200 bg-white px-3 py-1 text-xs font-semibold text-rose-600 shadow-sm"
-                                                                                >
-                                                                                    🚫 {label}
-                                                                                </span>
+                                                                                <p key={`${item.id}-tracker-excluded-${label}`} className="flex items-center gap-2">
+                                                                                    <span className="text-[0.55rem] uppercase tracking-[0.2em] text-rose-500">Sin</span>
+                                                                                    <span>{label}</span>
+                                                                                </p>
                                                                             ))}
                                                                         </div>
                                                                     </div>
