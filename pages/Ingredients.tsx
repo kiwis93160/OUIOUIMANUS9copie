@@ -64,6 +64,8 @@ const Ingredients: React.FC = () => {
         }
     };
 
+    const formatStockValue = (value: number) => Number(value.toFixed(2));
+
     return (
         <div className="space-y-6">
             <div className="mt-6 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
@@ -104,7 +106,7 @@ const Ingredients: React.FC = () => {
                                 <tr key={ing.id} className={`border-b hover:bg-gray-50 ${isLowStock ? 'bg-red-50' : ''}`}>
                                     <td className={`p-3 font-semibold ${isLowStock ? 'text-red-900' : 'text-gray-900'}`}>{ing.nom}</td>
                                     <td className={`p-3 font-bold ${isLowStock ? 'text-red-700' : 'text-gray-800'}`}>
-                                        {ing.stock_actuel} {ing.unite}
+                                        {formatStockValue(ing.stock_actuel)} {ing.unite}
                                     </td>
                                     <td className={`p-3 ${isLowStock ? 'text-red-800' : 'text-gray-700'}`}>
                                         {ing.stock_minimum} {ing.unite}
