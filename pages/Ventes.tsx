@@ -16,6 +16,7 @@ import OrderTimer from '../components/OrderTimer';
 import TableModal, { TableFormValues } from '../components/TableModal';
 import { useAuth } from '../contexts/AuthContext';
 import Modal from '../components/Modal';
+import { formatTableName } from '../utils/tableName';
 
 type StatusDescriptor = { text: string; statusClass: string; Icon: React.ComponentType<{ size?: number }> };
 
@@ -24,27 +25,6 @@ const STATUS_DESCRIPTORS: Record<Table['statut'], StatusDescriptor> = {
   en_cuisine: { text: 'En cuisine', statusClass: 'status--preparing', Icon: Utensils },
   para_entregar: { text: 'Para entregar', statusClass: 'status--ready', Icon: HandPlatter },
   para_pagar: { text: 'Para pagar', statusClass: 'status--payment', Icon: DollarSign },
-};
-
-const formatTableName = (name: string): string => {
-  const trimmed = name.trim();
-  if (!trimmed) {
-    return name;
-  }
-
-  const parts = trimmed.split(/\s+/);
-  if (parts.length < 2) {
-    return trimmed;
-  }
-
-  const [firstWord, ...rest] = parts;
-  let index = 0;
-
-  while (index < rest.length && rest[index].toLowerCase() === firstWord.toLowerCase()) {
-    index += 1;
-  }
-
-  return [firstWord, ...rest.slice(index)].join(' ');
 };
 
 const getTableStatus = (table: Table): StatusDescriptor => {
