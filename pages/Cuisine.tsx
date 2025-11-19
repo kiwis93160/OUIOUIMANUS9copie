@@ -49,7 +49,7 @@ const KitchenTicketCard: React.FC<{ order: KitchenTicketOrder; onReady: (orderId
             quantite: number;
             commentaire?: string;
             selectedExtras?: SelectedProductExtraOption[];
-            excludedIngredientLabels?: string[];
+            excludedIngredientIds?: string[];
         };
 
         const items: GroupedItem[] = [];
@@ -63,7 +63,6 @@ const KitchenTicketCard: React.FC<{ order: KitchenTicketOrder; onReady: (orderId
                 ? [...item.excluded_ingredients].sort().join('|')
                 : 'no_excluded';
             const baseKey = `${item.produitRef}::${commentKey}::${extrasKey}::${excludedKey}`;
-            const excludedIngredientLabels = mapIngredientIdsToNames(item.excluded_ingredients, ingredientNameMap);
 
             if (trimmedComment) {
                 items.push({
@@ -72,7 +71,7 @@ const KitchenTicketCard: React.FC<{ order: KitchenTicketOrder; onReady: (orderId
                     quantite: item.quantite,
                     commentaire: trimmedComment,
                     selectedExtras: item.selected_extras,
-                    excludedIngredientLabels,
+                    excludedIngredientIds: item.excluded_ingredients,
                 });
                 return;
             }
@@ -90,7 +89,7 @@ const KitchenTicketCard: React.FC<{ order: KitchenTicketOrder; onReady: (orderId
                 nom_produit: item.nom_produit,
                 quantite: item.quantite,
                 selectedExtras: item.selected_extras,
-                excludedIngredientLabels,
+                excludedIngredientIds: item.excluded_ingredients,
             });
         });
 
@@ -159,6 +158,10 @@ const KitchenTicketCard: React.FC<{ order: KitchenTicketOrder; onReady: (orderId
                             {groupedItems.length > 0 ? (
                                 <ul className="space-y-0.5">
                                     {groupedItems.map((item) => {
+                                        const excludedIngredientLabels = mapIngredientIdsToNames(
+                                            item.excludedIngredientIds,
+                                            ingredientNameMap,
+                                        );
                                         const note = item.commentaire?.trim();
                                         return (
                                             <li key={item.key} className="flex items-stretch rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 shadow-sm overflow-hidden min-h-[3.5rem]">
@@ -182,9 +185,9 @@ const KitchenTicketCard: React.FC<{ order: KitchenTicketOrder; onReady: (orderId
                                                             ))}
                                                         </ul>
                                                     )}
-                                                    {item.excludedIngredientLabels && item.excludedIngredientLabels.length > 0 && (
+                                                    {excludedIngredientLabels.length > 0 && (
                                                         <p className="ml-12 mt-1 rounded-md border border-red-200 bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">
-                                                            🚫 Sin: {item.excludedIngredientLabels.join(', ')}
+                                                            🚫 Sin: {excludedIngredientLabels.join(', ')}
                                                         </p>
                                                     )}
                                                     {note && (
