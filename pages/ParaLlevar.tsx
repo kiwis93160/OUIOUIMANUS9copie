@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useMemo, Dispatch, SetStateAction } from 'react';
 import { api } from '../services/api';
 import { Order, OrderItem, WeeklySchedule } from '../types';
-import { Clock, Eye, User, MapPin, Phone } from 'lucide-react';
+import { Clock, Eye, User, MapPin, Phone, PlusCircle } from 'lucide-react';
 import Modal from '../components/Modal';
 import OrderTimer from '../components/OrderTimer';
 import { getOrderUrgencyStyles, getOrderUrgencyToneClasses } from '../utils/orderUrgency';
@@ -140,50 +140,49 @@ const TakeawayCard: React.FC<{
                                             const excludedIngredientLabels = mapIngredientIdsToNames(item.excluded_ingredients, ingredientNameMap);
                                             const hasExcludedIngredients = excludedIngredientLabels.length > 0;
                                             return (
-                                                <li key={item.id} className="flex items-stretch rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 shadow-sm overflow-hidden min-h-[3.5rem]">
-                                                    <div className="flex flex-1 items-center justify-between gap-3 pr-3">
-                                                        <div className="flex flex-1 items-center">
-                                                            <span className={`flex self-stretch w-12 shrink-0 items-center justify-center text-xl font-bold text-white shadow-md ${urgencyTone.quantityBackground} rounded-l-lg`} style={toneFillStyle}>
+                                                <li
+                                                    key={item.id}
+                                                    className="flex items-stretch rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-900 shadow-sm overflow-hidden min-h-[3.5rem]"
+                                                >
+                                                    <div className="flex flex-1 flex-col gap-1 py-2 pr-3">
+                                                        <div className="flex items-center">
+                                                            <span
+                                                                className={`flex self-stretch w-12 shrink-0 items-center justify-center text-xl font-bold text-white shadow-md ${urgencyTone.quantityBackground} rounded-l-lg`}
+                                                                style={toneFillStyle}
+                                                            >
                                                                 {item.quantite}
                                                             </span>
-                                                            <div className="flex flex-col gap-1 px-3 py-3">
-                                                                <p className="font-semibold text-gray-900 text-[clamp(1.1rem,2.1vw,1.3rem)] leading-snug break-words text-balance whitespace-normal [hyphens:auto]">
-                                                                    {item.nom_produit}
-                                                                </p>
-                                                                {hasExtras && (
-                                                                    <div className="rounded-xl border border-orange-200/50 bg-orange-50/70 px-3 py-1.5 text-[11px] leading-snug text-gray-700">
-                                                                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-orange-500 mb-1">Extras</p>
-                                                                        <ul className="space-y-0.5">
-                                                                            {item.selected_extras!.map((extra, extraIndex) => (
-                                                                                <li key={`${item.id}-extra-${extraIndex}`} className="flex items-center justify-between gap-2">
-                                                                                    <span className="font-medium text-gray-800">
-                                                                                        {extra.extraName}: {extra.optionName}
-                                                                                    </span>
-                                                                                    {typeof extra.price === 'number' && (
-                                                                                        <span className="text-gray-600 font-semibold">+{formatCurrencyCOP(extra.price)}</span>
-                                                                                    )}
-                                                                                </li>
-                                                                            ))}
-                                                                        </ul>
-                                                                    </div>
-                                                                )}
-                                                                {hasExcludedIngredients && (
-                                                                    <div className="rounded-xl border border-red-200/60 bg-red-50/80 px-3 py-1.5 text-[11px] leading-snug text-gray-700">
-                                                                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-red-500 mb-1">Sin</p>
-                                                                        <p className="text-xs font-semibold text-red-600">
-                                                                            🚫 {excludedIngredientLabels.join(', ')}
-                                                                        </p>
-                                                                    </div>
-                                                                )}
-                                                            </div>
+                                                            <span className="flex-1 px-3 font-semibold text-gray-900 text-[clamp(1.1rem,2.1vw,1.3rem)] leading-snug break-words text-balance whitespace-normal [hyphens:auto]">
+                                                                {item.nom_produit}
+                                                            </span>
                                                         </div>
-                                                        <span className="whitespace-nowrap text-sm font-semibold text-gray-900 sm:text-base">{formatCurrencyCOP(item.prix_unitaire * item.quantite)}</span>
+
+                                                        {hasExtras && (
+                                                            <div className="ml-12 mt-1 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-800 space-y-1">
+                                                                {item.selected_extras!.map((extra, extraIndex) => (
+                                                                    <div key={`${item.id}-extra-${extraIndex}`} className="flex items-center gap-2">
+                                                                        <span className="inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600">
+                                                                            <PlusCircle size={12} />
+                                                                        </span>
+                                                                        <span className="font-semibold text-emerald-700">{extra.extraName}:</span>
+                                                                        <span className="text-emerald-800">{extra.optionName}</span>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        )}
+
+                                                        {hasExcludedIngredients && (
+                                                            <p className="ml-12 mt-1 rounded-md border border-red-200 bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">
+                                                                🚫 Sin: {excludedIngredientLabels.join(', ')}
+                                                            </p>
+                                                        )}
+
+                                                        {note && (
+                                                            <p className="ml-12 rounded-md border border-dashed border-blue-200 bg-blue-50 px-3 py-2 text-xs font-medium italic text-blue-800">
+                                                                {note}
+                                                            </p>
+                                                        )}
                                                     </div>
-                                                    {note && (
-                                                        <p className="mt-2 rounded-md border border-dashed border-blue-200 bg-blue-50 px-3 py-2 text-xs font-medium italic text-blue-800 ml-14 mr-3">
-                                                            {note}
-                                                        </p>
-                                                    )}
                                                 </li>
                                             );
                                         })}
