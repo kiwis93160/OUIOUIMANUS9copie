@@ -8,7 +8,7 @@ import { ArrowLeft } from 'lucide-react';
 import PaymentModal from '../components/PaymentModal';
 import Modal from '../components/Modal';
 import { createOrderItemsSnapshot, areOrderItemSnapshotsEqual, type OrderItemsSnapshot } from '../utils/orderSync';
-import ProductGrid from '../components/commande/ProductGrid';
+import ProductGrid, { ProductStockStatus, ProductStockStatusMap } from '../components/commande/ProductGrid';
 import OrderSummary from '../components/commande/OrderSummary';
 import ItemCustomizationModal, { type ItemCustomizationResult } from '../components/commande/ItemCustomizationModal';
 import { createIngredientNameMap } from '../utils/ingredientNames';
@@ -349,20 +349,58 @@ const Commande: React.FC = () => {
         return products.filter(product => product.categoria_id === activeCategoryId);
     }, [activeCategoryId, products]);
 
-
-    const isProductAvailable = useCallback((product: Product): boolean => {
-        if (!product.recipe || product.recipe.length === 0) return true;
-
-        for (const recipeItem of product.recipe) {
-            const ingredient = ingredients.find(i => i.id === recipeItem.ingredient_id);
-            if (!ingredient) return false;
-
-            if (ingredient.stock_actuel <= ingredient.stock_minimum) {
-                return false;
-            }
+    const productStockStatuses = useMemo<ProductStockStatusMap>(() => {
+        if (products.length === 0) {
+            return {};
         }
-        return true;
-    }, [ingredients]);
+
+        const ingredientMap = new Map(ingredients.map(ingredient => [ingredient.id, ingredient]));
+        const statusMap: ProductStockStatusMap = {};
+
+        products.forEach(product => {
+            if (!product.recipe || product.recipe.length === 0) {
+                return;
+            }
+
+            const affected: ProductStockStatus['affectedIngredients'] = [];
+
+            product.recipe.forEach(recipeItem => {
+                const ingredient = ingredientMap.get(recipeItem.ingredient_id);
+                if (!ingredient) {
+                    affected.push({
+                        id: recipeItem.ingredient_id,
+                        name: 'Ingrédient indisponible',
+                        currentStock: 0,
+                        minimumStock: 0,
+                        status: 'out',
+                    });
+                    return;
+                }
+
+                if (ingredient.stock_actuel <= ingredient.stock_minimum) {
+                    affected.push({
+                        id: ingredient.id,
+                        name: ingredient.nom,
+                        currentStock: ingredient.stock_actuel,
+                        minimumStock: ingredient.stock_minimum,
+                        status: ingredient.stock_actuel <= 0 ? 'out' : 'low',
+                    });
+                }
+            });
+
+            if (affected.length > 0) {
+                const hasOutOfStock = affected.some(item => item.status === 'out');
+                statusMap[product.id] = {
+                    hasLowStock: true,
+                    hasOutOfStock,
+                    affectedIngredients: affected,
+                };
+            }
+        });
+
+        return statusMap;
+    }, [ingredients, products]);
+
     
     type OrderItemsUpdater = OrderItem[] | ((items: OrderItem[]) => OrderItem[]);
 
@@ -709,14 +747,14 @@ const Commande: React.FC = () => {
     }, [orderItems]);
 
     const handleProductPointerDown = useCallback(
-        (_product: Product) => (event: React.PointerEvent<HTMLButtonElement>) => {
+        (_product: Product) => (event: React.PointerEvent<HTMLDivElement>) => {
             event.preventDefault();
             event.currentTarget.focus();
         },
         [],
     );
 
-    const handleProductKeyDown = useCallback((product: Product) => (event: React.KeyboardEvent<HTMLButtonElement>) => {
+    const handleProductKeyDown = useCallback((product: Product) => (event: React.KeyboardEvent<HTMLDivElement>) => {
         if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
             handleProductSelection(product);
@@ -757,9 +795,9 @@ const Commande: React.FC = () => {
                     activeCategoryId={activeCategoryId}
                     categories={categories}
                     onSelectCategory={setActiveCategoryId}
-                    isProductAvailable={isProductAvailable}
                     handleProductPointerDown={handleProductPointerDown}
                     handleProductKeyDown={handleProductKeyDown}
+                    productStockStatuses={productStockStatuses}
                 />
             </div>
 
