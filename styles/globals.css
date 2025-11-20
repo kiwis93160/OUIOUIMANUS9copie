@@ -1428,12 +1428,23 @@ body {
   background: color-mix(in srgb, var(--color-surface) 85%, rgba(15, 23, 42, 0.08));
   box-shadow: 0 18px 42px rgba(15, 23, 42, 0.12);
   border: 1px solid color-mix(in srgb, var(--color-border-strong) 75%, transparent);
+  transition: box-shadow 0.25s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 
 .pin-input:focus-within {
   outline: 3px solid color-mix(in srgb, var(--color-accent) 75%, transparent);
   outline-offset: 4px;
   box-shadow: 0 22px 48px rgba(15, 23, 42, 0.18);
+}
+
+.pin-input--complete {
+  border-color: color-mix(in srgb, var(--color-success, #22c55e) 55%, transparent);
+  box-shadow: 0 22px 48px rgba(34, 197, 94, 0.18);
+}
+
+.pin-input--error {
+  border-color: color-mix(in srgb, var(--color-danger) 55%, transparent);
+  box-shadow: 0 22px 48px rgba(239, 68, 68, 0.15);
 }
 
 .pin-input__field {
@@ -1489,12 +1500,15 @@ body {
 }
 
 .pin-indicator {
-  display: flex;
+  position: relative;
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(auto-fit, minmax(2.85rem, 1fr));
   gap: clamp(0.5rem, 2vw, 0.75rem);
 }
 
 .pin-indicator__slot {
-  width: clamp(2.85rem, 7vw, 3.5rem);
+  width: 100%;
   height: clamp(3.35rem, 8vw, 4rem);
   border-radius: 0.85rem;
   background: color-mix(in srgb, var(--color-surface) 90%, transparent);
@@ -1505,6 +1519,23 @@ body {
   font-size: calc(var(--font-size-xl) * 1.1);
   font-weight: 700;
   color: var(--color-heading);
+  transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+}
+
+.pin-indicator__slot[data-filled='true'] {
+  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface));
+  border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border));
+  transform: translateY(-1px);
+}
+
+.pin-indicator__progress {
+  position: absolute;
+  bottom: -0.45rem;
+  left: 0;
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-heading) 100%);
+  transition: width 0.25s ease;
 }
 
 .login-modal {
@@ -1524,6 +1555,107 @@ body {
   align-items: center;
   gap: 1.25rem;
   max-width: min(26rem, 100%);
+}
+
+.login-modal__lead {
+  margin: 0;
+  font-size: calc(var(--font-size-base) * 1.05);
+  color: var(--color-heading);
+  text-align: center;
+  line-height: 1.5;
+}
+
+.login-modal__status {
+  width: 100%;
+  text-align: center;
+  background: color-mix(in srgb, var(--color-surface) 90%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  border-radius: 0.9rem;
+  padding: 0.85rem 1rem;
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+}
+
+.login-modal__status-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-weight: 600;
+  color: var(--color-heading);
+}
+
+.login-modal__spinner {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 999px;
+  border: 2px solid color-mix(in srgb, var(--color-accent) 60%, transparent);
+  border-right-color: transparent;
+  animation: spin 0.75s linear infinite;
+}
+
+.login-modal__dot {
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-accent) 70%, transparent);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.login-modal__hint {
+  margin: 0.35rem 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+}
+
+.login-modal__actions {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+  justify-content: center;
+}
+
+.login-modal__button {
+  min-width: 9rem;
+  border-radius: 999px;
+  padding: 0.75rem 1.1rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.login-modal__button:hover,
+.login-modal__button:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-focus);
+  outline: none;
+}
+
+.login-modal__button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+  box-shadow: none;
+}
+
+.login-modal__button--ghost {
+  background: transparent;
+  color: var(--color-heading);
+  border-color: color-mix(in srgb, var(--color-border) 60%, transparent);
+}
+
+.login-modal__button--primary {
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--color-heading) 10%);
+  color: var(--color-surface);
+}
+
+.login-modal__button--primary:hover,
+.login-modal__button--primary:focus-visible {
+  background: color-mix(in srgb, var(--color-accent) 95%, var(--color-heading) 15%);
 }
 
 .login-modal__error {
