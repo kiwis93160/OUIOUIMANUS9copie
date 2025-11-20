@@ -63,6 +63,26 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
         );
     };
 
+    const renderExtras = (item: OrderItem, keyPrefix: string) => {
+        if (!item.selected_extras || item.selected_extras.length === 0) {
+            return null;
+        }
+
+        return (
+            <div className="mt-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-800 space-y-1">
+                {item.selected_extras.map((extra, extraIndex) => (
+                    <div key={`${item.id}-${keyPrefix}-${extraIndex}`} className="flex items-center gap-2">
+                        <span className="inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600">
+                            <PlusCircle size={12} />
+                        </span>
+                        <span className="font-semibold text-emerald-700">{extra.extraName}:</span>
+                        <span className="text-emerald-800">{extra.optionName}</span>
+                    </div>
+                ))}
+            </div>
+        );
+    };
+
     const tableLabel = formatTableLabelForOrder(order.table_nom);
 
     return (
@@ -137,20 +157,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                                                 <MessageSquare size={12} /> Agregar un comentario
                                             </button>
                                         )}
-                                        {item.selected_extras && item.selected_extras.length > 0 && (
-                                            <ul className="mt-2 space-y-1 rounded-md bg-white/80 p-2 text-xs text-gray-800">
-                                                {item.selected_extras.map((extra, extraIndex) => (
-                                                    <li key={`${item.id}-extra-${extraIndex}`} className="flex justify-between">
-                                                        <span>
-                                                            {extra.extraName}: {extra.optionName}
-                                                        </span>
-                                                        <span className="font-semibold text-brand-secondary">
-                                                            {formatCurrencyCOP(extra.price)}
-                                                        </span>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        )}
+                                        {renderExtras(item, 'extra')}
                                         {renderExcludedIngredients(item)}
                                     </div>
                                 ))
@@ -181,20 +188,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                                         <p className="text-sm text-gray-700 mt-2">
                                             {formatCurrencyCOP(item.prix_unitaire)} /u
                                         </p>
-                                        {item.selected_extras && item.selected_extras.length > 0 && (
-                                            <ul className="mt-2 space-y-1 rounded-md bg-white/80 p-2 text-xs text-gray-800">
-                                                {item.selected_extras.map((extra, extraIndex) => (
-                                                    <li key={`${item.id}-sent-extra-${extraIndex}`} className="flex justify-between">
-                                                        <span>
-                                                            {extra.extraName}: {extra.optionName}
-                                                        </span>
-                                                        <span className="font-semibold text-brand-secondary">
-                                                            {formatCurrencyCOP(extra.price)}
-                                                        </span>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        )}
+                                        {renderExtras(item, 'sent-extra')}
                                         {renderExcludedIngredients(item)}
                                         {item.commentaire && (
                                             <p className="mt-2 text-sm italic text-gray-600 pl-2">"{item.commentaire}"</p>
