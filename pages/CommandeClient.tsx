@@ -7,7 +7,7 @@ import { Product, Category, OrderItem, Order, SelectedProductExtraOption, Ingred
 import { api } from '../services/api';
 import { formatCurrencyCOP } from '../utils/formatIntegerAmount';
 import { uploadPaymentReceipt } from '../services/cloudinary';
-import { ShoppingCart, ArrowLeft, Clock, Minus, Plus } from 'lucide-react';
+import { ShoppingCart, ArrowLeft, Clock, Minus, Plus, PlusCircle } from 'lucide-react';
 import { storeActiveCustomerOrder, ONE_DAY_IN_MS } from '../services/customerOrderStorage';
 import ProductCardWithPromotion from '../components/ProductCardWithPromotion';
 import ActivePromotionsDisplay from '../components/ActivePromotionsDisplay';
@@ -944,11 +944,11 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                                     return (
                                         <div
                                             key={item.id}
-                                            className="group relative rounded-2xl border border-orange-200 bg-gradient-to-br from-orange-50 via-orange-100 to-orange-50 px-4 py-4 text-gray-900 shadow-lg shadow-orange-100/60"
+                                            className="group relative rounded-2xl border border-orange-300/70 bg-gradient-to-br from-orange-500 via-orange-600 to-red-600 px-4 py-4 text-white shadow-xl shadow-orange-200/80"
                                         >
                                             <div className="flex flex-col">
                                                 <div className="flex items-start justify-between gap-3">
-                                                    <p className="flex-1 text-[clamp(1rem,2vw,1.3rem)] font-semibold leading-snug text-gray-900 break-words text-balance whitespace-normal [hyphens:auto]">
+                                                    <p className="flex-1 text-[clamp(1rem,2vw,1.3rem)] font-semibold leading-snug text-white break-words text-balance whitespace-normal [hyphens:auto] drop-shadow-sm">
                                                         {item?.nom_produit || 'Artículo'}
                                                     </p>
                                                     <div className="flex items-center gap-2 rounded-full border border-orange-200 bg-white/80 px-3 py-1 text-sm font-semibold text-gray-900 shadow-sm">
@@ -971,32 +971,32 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                                                 </div>
 
                                                 {item.commentaire && (
-                                                    <p className="mt-3 text-sm text-gray-700 bg-white/70 border-l-2 border-orange-300/70 p-2 rounded">
+                                                    <p className="mt-3 text-sm text-gray-800 bg-white/90 border-l-2 border-orange-200 p-2 rounded shadow-sm">
                                                         💬 {item.commentaire}
                                                     </p>
                                                 )}
+                                                {item.selected_extras && item.selected_extras.length > 0 && (
+                                                    <div className="mt-3 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800 shadow-inner space-y-1">
+                                                        {item.selected_extras.map((extra, extraIndex) => (
+                                                            <div key={`${item.id}-cart-extra-${extraIndex}`} className="flex items-center gap-2">
+                                                                <span className="inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600">
+                                                                    <PlusCircle size={14} />
+                                                                </span>
+                                                                <span className="font-semibold text-emerald-700">{extra.extraName}:</span>
+                                                                <span className="font-semibold text-emerald-800 flex-1">{extra.optionName}</span>
+                                                                <span className="font-semibold text-emerald-700">{formatCurrencyCOP(extra.price)}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
                                                 {excludedIngredientLabels.length > 0 && (
-                                                    <p className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2 text-sm font-semibold text-red-700">
+                                                    <p className="mt-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 shadow-inner">
                                                         🚫 Sin: {excludedIngredientLabels.join(', ')}
                                                     </p>
                                                 )}
-                                                {item.selected_extras && item.selected_extras.length > 0 && (
-                                                    <ul className="mt-2 space-y-1 rounded-lg border border-orange-200 bg-white/70 p-2 text-sm font-semibold text-gray-800">
-                                                        {item.selected_extras.map((extra, extraIndex) => (
-                                                            <li key={`${item.id}-cart-extra-${extraIndex}`} className="flex justify-between">
-                                                                <span>
-                                                                    ➕ {extra.extraName}: {extra.optionName}
-                                                                </span>
-                                                                <span className="text-gray-900">
-                                                                    {formatCurrencyCOP(extra.price)}
-                                                                </span>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                )}
 
                                                 <div className="mt-4 flex justify-end">
-                                                    <span className="text-lg font-bold text-gray-900">
+                                                    <span className="text-lg font-bold text-white drop-shadow-sm">
                                                         {formatCurrencyCOP(item.prix_unitaire)}
                                                     </span>
                                                 </div>
