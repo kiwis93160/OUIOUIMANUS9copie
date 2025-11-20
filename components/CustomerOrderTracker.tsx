@@ -1017,27 +1017,22 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                 key={item.id}
                                                 className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/95 text-slate-900 shadow-xl transition-all hover:-translate-y-0.5 hover:border-amber-300/60 hover:shadow-amber-500/30"
                                             >
-                                                <div className="flex items-stretch">
-                                                    <div className="flex aspect-square min-h-[4.5rem] min-w-[4.5rem] flex-shrink-0 items-center justify-center rounded-l-2xl bg-gradient-to-b from-orange-500 to-rose-500 text-3xl font-black text-white shadow-inner shadow-amber-500/40 sm:min-h-[5.5rem] sm:min-w-[5.5rem]">
-                                                        <span className="text-2xl font-extrabold leading-none sm:text-3xl">{item.quantite}</span>
-                                                    </div>
+                                                <div className="absolute left-3 top-3 inline-flex h-11 min-w-[44px] items-center justify-center rounded-lg bg-gradient-to-b from-orange-500 to-rose-500 px-3 text-lg font-black leading-none text-white shadow-[0_10px_20px_rgba(249,115,22,0.35)] ring-2 ring-white/50">
+                                                    {item.quantite}
+                                                </div>
+                                                <div className="flex items-stretch pl-16">
                                                     <div className="my-0 flex flex-1 flex-col gap-3 px-[15px] py-0 sm:flex-row sm:items-center sm:justify-between self-start">
                                                         <div className="min-w-0 flex-1">
                                                             <div>
                                                                 <p className="my-0 text-base font-semibold leading-tight text-balance text-slate-900 sm:text-lg">
                                                                     {item.nom_produit}
                                                                 </p>
-                                                                {!isFreeShipping && (
-                                                                    <p className="my-0 text-xs font-medium uppercase tracking-wider text-slate-500">
-                                                                        {formatCurrencyCOP(item.prix_unitaire)} /u
-                                                                    </p>
-                                                                )}
                                                             </div>
                                                             {itemDescription && (
                                                                 <p className="my-0 text-sm leading-snug text-slate-600">{itemDescription}</p>
                                                             )}
                                                             {hasExtras && (
-                                                                <div className="mt-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-800 space-y-1">
+                                                                <div className="mt-2 mb-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-800 space-y-1">
                                                                     {item.selected_extras!.map((extra, extraIndex) => (
                                                                         <div key={`${item.id}-tracker-extra-${extraIndex}`} className="flex flex-wrap items-center gap-2">
                                                                             <span className="inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600">
@@ -1053,7 +1048,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                                 </div>
                                                             )}
                                                             {hasExcludedIngredients && (
-                                                                <p className="mt-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700">
+                                                                <p className="mt-2 mb-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700">
                                                                     🚫 Sin: {excludedIngredientLabels.join(', ')}
                                                                 </p>
                                                             )}
@@ -1535,14 +1530,14 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                         <div className="pointer-events-none absolute -right-14 top-1/2 h-28 w-28 -translate-y-1/2 rounded-full bg-amber-400/20 blur-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-80" />
                                         <div className="pointer-events-none absolute -left-16 -top-10 h-24 w-24 rounded-full bg-white/10 blur-2xl opacity-50" />
                                         <div className="relative flex items-start justify-between gap-4">
-                                            <div className="flex flex-1 items-start gap-3">
-                                                <div
-                                                    className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-2xl font-extrabold text-white shadow-md ${
-                                                        variant === 'hero' ? 'ring-2 ring-white/40' : ''
-                                                    }`}
-                                                >
-                                                    {item.quantite}
-                                                </div>
+                                            <div
+                                                className={`absolute left-0 top-2 inline-flex h-11 min-w-[44px] items-center justify-center rounded-lg bg-gradient-to-b from-amber-500 to-orange-500 px-3 text-lg font-black leading-none text-white shadow-[0_10px_20px_rgba(249,115,22,0.35)] ${
+                                                    variant === 'hero' ? 'ring-2 ring-white/40' : 'ring-1 ring-white/50'
+                                                }`}
+                                            >
+                                                {item.quantite}
+                                            </div>
+                                            <div className="flex flex-1 items-start gap-3 pl-16">
                                                 <div className="min-w-0 space-y-2">
                                                     <div className="space-y-1">
                                                         <p className={`text-lg font-semibold leading-tight text-balance ${variant === 'hero' ? 'text-white' : 'text-slate-900'}`}>
