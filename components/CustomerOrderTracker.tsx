@@ -1018,7 +1018,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                 className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/95 text-slate-900 shadow-xl transition-all hover:-translate-y-0.5 hover:border-amber-300/60 hover:shadow-amber-500/30"
                                             >
                                                 <div className="flex items-stretch">
-                                                    <div className="flex aspect-square min-h-[4.5rem] min-w-[4.5rem] flex-shrink-0 items-center justify-center rounded-l-2xl bg-gradient-to-b from-orange-500 to-rose-500 text-3xl font-black text-white shadow-inner shadow-amber-500/40 sm:min-h-[5.5rem] sm:min-w-[5.5rem]">
+                                                    <div className="flex w-14 shrink-0 items-center justify-center self-stretch rounded-l-2xl bg-gradient-to-b from-orange-500 to-rose-500 text-white shadow-inner shadow-amber-500/40 sm:w-16">
                                                         <span className="text-2xl font-extrabold leading-none sm:text-3xl">{item.quantite}</span>
                                                     </div>
                                                     <div className="my-0 flex flex-1 flex-col gap-3 px-[15px] py-0 sm:flex-row sm:items-center sm:justify-between self-start">
@@ -1027,17 +1027,12 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                                 <p className="my-0 text-base font-semibold leading-tight text-balance text-slate-900 sm:text-lg">
                                                                     {item.nom_produit}
                                                                 </p>
-                                                                {!isFreeShipping && (
-                                                                    <p className="my-0 text-xs font-medium uppercase tracking-wider text-slate-500">
-                                                                        {formatCurrencyCOP(item.prix_unitaire)} /u
-                                                                    </p>
-                                                                )}
                                                             </div>
                                                             {itemDescription && (
                                                                 <p className="my-0 text-sm leading-snug text-slate-600">{itemDescription}</p>
                                                             )}
                                                             {hasExtras && (
-                                                                <div className="mt-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-800 space-y-1">
+                                                                <div className="mt-2 mb-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-800 space-y-1">
                                                                     {item.selected_extras!.map((extra, extraIndex) => (
                                                                         <div key={`${item.id}-tracker-extra-${extraIndex}`} className="flex flex-wrap items-center gap-2">
                                                                             <span className="inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600">
@@ -1053,7 +1048,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                                 </div>
                                                             )}
                                                             {hasExcludedIngredients && (
-                                                                <p className="mt-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700">
+                                                                <p className="mt-2 mb-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700">
                                                                     🚫 Sin: {excludedIngredientLabels.join(', ')}
                                                                 </p>
                                                             )}
