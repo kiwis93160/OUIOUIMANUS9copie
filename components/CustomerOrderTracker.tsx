@@ -1017,10 +1017,10 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                 key={item.id}
                                                 className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/95 text-slate-900 shadow-xl transition-all hover:-translate-y-0.5 hover:border-amber-300/60 hover:shadow-amber-500/30"
                                             >
-                                                <div className="flex items-stretch">
-                                                    <div className="flex w-14 shrink-0 items-center justify-center self-stretch rounded-l-2xl bg-gradient-to-b from-orange-500 to-rose-500 text-white shadow-inner shadow-amber-500/40 sm:w-16">
-                                                        <span className="text-2xl font-extrabold leading-none sm:text-3xl">{item.quantite}</span>
-                                                    </div>
+                                                <div className="absolute left-3 top-3 inline-flex h-11 min-w-[44px] items-center justify-center rounded-lg bg-gradient-to-b from-orange-500 to-rose-500 px-3 text-lg font-black leading-none text-white shadow-[0_10px_20px_rgba(249,115,22,0.35)] ring-2 ring-white/50">
+                                                    {item.quantite}
+                                                </div>
+                                                <div className="flex items-stretch pl-16">
                                                     <div className="my-0 flex flex-1 flex-col gap-3 px-[15px] py-0 sm:flex-row sm:items-center sm:justify-between self-start">
                                                         <div className="min-w-0 flex-1">
                                                             <div>
@@ -1530,14 +1530,14 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                         <div className="pointer-events-none absolute -right-14 top-1/2 h-28 w-28 -translate-y-1/2 rounded-full bg-amber-400/20 blur-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-80" />
                                         <div className="pointer-events-none absolute -left-16 -top-10 h-24 w-24 rounded-full bg-white/10 blur-2xl opacity-50" />
                                         <div className="relative flex items-start justify-between gap-4">
-                                            <div className="flex flex-1 items-start gap-3">
-                                                <div
-                                                    className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-2xl font-extrabold text-white shadow-md ${
-                                                        variant === 'hero' ? 'ring-2 ring-white/40' : ''
-                                                    }`}
-                                                >
-                                                    {item.quantite}
-                                                </div>
+                                            <div
+                                                className={`absolute left-0 top-2 inline-flex h-11 min-w-[44px] items-center justify-center rounded-lg bg-gradient-to-b from-amber-500 to-orange-500 px-3 text-lg font-black leading-none text-white shadow-[0_10px_20px_rgba(249,115,22,0.35)] ${
+                                                    variant === 'hero' ? 'ring-2 ring-white/40' : 'ring-1 ring-white/50'
+                                                }`}
+                                            >
+                                                {item.quantite}
+                                            </div>
+                                            <div className="flex flex-1 items-start gap-3 pl-16">
                                                 <div className="min-w-0 space-y-2">
                                                     <div className="space-y-1">
                                                         <p className={`text-lg font-semibold leading-tight text-balance ${variant === 'hero' ? 'text-white' : 'text-slate-900'}`}>
