@@ -1037,44 +1037,25 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                                 <p className="my-0 text-sm leading-snug text-slate-600">{itemDescription}</p>
                                                             )}
                                                             {hasExtras && (
-                                                                <div className="mt-2 rounded-2xl border border-emerald-200/70 bg-emerald-50/90 px-3 py-2 shadow-inner shadow-emerald-100/70">
-                                                                    <div className="flex-1 space-y-0.5 text-sm font-semibold text-emerald-700">
-                                                                        {item.selected_extras!.map((extra, extraIndex) => (
-                                                                            <p
-                                                                                key={`${item.id}-tracker-extra-${extraIndex}`}
-                                                                                className="mb-1 flex flex-wrap items-center gap-2 last:mb-0"
-                                                                            >
-                                                                                <span className="inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600">
-                                                                                    <PlusCircle size={12} />
-                                                                                </span>
-                                                                                <span className="text-[0.55rem] uppercase tracking-[0.2em] text-emerald-500">
-                                                                                    {extra.extraName}
-                                                                                </span>
-                                                                                <span className="text-emerald-700">{extra.optionName}</span>
-                                                                                {typeof extra.price === 'number' && extra.price > 0 && (
-                                                                                    <span className="text-xs font-bold text-emerald-600">(+{formatCurrencyCOP(extra.price)})</span>
-                                                                                )}
-                                                                            </p>
-                                                                        ))}
-                                                                    </div>
+                                                                <div className="mt-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-800 space-y-1">
+                                                                    {item.selected_extras!.map((extra, extraIndex) => (
+                                                                        <div key={`${item.id}-tracker-extra-${extraIndex}`} className="flex flex-wrap items-center gap-2">
+                                                                            <span className="inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600">
+                                                                                <PlusCircle size={12} />
+                                                                            </span>
+                                                                            <span className="font-semibold text-emerald-700">{extra.extraName}:</span>
+                                                                            <span className="font-semibold text-emerald-800">{extra.optionName}</span>
+                                                                            {typeof extra.price === 'number' && extra.price > 0 && (
+                                                                                <span className="text-xs font-semibold text-emerald-700">(+{formatCurrencyCOP(extra.price)})</span>
+                                                                            )}
+                                                                        </div>
+                                                                    ))}
                                                                 </div>
                                                             )}
                                                             {hasExcludedIngredients && (
-                                                                <div className="mt-2 rounded-2xl border border-rose-200/80 bg-rose-50/90 px-3 py-2 shadow-inner shadow-rose-100/70">
-                                                                    <div className="flex-1 space-y-0.5 text-sm font-semibold text-rose-600">
-                                                                        {excludedIngredientLabels.map(label => (
-                                                                            <p
-                                                                                key={`${item.id}-tracker-excluded-${label}`}
-                                                                                className="mb-1 flex items-center gap-2 last:mb-0"
-                                                                            >
-                                                                                <span className="inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-rose-500/10 text-rose-600">
-                                                                                    <Ban size={12} />
-                                                                                </span>
-                                                                                <span>{label}</span>
-                                                                            </p>
-                                                                        ))}
-                                                                    </div>
-                                                                </div>
+                                                                <p className="mt-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700">
+                                                                    🚫 Sin: {excludedIngredientLabels.join(', ')}
+                                                                </p>
                                                             )}
                                                             {trimmedComment && (
                                                                 <div className="my-0 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-sm italic text-amber-700 shadow-inner shadow-amber-200/60">
