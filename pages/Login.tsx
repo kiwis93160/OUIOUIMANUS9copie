@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
 import { api } from '../services/api';
 import { EditableElementKey, EditableZoneKey, Product, Order, SiteContent, SectionStyle } from '../types';
-import { Clock, Mail, MapPin, Menu, MessageCircle, X } from 'lucide-react';
+import { Check, Clock, Mail, MapPin, Menu, MessageCircle, X } from 'lucide-react';
 import CustomerOrderTracker from '../components/CustomerOrderTracker';
 import { clearActiveCustomerOrder, getActiveCustomerOrder } from '../services/customerOrderStorage';
 import { formatCurrencyCOP } from '../utils/formatIntegerAmount';
@@ -50,10 +50,11 @@ type PinInputProps = {
   describedBy?: string;
   disabled?: boolean;
   hasError?: boolean;
+  onSubmit?: () => void;
 };
 
 const PinInput = React.forwardRef<HTMLInputElement, PinInputProps>(
-  ({ pin, onPinChange, pinLength, describedBy, disabled, hasError }, ref) => {
+  ({ pin, onPinChange, pinLength, describedBy, disabled, hasError, onSubmit }, ref) => {
     const handleKeyClick = (key: string) => {
       if (pin.length < pinLength && !disabled) {
         onPinChange(pin + key);
@@ -107,11 +108,6 @@ const PinInput = React.forwardRef<HTMLInputElement, PinInputProps>(
       }
     };
 
-    const digitsMessage =
-      pin.length === 0
-        ? `No se ha ingresado ningún número. Puedes escribir ${pinLength} dígitos.`
-        : `${pin.length} ${pin.length > 1 ? 'dígitos ingresados' : 'dígito ingresado'} de ${pinLength}.`;
-
     const hasCompletedPin = pin.length === pinLength;
     const pinState = hasError ? 'error' : hasCompletedPin ? 'complete' : pin.length > 0 ? 'active' : 'idle';
 
@@ -143,9 +139,6 @@ const PinInput = React.forwardRef<HTMLInputElement, PinInputProps>(
           ))}
           <div className="pin-indicator__progress" style={{ width: `${(pin.length / pinLength) * 100}%` }} aria-hidden />
         </div>
-        <div className="pin-input__live" aria-live="polite">
-          {digitsMessage}
-        </div>
         <div className="pin-pad" role="group" aria-label="Clavier numérique">
           {[...Array(9)].map((_, index) => (
             <button
@@ -158,12 +151,26 @@ const PinInput = React.forwardRef<HTMLInputElement, PinInputProps>(
               {index + 1}
             </button>
           ))}
-          <div aria-hidden="true" />
+          <button
+            type="button"
+            onClick={handleDelete}
+            className="pin-pad__button pin-pad__button--muted"
+            disabled={disabled}
+            aria-label="Borrar"
+          >
+            <X className="h-5 w-5" aria-hidden />
+          </button>
           <button type="button" onClick={() => handleKeyClick('0')} className="pin-pad__button" disabled={disabled}>
             0
           </button>
-          <button type="button" onClick={handleDelete} className="pin-pad__button pin-pad__button--muted" disabled={disabled}>
-            BORRAR
+          <button
+            type="submit"
+            onClick={() => onSubmit?.()}
+            className="pin-pad__button pin-pad__button--primary"
+            disabled={disabled || !hasCompletedPin}
+            aria-label="Connexion"
+          >
+            <Check className="h-5 w-5" aria-hidden />
           </button>
         </div>
       </div>
@@ -447,25 +454,10 @@ const Login: React.FC = () => {
   const bestSellerCount = bestSellersToDisplay.length;
   const menuGridClassName = computeMenuGridClassName(bestSellerCount);
   const menuCardClassName = computeMenuCardClassName(bestSellerCount);
-  const pinHelperId = useId();
-  const pinStatusId = useId();
   const pinIsComplete = pin.length === PIN_LENGTH;
-  const describedByIds = [pinHelperId, pinStatusId, error ? 'staff-pin-error' : null]
-    .filter(Boolean)
-    .join(' ') || undefined;
-  const pinStatusMessage = loading
-    ? 'Validation en cours…'
-    : error
-      ? 'Réessayez ou demandez un nouveau code.'
-      : pinIsComplete
-        ? 'Prêt à valider. Appuyez sur Entrée ou cliquez sur "Accéder".'
-        : 'Saisissez le code PIN transmis par un manager.';
-  const pinHintMessage = pinIsComplete
-    ? 'Le code se valide automatiquement dès le 6ᵉ chiffre.'
-    : 'Vous pouvez coller les 6 chiffres reçus pour gagner du temps.';
+  const describedByIds = undefined;
 
-  const handleFormSubmit = (e: FormEvent) => {
-    e.preventDefault();
+  const attemptSubmit = () => {
     if (!pinIsComplete) {
       setError(`Veuillez saisir les ${PIN_LENGTH} chiffres du code personnel.`);
       pinInputRef.current?.focus();
@@ -475,6 +467,11 @@ const Login: React.FC = () => {
     if (!loading) {
       submitPin(pin);
     }
+  };
+
+  const handleFormSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    attemptSubmit();
   };
 
   const handleNewOrder = () => {
@@ -1046,7 +1043,7 @@ const Login: React.FC = () => {
           setPin('');
           setError('');
         }}
-        title="Connexion du personnel"
+        title=""
         size="lg"
       >
         <div className="login-modal">
@@ -1063,53 +1060,8 @@ const Login: React.FC = () => {
                 describedBy={describedByIds}
                 hasError={Boolean(error)}
                 disabled={loading}
+                onSubmit={attemptSubmit}
               />
-              {error && (
-                <p id="staff-pin-error" className="login-modal__error" role="alert" aria-live="assertive">
-                  {error}
-                </p>
-              )}
-              <div className="login-modal__status" id={pinStatusId} role="status" aria-live="polite">
-                <div className="login-modal__status-line">
-                  {loading ? (
-                    <span className="login-modal__spinner" aria-hidden />
-                  ) : (
-                    <span className="login-modal__dot" aria-hidden />
-                  )}
-                  <span>{pinStatusMessage}</span>
-                </div>
-                <p className="login-modal__hint">{pinHintMessage}</p>
-              </div>
-              <div className="login-modal__actions">
-                <button
-                  type="button"
-                  className="login-modal__button login-modal__button--ghost"
-                  onClick={() => {
-                    setPin('');
-                    setError('');
-                    requestAnimationFrame(() => pinInputRef.current?.focus());
-                  }}
-                  disabled={loading || pin.length === 0}
-                >
-                  Effacer
-                </button>
-                <button
-                  type="submit"
-                  className="login-modal__button login-modal__button--primary"
-                  disabled={!pinIsComplete || loading}
-                  aria-busy={loading}
-                >
-                  {loading ? 'Connexion…' : 'Accéder'}
-                </button>
-              </div>
-              <div className="login-modal__support">
-                <h4>Conseils rapides</h4>
-                <p>{pinHintMessage}</p>
-                <ul className="login-modal__support-list">
-                  <li className="login-modal__support-item">Validation automatique dès le 6ᵉ chiffre saisi.</li>
-                  <li className="login-modal__support-item">Coller le code reçu ou utiliser le pavé numérique accélère l'entrée.</li>
-                </ul>
-              </div>
             </div>
           </form>
         </div>
