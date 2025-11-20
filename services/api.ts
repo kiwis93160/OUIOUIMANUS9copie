@@ -2714,6 +2714,7 @@ export const api = {
     const { items: incomingItems, clientInfo, removedItemIds = [], ...rest } = updates;
 
     let existingItems: OrderItem[] = [];
+    let itemsForStockDeduction: OrderItem[] = [];
     if (incomingItems) {
       const existingOrder = await fetchOrderById(orderId);
       if (!existingOrder) {
@@ -2727,6 +2728,16 @@ export const api = {
       const itemsToUpdate = incomingItems.filter(
         item => isUuid(item.id) && existingItemIds.has(item.id),
       );
+      itemsForStockDeduction = [];
+
+      const prepareItemForStockDeduction = (item: OrderItem, quantity?: number): OrderItem => ({
+        ...item,
+        quantite: quantity ?? item.quantite,
+        commentaire: item.commentaire ?? '',
+        estado: item.estado ?? 'en_attente',
+        excluded_ingredients: item.excluded_ingredients ?? [],
+        selected_extras: item.selected_extras ?? [],
+      });
 
       if (itemsToInsert.length > 0) {
         await runOrderItemsMutationWithSelectedExtrasFallback(includeSelectedExtras =>
@@ -2751,6 +2762,8 @@ export const api = {
             ),
           ) as Promise<SupabaseResponse<OrderItem[]>>,
         );
+
+        itemsForStockDeduction.push(...itemsToInsert.map(item => prepareItemForStockDeduction(item)));
       }
 
       if (itemsToUpdate.length > 0) {
@@ -2779,6 +2792,21 @@ export const api = {
             ),
           ),
         );
+
+        for (const item of itemsToUpdate) {
+          const existingItem = existingItems.find(existing => existing.id === item.id);
+          if (!existingItem) {
+            continue;
+          }
+
+          const incomingQuantity = item.quantite;
+          const existingQuantity = existingItem.quantite;
+
+          if (incomingQuantity > existingQuantity) {
+            const additionalQuantity = incomingQuantity - existingQuantity;
+            itemsForStockDeduction.push(prepareItemForStockDeduction(item, additionalQuantity));
+          }
+        }
       }
     }
 
@@ -2830,6 +2858,14 @@ export const api = {
 
     if (Object.keys(payload).length > 0) {
       await supabase.from('orders').update(payload).eq('id', orderId);
+    }
+
+    if (incomingItems && itemsForStockDeduction.length > 0) {
+      try {
+        await deductIngredientsStockForOrderItems(itemsForStockDeduction);
+      } catch (error) {
+        console.error('Failed to deduct ingredient stock after updating order', error);
+      }
     }
 
     publishOrderChange({ includeNotifications: options?.includeNotifications ?? true });
