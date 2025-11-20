@@ -1,4 +1,4 @@
-import React, { useState, FormEvent, useEffect, useCallback, useRef, useMemo } from 'react';
+import React, { useState, FormEvent, useEffect, useCallback, useRef, useMemo, useId } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
@@ -1050,6 +1050,9 @@ const Login: React.FC = () => {
         <div className="login-modal">
           <form onSubmit={handleFormSubmit} className="login-modal__form" aria-describedby={describedByIds}>
             <div className="login-modal__panel">
+              <p className="login-modal__lead" id={pinHelperId}>
+                Accès rapide au tableau de bord sécurisé. Saisissez uniquement le code partagé avec votre équipe.
+              </p>
               <PinInput
                 ref={pinInputRef}
                 pin={pin}
