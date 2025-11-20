@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
 import { api } from '../services/api';
 import { EditableElementKey, EditableZoneKey, Product, Order, SiteContent, SectionStyle } from '../types';
-import { Clock, Mail, MapPin, Menu, MessageCircle, X } from 'lucide-react';
+import { Check, Clock, Mail, MapPin, Menu, MessageCircle, X } from 'lucide-react';
 import CustomerOrderTracker from '../components/CustomerOrderTracker';
 import { clearActiveCustomerOrder, getActiveCustomerOrder } from '../services/customerOrderStorage';
 import { formatCurrencyCOP } from '../utils/formatIntegerAmount';
@@ -49,106 +49,138 @@ type PinInputProps = {
   pinLength: number;
   describedBy?: string;
   disabled?: boolean;
+  hasError?: boolean;
+  onSubmit?: () => void;
 };
 
-const PinInput = React.forwardRef<HTMLInputElement, PinInputProps>(({ pin, onPinChange, pinLength, describedBy, disabled }, ref) => {
-  const handleKeyClick = (key: string) => {
-    if (pin.length < pinLength && !disabled) {
-      onPinChange(pin + key);
-    }
-  };
+const PinInput = React.forwardRef<HTMLInputElement, PinInputProps>(
+  ({ pin, onPinChange, pinLength, describedBy, disabled, hasError, onSubmit }, ref) => {
+    const handleKeyClick = (key: string) => {
+      if (pin.length < pinLength && !disabled) {
+        onPinChange(pin + key);
+      }
+    };
 
-  const handleDelete = () => {
-    if (pin.length > 0 && !disabled) {
-      onPinChange(pin.slice(0, -1));
-    }
-  };
+    const handleDelete = () => {
+      if (pin.length > 0 && !disabled) {
+        onPinChange(pin.slice(0, -1));
+      }
+    };
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (disabled) {
-      return;
-    }
-    const sanitized = event.target.value.replace(/\D/g, '').slice(0, pinLength);
-    onPinChange(sanitized);
-  };
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (disabled) {
+        return;
+      }
+      const sanitized = event.target.value.replace(/\D/g, '').slice(0, pinLength);
+      onPinChange(sanitized);
+    };
 
-  const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (/^\d$/.test(event.key)) {
-      event.preventDefault();
-      handleKeyClick(event.key);
-      return;
-    }
+    const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (/^\d$/.test(event.key)) {
+        event.preventDefault();
+        handleKeyClick(event.key);
+        return;
+      }
 
-    if (event.key === 'Backspace') {
-      event.preventDefault();
-      handleDelete();
-      return;
-    }
+      if (event.key === 'Backspace') {
+        event.preventDefault();
+        handleDelete();
+        return;
+      }
 
-    if (event.key === 'Escape') {
-      event.preventDefault();
-      onPinChange('');
-    }
-  };
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        onPinChange('');
+      }
+    };
 
-  const digitsMessage =
-    pin.length === 0
-      ? `No se ha ingresado ningún número. Puedes escribir ${pinLength} dígitos.`
-      : `${pin.length} ${pin.length > 1 ? 'dígitos ingresados' : 'dígito ingresado'} de ${pinLength}.`;
+    const handlePaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
+      if (disabled) {
+        return;
+      }
 
-  return (
-    <div className="pin-input" aria-label="Teclado numérico seguro">
-      <input
-        ref={ref}
-        id="staff-pin-field"
-        type="password"
-        inputMode="numeric"
-        autoComplete="one-time-code"
-        className="pin-input__field"
-        value={pin}
-        onChange={handleInputChange}
-        onKeyDown={handleInputKeyDown}
-        aria-describedby={describedBy}
-        aria-label={`Código PIN de ${pinLength} dígitos`}
-        disabled={disabled}
-        aria-disabled={disabled}
-        aria-busy={disabled}
-      />
-      <div className="pin-indicator" role="presentation">
-        {Array.from({ length: pinLength }).map((_, index) => (
-          <div key={index} className="pin-indicator__slot" aria-hidden="true">
-            {pin[index] ? '•' : ''}
-          </div>
-        ))}
-      </div>
-      <div className="pin-input__live" aria-live="polite">
-        {digitsMessage}
-      </div>
-      <div className="pin-pad">
-        {[...Array(9)].map((_, index) => (
+      const pasted = event.clipboardData.getData('text');
+      const sanitized = pasted.replace(/\D/g, '').slice(0, pinLength);
+
+      if (sanitized.length > 0) {
+        event.preventDefault();
+        onPinChange(sanitized);
+      }
+    };
+
+    const hasCompletedPin = pin.length === pinLength;
+    const pinState = hasError ? 'error' : hasCompletedPin ? 'complete' : pin.length > 0 ? 'active' : 'idle';
+
+    return (
+      <div className={`pin-input pin-input--${pinState}`} data-state={pinState} aria-label="Teclado numérico seguro">
+        <input
+          ref={ref}
+          id="staff-pin-field"
+          type="password"
+          inputMode="numeric"
+          autoComplete="one-time-code"
+          className="pin-input__field"
+          value={pin}
+          onChange={handleInputChange}
+          onKeyDown={handleInputKeyDown}
+          onPaste={handlePaste}
+          aria-describedby={describedBy}
+          aria-label={`Código PIN de ${pinLength} dígitos`}
+          aria-invalid={hasError}
+          disabled={disabled}
+          aria-disabled={disabled}
+          aria-busy={disabled}
+        />
+        <div className="pin-indicator" role="presentation">
+          {Array.from({ length: pinLength }).map((_, index) => (
+            <div key={index} className="pin-indicator__slot" aria-hidden="true" data-filled={Boolean(pin[index])}>
+              {pin[index] ? '•' : ''}
+            </div>
+          ))}
+          <div className="pin-indicator__progress" style={{ width: `${(pin.length / pinLength) * 100}%` }} aria-hidden />
+        </div>
+        <div className="pin-pad" role="group" aria-label="Clavier numérique">
+          {[...Array(9)].map((_, index) => (
+            <button
+              type="button"
+              key={index + 1}
+              onClick={() => handleKeyClick(String(index + 1))}
+              className="pin-pad__button"
+              disabled={disabled}
+            >
+              {index + 1}
+            </button>
+          ))}
           <button
             type="button"
-            key={index + 1}
-            onClick={() => handleKeyClick(String(index + 1))}
-            className="pin-pad__button"
+            onClick={handleDelete}
+            className="pin-pad__button pin-pad__button--muted"
             disabled={disabled}
+            aria-label="Borrar"
           >
-            {index + 1}
+            <X className="h-5 w-5" aria-hidden />
           </button>
-        ))}
-        <div aria-hidden="true" />
-        <button type="button" onClick={() => handleKeyClick('0')} className="pin-pad__button" disabled={disabled}>
-          0
-        </button>
-        <button type="button" onClick={handleDelete} className="pin-pad__button pin-pad__button--muted" disabled={disabled}>
-          BORRAR
-        </button>
+          <button type="button" onClick={() => handleKeyClick('0')} className="pin-pad__button" disabled={disabled}>
+            0
+          </button>
+          <button
+            type="submit"
+            onClick={() => onSubmit?.()}
+            className="pin-pad__button pin-pad__button--primary"
+            disabled={disabled || !hasCompletedPin}
+            aria-label="Connexion"
+          >
+            <Check className="h-5 w-5" aria-hidden />
+          </button>
+        </div>
       </div>
-    </div>
-  );
-});
+    );
+  },
+);
 
 PinInput.displayName = 'PinInput';
+
+const PIN_LENGTH = 6;
 
 const computeMenuGridClassName = (count: number): string => {
   if (count === 1) return 'menu-grid menu-grid--single';
@@ -339,10 +371,16 @@ const Login: React.FC = () => {
   }, [isModalOpen]);
 
   useEffect(() => {
-    if (pin.length === 6 && !loading) {
+    if (pin.length === PIN_LENGTH && !loading) {
       submitPin(pin);
     }
   }, [pin, loading, submitPin]);
+
+  useEffect(() => {
+    if (error && pin.length > 0) {
+      setError('');
+    }
+  }, [pin, error]);
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -416,12 +454,24 @@ const Login: React.FC = () => {
   const bestSellerCount = bestSellersToDisplay.length;
   const menuGridClassName = computeMenuGridClassName(bestSellerCount);
   const menuCardClassName = computeMenuCardClassName(bestSellerCount);
+  const pinIsComplete = pin.length === PIN_LENGTH;
+  const describedByIds = undefined;
+
+  const attemptSubmit = () => {
+    if (!pinIsComplete) {
+      setError(`Veuillez saisir les ${PIN_LENGTH} chiffres du code personnel.`);
+      pinInputRef.current?.focus();
+      return;
+    }
+
+    if (!loading) {
+      submitPin(pin);
+    }
+  };
 
   const handleFormSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (pin.length === 6 && !loading) {
-      submitPin(pin);
-    }
+    attemptSubmit();
   };
 
   const handleNewOrder = () => {
@@ -993,25 +1043,22 @@ const Login: React.FC = () => {
           setPin('');
           setError('');
         }}
-        title="Connexion du personnel"
+        title=""
         size="lg"
       >
         <div className="login-modal">
-          <form onSubmit={handleFormSubmit} className="login-modal__form" aria-describedby={error ? 'staff-pin-error' : undefined}>
+          <form onSubmit={handleFormSubmit} className="login-modal__form" aria-describedby={describedByIds}>
             <div className="login-modal__panel">
               <PinInput
                 ref={pinInputRef}
                 pin={pin}
                 onPinChange={setPin}
-                pinLength={6}
-                describedBy={error ? 'staff-pin-error' : undefined}
+                pinLength={PIN_LENGTH}
+                describedBy={describedByIds}
+                hasError={Boolean(error)}
                 disabled={loading}
+                onSubmit={attemptSubmit}
               />
-              {error && (
-                <p id="staff-pin-error" className="login-modal__error" role="alert" aria-live="assertive">
-                  {error}
-                </p>
-              )}
             </div>
           </form>
         </div>
