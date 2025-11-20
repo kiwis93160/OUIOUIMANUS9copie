@@ -303,6 +303,7 @@ export interface ProductExtraOption {
   price: number;
   type?: 'custom' | 'ingredient';
   ingredient_id?: string | null;
+  ingredient_usage?: number | null;
 }
 
 export interface ProductExtra {

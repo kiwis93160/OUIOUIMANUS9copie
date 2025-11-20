@@ -82,13 +82,16 @@ export const mapSelectedProductExtraOption = (
     option: ProductExtraOption,
 ): SelectedProductExtraOption => {
     const isIngredientOption = option.type === 'ingredient' || Boolean(option.ingredient_id);
+    const ingredientUsage = isIngredientOption
+        ? option.ingredient_usage ?? resolveExtraIngredientUsage(product, option.ingredient_id)
+        : null;
     return {
         extraName: extra.name,
         optionName: option.name,
         price: option.price,
         ingredient_id: option.ingredient_id,
         ingredient_name: isIngredientOption ? option.name : null,
-        ingredient_usage: isIngredientOption ? resolveExtraIngredientUsage(product, option.ingredient_id) : null,
+        ingredient_usage: ingredientUsage,
     };
 };
 
