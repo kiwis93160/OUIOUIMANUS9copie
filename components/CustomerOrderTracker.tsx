@@ -1021,13 +1021,16 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                         return (
                                             <div
                                                 key={item.id}
-                                                className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/95 text-slate-900 shadow-xl"
+                                                className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/95 text-slate-900 shadow-xl flex"
                                             >
-                                                <div className="absolute left-3 top-3 inline-flex h-11 min-w-[44px] items-center justify-center rounded-lg bg-gradient-to-b from-orange-500 to-rose-500 px-3 text-lg font-black leading-none text-white shadow-[0_10px_20px_rgba(249,115,22,0.35)] ring-2 ring-white/50">
+                                                <div
+                                                    className="flex w-14 items-center justify-center bg-gradient-to-b from-orange-500 to-rose-500 text-2xl font-black leading-none text-white shadow-[0_10px_20px_rgba(249,115,22,0.35)] ring-2 ring-white/50 sm:w-16"
+                                                    style={{ backgroundImage: `linear-gradient(to bottom, ${QUANTITY_BADGE_GRADIENT_FROM}, ${QUANTITY_BADGE_GRADIENT_TO})` }}
+                                                >
                                                     {item.quantite}
                                                 </div>
-                                                <div className="flex items-stretch pl-16">
-                                                    <div className="my-0 flex flex-1 flex-col gap-3 px-[15px] py-0 sm:flex-row sm:items-center sm:justify-between self-start">
+                                                <div className="flex items-stretch flex-1">
+                                                    <div className="my-0 flex flex-1 flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between self-stretch">
                                                         <div className="min-w-0 flex-1">
                                                             <div>
                                                                 <p className="my-0 text-base font-semibold leading-tight text-balance text-slate-900 sm:text-lg">
@@ -1096,7 +1099,12 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                                     </span>
                                                                 </>
                                                             ) : (
-                                                                <span className="rounded-full bg-slate-100 px-4 py-1.5 text-lg font-bold text-slate-900 shadow-inner shadow-slate-200">
+                                                                <span
+                                                                    className="rounded-full px-4 py-1.5 text-lg font-bold text-white shadow-inner shadow-orange-500/30 ring-1 ring-orange-200/60"
+                                                                    style={{
+                                                                        backgroundImage: `linear-gradient(to bottom, ${QUANTITY_BADGE_GRADIENT_FROM}, ${QUANTITY_BADGE_GRADIENT_TO})`,
+                                                                    }}
+                                                                >
                                                                     {formatCurrencyCOP(item.prix_unitaire * item.quantite)}
                                                                 </span>
                                                             )}
@@ -1549,23 +1557,25 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                 const hasExcludedIngredients = excludedIngredientLabels.length > 0;
 
                                 return (
-                                    <div key={item.id} className="relative">
+                                    <div
+                                        key={item.id}
+                                        className={`relative overflow-hidden rounded-2xl border shadow-sm flex ${
+                                            variant === 'hero'
+                                                ? 'border-white/20 bg-slate-900/35 text-gray-100 backdrop-blur-2xl'
+                                                : 'border-slate-200 bg-white text-slate-600'
+                                        }`}
+                                    >
                                         <div
-                                            className={`absolute left-0 top-2 inline-flex h-11 min-w-[44px] items-center justify-center rounded-lg bg-gradient-to-b from-amber-500 to-orange-500 px-3 text-lg font-black leading-none text-white shadow-[0_10px_20px_rgba(249,115,22,0.35)] ${
+                                            className={`flex w-14 items-center justify-center text-2xl font-black leading-none text-white shadow-[0_10px_20px_rgba(249,115,22,0.35)] ${
                                                 variant === 'hero' ? 'ring-2 ring-white/40' : 'ring-1 ring-white/50'
-                                            }`}
+                                            } sm:w-16`}
+                                            style={{ backgroundImage: `linear-gradient(to bottom, ${QUANTITY_BADGE_GRADIENT_FROM}, ${QUANTITY_BADGE_GRADIENT_TO})` }}
                                         >
                                             {item.quantite}
                                         </div>
-                                        <div
-                                            className={`relative ml-6 overflow-hidden rounded-2xl border px-5 pt-1 pb-1 shadow-sm ${
-                                                variant === 'hero'
-                                                    ? 'border-white/20 bg-slate-900/35 text-gray-100 backdrop-blur-2xl'
-                                                    : 'border-slate-200 bg-white text-slate-600'
-                                            }`}
-                                        >
-                                            <div className="relative flex items-start justify-between gap-4">
-                                                <div className="flex flex-1 items-start gap-3 pl-14">
+                                        <div className="relative flex flex-1 items-stretch px-5 py-3 sm:py-4">
+                                            <div className="relative flex items-start justify-between gap-4 w-full">
+                                                <div className="flex flex-1 items-start gap-3">
                                                     <div className="min-w-0 space-y-2">
                                                         <div className="space-y-1">
                                                             <p className={`text-lg font-semibold leading-tight text-balance ${variant === 'hero' ? 'text-white' : 'text-slate-900'}`}>
