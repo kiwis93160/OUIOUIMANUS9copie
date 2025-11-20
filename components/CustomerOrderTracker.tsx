@@ -36,6 +36,10 @@ const FALLBACK_SUPPORT_PHONE_DISPLAY = '+57 323 809 0562';
 
 const sanitizePhoneDigits = (value: string): string => value.replace(/[^\d]/g, '');
 
+const QUANTITY_BADGE_GRADIENT_FROM = '#f59e0b';
+const QUANTITY_BADGE_GRADIENT_TO = '#f97316';
+const QUANTITY_BADGE_BASE_COLOR = '#f97316';
+
 const isFreeShippingType = (type?: string | null) => (type ?? '').toLowerCase() === 'free_shipping';
 
 const saveOrderToHistory = (order: Order) => {
@@ -512,7 +516,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
         : "w-full px-4 pt-0 pb-4 sm:pt-1 sm:pb-5 flex justify-center";
 
     const contentClasses = variant === 'page'
-        ? "bg-white/95 p-6 rounded-xl shadow-2xl max-w-2xl mx-auto"
+        ? "bg-white/95 p-6 rounded-xl shadow-2xl max-w-2xl mx-auto border-2"
         : "max-w-4xl mx-auto";
 
     const detailContainerClasses = 'border-t pt-6 mt-6 space-y-4 relative md:w-1/2 md:mx-auto';
@@ -598,7 +602,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                 : undefined;
             const promoCode = promoConfig?.promo_code as string | undefined;
             const visuals = promotion.visuals || null;
-            const bgColor = visuals?.badge_bg_color || '#4CAF50';
+            const bgColor = QUANTITY_BADGE_BASE_COLOR;
             const discountAmount = promotion.discount_amount || 0;
 
             return (
@@ -645,7 +649,10 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
     if (variant === 'hero') {
         return (
             <div className={containerClasses}>
-                <div className="relative w-full max-w-4xl rounded-3xl border-[6px] border-orange-300/70 bg-brand-primary p-6 text-white shadow-2xl sm:p-8">
+                <div
+                    className="relative w-full max-w-4xl rounded-3xl border-[6px] bg-brand-primary p-6 text-white shadow-2xl sm:p-8"
+                    style={{ borderColor: QUANTITY_BADGE_BASE_COLOR }}
+                >
                     <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-3xl opacity-70">
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.18),_transparent_65%)]" />
                         <div className="absolute -bottom-32 right-0 h-64 w-64 rounded-full bg-gradient-to-br from-white/20 via-amber-200/30 to-orange-300/30 blur-3xl" />
@@ -1143,7 +1150,10 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
 
     return (
         <div className={containerClasses}>
-            <div className={contentClasses}>
+            <div
+                className={contentClasses}
+                style={variant === 'page' ? { borderColor: QUANTITY_BADGE_BASE_COLOR } : undefined}
+            >
                 <h2 className={`text-3xl font-bold text-center mb-2 ${variant === 'hero' ? 'text-white' : 'text-gray-800'}`}>Seguimiento de tu pedido</h2>
                 <p className={`text-center font-semibold mb-8 ${variant === 'hero' ? 'text-gray-300' : 'text-gray-500'}`}>Pedido #{order.id.slice(-6)}</p>
 
@@ -1519,96 +1529,100 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                     : null;
 
                                 return (
-                                    <div
-                                        key={item.id}
-                                        className={`group relative overflow-hidden rounded-2xl border px-5 pt-1 pb-1 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg ${
-                                            variant === 'hero'
-                                                ? 'border-white/20 bg-slate-900/35 text-gray-100 backdrop-blur-2xl'
-                                                : 'border-slate-200 bg-white text-slate-600'
-                                        }`}
-                                    >
-                                        <div className="pointer-events-none absolute -right-14 top-1/2 h-28 w-28 -translate-y-1/2 rounded-full bg-amber-400/20 blur-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-80" />
-                                        <div className="pointer-events-none absolute -left-16 -top-10 h-24 w-24 rounded-full bg-white/10 blur-2xl opacity-50" />
-                                        <div className="relative flex items-start justify-between gap-4">
-                                            <div
-                                                className={`absolute left-0 top-2 inline-flex h-11 min-w-[44px] items-center justify-center rounded-lg bg-gradient-to-b from-amber-500 to-orange-500 px-3 text-lg font-black leading-none text-white shadow-[0_10px_20px_rgba(249,115,22,0.35)] ${
-                                                    variant === 'hero' ? 'ring-2 ring-white/40' : 'ring-1 ring-white/50'
-                                                }`}
-                                            >
-                                                {item.quantite}
-                                            </div>
-                                            <div className="flex flex-1 items-start gap-3 pl-16">
-                                                <div className="min-w-0 space-y-2">
-                                                    <div className="space-y-1">
-                                                        <p className={`text-lg font-semibold leading-tight text-balance ${variant === 'hero' ? 'text-white' : 'text-slate-900'}`}>
-                                                            {item.nom_produit}
-                                                        </p>
-                                                        <p className={`text-xs font-medium uppercase tracking-wide ${variant === 'hero' ? 'text-white/60' : 'text-slate-500'}`}>
-                                                            {isFreeShipping ? 'Entrega gratis' : `${formatCurrencyCOP(item.prix_unitaire)} /u`}
-                                                        </p>
+                                    <div key={item.id} className="relative">
+                                        <div
+                                            className={`absolute left-0 top-2 inline-flex h-11 min-w-[44px] items-center justify-center rounded-lg bg-gradient-to-b from-amber-500 to-orange-500 px-3 text-lg font-black leading-none text-white shadow-[0_10px_20px_rgba(249,115,22,0.35)] ${
+                                                variant === 'hero' ? 'ring-2 ring-white/40' : 'ring-1 ring-white/50'
+                                            }`}
+                                        >
+                                            {item.quantite}
+                                        </div>
+                                        <div
+                                            className={`group relative ml-6 overflow-hidden rounded-2xl border px-5 pt-1 pb-1 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg ${
+                                                variant === 'hero'
+                                                    ? 'border-white/20 bg-slate-900/35 text-gray-100 backdrop-blur-2xl'
+                                                    : 'border-slate-200 bg-white text-slate-600'
+                                            }`}
+                                        >
+                                            <div className="pointer-events-none absolute -right-14 top-1/2 h-28 w-28 -translate-y-1/2 rounded-full bg-amber-400/20 blur-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-80" />
+                                            <div className="pointer-events-none absolute -left-16 -top-10 h-24 w-24 rounded-full bg-white/10 blur-2xl opacity-50" />
+                                            <div className="relative flex items-start justify-between gap-4">
+                                                <div className="flex flex-1 items-start gap-3 pl-14">
+                                                    <div className="min-w-0 space-y-2">
+                                                        <div className="space-y-1">
+                                                            <p className={`text-lg font-semibold leading-tight text-balance ${variant === 'hero' ? 'text-white' : 'text-slate-900'}`}>
+                                                                {item.nom_produit}
+                                                            </p>
+                                                            <p className={`text-xs font-medium uppercase tracking-wide ${variant === 'hero' ? 'text-white/60' : 'text-slate-500'}`}>
+                                                                {isFreeShipping ? 'Entrega gratis' : `${formatCurrencyCOP(item.prix_unitaire)} /u`}
+                                                            </p>
+                                                        </div>
+                                                        {itemDescription && (
+                                                            <p className={`text-sm leading-snug ${variant === 'hero' ? 'text-white/70' : 'text-slate-500'}`}>
+                                                                {itemDescription}
+                                                            </p>
+                                                        )}
+                                                        {itemComment && (
+                                                            <div className={`rounded-xl border px-3 py-2 text-sm italic shadow-inner ${
+                                                                variant === 'hero'
+                                                                    ? 'border-amber-300/30 bg-black/30 text-amber-100/90'
+                                                                    : 'border-amber-200 bg-amber-50 text-amber-700'
+                                                            }`}>
+                                                                « {itemComment} »
+                                                            </div>
+                                                        )}
+                                                        {isDomicilio && (
+                                                            <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold ${
+                                                                isFreeShipping
+                                                                    ? variant === 'hero'
+                                                                        ? 'border-emerald-300/40 bg-emerald-500/20 text-emerald-100'
+                                                                        : 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                                                                    : variant === 'hero'
+                                                                        ? 'border-white/15 bg-black/30 text-white/80'
+                                                                        : 'border-slate-200 bg-slate-50 text-slate-600'
+                                                            }`}>
+                                                                <TruckIcon size={14} />
+                                                                {isFreeShipping ? 'Entrega gratis' : 'Entrega'}
+                                                            </div>
+                                                        )}
                                                     </div>
-                                                    {itemDescription && (
-                                                        <p className={`text-sm leading-snug ${variant === 'hero' ? 'text-white/70' : 'text-slate-500'}`}>
-                                                            {itemDescription}
-                                                        </p>
+                                                </div>
+                                                <div className="flex shrink-0 flex-col items-end gap-1 text-right">
+                                                    {isFreeShipping ? (
+                                                        <>
+                                                            <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-semibold ${
+                                                                variant === 'hero'
+                                                                    ? 'border border-emerald-300/40 bg-emerald-500/20 text-emerald-100'
+                                                                    : 'border border-emerald-200 bg-emerald-50 text-emerald-700'
+                                                            }`}>
+                                                                <Gift size={16} /> Gratuit
+                                                            </span>
+                                                            <span className={`text-xs font-medium line-through ${
+                                                                variant === 'hero' ? 'text-emerald-100/70 decoration-emerald-200/70' : 'text-emerald-600/70 decoration-emerald-400'
+                                                            }`}>
+                                                                {formatCurrencyCOP(8000)}
+                                                            </span>
+                                                        </>
+                                                    ) : (
+                                                        <span
+                                                            className="rounded-full px-4 py-1.5 text-lg font-bold text-white shadow-inner shadow-orange-500/30 ring-1 ring-orange-200/60"
+                                                            style={{
+                                                                backgroundImage: `linear-gradient(to bottom, ${QUANTITY_BADGE_GRADIENT_FROM}, ${QUANTITY_BADGE_GRADIENT_TO})`,
+                                                            }}
+                                                        >
+                                                            {formatCurrencyCOP(item.prix_unitaire * item.quantite)}
+                                                        </span>
                                                     )}
-                                                    {itemComment && (
-                                                        <div className={`rounded-xl border px-3 py-2 text-sm italic shadow-inner ${
-                                                            variant === 'hero'
-                                                                ? 'border-amber-300/30 bg-black/30 text-amber-100/90'
-                                                                : 'border-amber-200 bg-amber-50 text-amber-700'
-                                                        }`}>
-                                                            « {itemComment} »
-                                                        </div>
-                                                    )}
-                                                    {isDomicilio && (
-                                                        <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold ${
-                                                            isFreeShipping
-                                                                ? variant === 'hero'
-                                                                    ? 'border-emerald-300/40 bg-emerald-500/20 text-emerald-100'
-                                                                    : 'border-emerald-200 bg-emerald-50 text-emerald-700'
-                                                                : variant === 'hero'
-                                                                    ? 'border-white/15 bg-black/30 text-white/80'
-                                                                    : 'border-slate-200 bg-slate-50 text-slate-600'
-                                                        }`}>
-                                                            <TruckIcon size={14} />
-                                                            {isFreeShipping ? 'Entrega gratis' : 'Entrega'}
-                                                        </div>
+                                                    {!isFreeShipping ? (
+                                                        <span className={`text-xs font-medium ${variant === 'hero' ? 'text-white/50' : 'text-slate-500'}`}>
+                                                            Total TTC
+                                                        </span>
+                                                    ) : (
+                                                        <span className={`text-xs font-medium ${variant === 'hero' ? 'text-emerald-200/80' : 'text-emerald-600/80'}`}>
+                                                            Entrega ahorrada
+                                                        </span>
                                                     )}
                                                 </div>
-                                            </div>
-                                            <div className="flex shrink-0 flex-col items-end gap-1 text-right">
-                                                {isFreeShipping ? (
-                                                    <>
-                                                        <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-semibold ${
-                                                            variant === 'hero'
-                                                                ? 'border border-emerald-300/40 bg-emerald-500/20 text-emerald-100'
-                                                                : 'border border-emerald-200 bg-emerald-50 text-emerald-700'
-                                                        }`}>
-                                                            <Gift size={16} /> Gratuit
-                                                        </span>
-                                                        <span className={`text-xs font-medium line-through ${
-                                                            variant === 'hero' ? 'text-emerald-100/70 decoration-emerald-200/70' : 'text-emerald-600/70 decoration-emerald-400'
-                                                        }`}>
-                                                            {formatCurrencyCOP(8000)}
-                                                        </span>
-                                                    </>
-                                                ) : (
-                                                    <span className={`rounded-full px-4 py-1.5 text-lg font-bold ${
-                                                        variant === 'hero' ? 'bg-black/30 text-white shadow-inner shadow-black/30' : 'bg-slate-100 text-slate-900'
-                                                    }`}>
-                                                        {formatCurrencyCOP(item.prix_unitaire * item.quantite)}
-                                                    </span>
-                                                )}
-                                                {!isFreeShipping ? (
-                                                    <span className={`text-xs font-medium ${variant === 'hero' ? 'text-white/50' : 'text-slate-500'}`}>
-                                                        Total TTC
-                                                    </span>
-                                                ) : (
-                                                    <span className={`text-xs font-medium ${variant === 'hero' ? 'text-emerald-200/80' : 'text-emerald-600/80'}`}>
-                                                        Entrega ahorrada
-                                                    </span>
-                                                )}
                                             </div>
                                         </div>
                                     </div>
