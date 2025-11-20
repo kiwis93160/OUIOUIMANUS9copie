@@ -602,15 +602,14 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                 : undefined;
             const promoCode = promoConfig?.promo_code as string | undefined;
             const visuals = promotion.visuals || null;
-            const bgColor = QUANTITY_BADGE_BASE_COLOR;
             const discountAmount = promotion.discount_amount || 0;
 
             return (
                 <div
                     key={`${promotion.promotion_id}-${promotion.name}`}
-                    className="flex items-center rounded-xl shadow-lg transition-transform hover:scale-[1.01] overflow-hidden py-2"
+                    className="flex items-center rounded-xl shadow-lg overflow-hidden py-2"
                     style={{
-                        backgroundColor: bgColor,
+                        backgroundImage: `linear-gradient(to bottom, ${QUANTITY_BADGE_GRADIENT_FROM}, ${QUANTITY_BADGE_GRADIENT_TO})`,
                     }}
                     aria-label={`Promotion ${promotion.name}`}
                 >
@@ -1022,7 +1021,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                         return (
                                             <div
                                                 key={item.id}
-                                                className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/95 text-slate-900 shadow-xl transition-all hover:-translate-y-0.5 hover:border-amber-300/60 hover:shadow-amber-500/30"
+                                                className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/95 text-slate-900 shadow-xl"
                                             >
                                                 <div className="absolute left-3 top-3 inline-flex h-11 min-w-[44px] items-center justify-center rounded-lg bg-gradient-to-b from-orange-500 to-rose-500 px-3 text-lg font-black leading-none text-white shadow-[0_10px_20px_rgba(249,115,22,0.35)] ring-2 ring-white/50">
                                                     {item.quantite}
@@ -1039,9 +1038,12 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                                 <p className="my-0 text-sm leading-snug text-slate-600">{itemDescription}</p>
                                                             )}
                                                             {hasExtras && (
-                                                                <div className="mt-2 mb-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-800 space-y-1">
+                                                                <div className="mt-2 mb-2 flex flex-wrap gap-2">
                                                                     {item.selected_extras!.map((extra, extraIndex) => (
-                                                                        <div key={`${item.id}-tracker-extra-${extraIndex}`} className="flex flex-wrap items-center gap-2">
+                                                                        <div
+                                                                            key={`${item.id}-tracker-extra-${extraIndex}`}
+                                                                            className="inline-flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-800"
+                                                                        >
                                                                             <span className="inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600">
                                                                                 <PlusCircle size={12} />
                                                                             </span>
@@ -1055,9 +1057,17 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                                 </div>
                                                             )}
                                                             {hasExcludedIngredients && (
-                                                                <p className="mt-2 mb-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700">
-                                                                    🚫 Sin: {excludedIngredientLabels.join(', ')}
-                                                                </p>
+                                                                <div className="mt-2 mb-2 flex flex-wrap gap-2">
+                                                                    {excludedIngredientLabels.map((ingredientLabel, ingredientIndex) => (
+                                                                        <span
+                                                                            key={`${item.id}-excluded-${ingredientIndex}`}
+                                                                            className="inline-flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700"
+                                                                        >
+                                                                            <Ban size={12} />
+                                                                            Sin {ingredientLabel}
+                                                                        </span>
+                                                                    ))}
+                                                                </div>
                                                             )}
                                                             {trimmedComment && (
                                                                 <div className="my-0 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-sm italic text-amber-700 shadow-inner shadow-amber-200/60">
@@ -1126,11 +1136,18 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                             <button
                                 onClick={isOrderCompleted ? onNewOrderClick : undefined}
                                 disabled={!isOrderCompleted}
-                                className={`inline-flex items-center justify-center gap-2 rounded-xl px-8 py-3.5 text-base font-bold transition-all ${
+                                className={`inline-flex items-center justify-center gap-2 rounded-xl px-8 py-3.5 text-base font-bold ${
                                     isOrderCompleted
-                                        ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg shadow-amber-500/25 hover:shadow-xl hover:shadow-amber-500/40 hover:scale-[1.02] cursor-pointer'
+                                        ? 'text-white'
                                         : 'bg-gray-400 text-gray-200 cursor-not-allowed opacity-60'
                                 }`}
+                                style={
+                                    isOrderCompleted
+                                        ? {
+                                              backgroundImage: `linear-gradient(to bottom, ${QUANTITY_BADGE_GRADIENT_FROM}, ${QUANTITY_BADGE_GRADIENT_TO})`,
+                                          }
+                                        : undefined
+                                }
                             >
                                 Nouvelle commande
                             </button>
@@ -1527,6 +1544,9 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                 const itemComment = typeof item.commentaire === 'string' && item.commentaire.trim().length > 0
                                     ? item.commentaire.trim()
                                     : null;
+                                const excludedIngredientLabels = mapIngredientIdsToNames(item.excluded_ingredients, ingredientNameMap);
+                                const hasExtras = Array.isArray(item.selected_extras) && item.selected_extras.length > 0;
+                                const hasExcludedIngredients = excludedIngredientLabels.length > 0;
 
                                 return (
                                     <div key={item.id} className="relative">
@@ -1538,14 +1558,12 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                             {item.quantite}
                                         </div>
                                         <div
-                                            className={`group relative ml-6 overflow-hidden rounded-2xl border px-5 pt-1 pb-1 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg ${
+                                            className={`relative ml-6 overflow-hidden rounded-2xl border px-5 pt-1 pb-1 shadow-sm ${
                                                 variant === 'hero'
                                                     ? 'border-white/20 bg-slate-900/35 text-gray-100 backdrop-blur-2xl'
                                                     : 'border-slate-200 bg-white text-slate-600'
                                             }`}
                                         >
-                                            <div className="pointer-events-none absolute -right-14 top-1/2 h-28 w-28 -translate-y-1/2 rounded-full bg-amber-400/20 blur-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-80" />
-                                            <div className="pointer-events-none absolute -left-16 -top-10 h-24 w-24 rounded-full bg-white/10 blur-2xl opacity-50" />
                                             <div className="relative flex items-start justify-between gap-4">
                                                 <div className="flex flex-1 items-start gap-3 pl-14">
                                                     <div className="min-w-0 space-y-2">
@@ -1561,6 +1579,33 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                             <p className={`text-sm leading-snug ${variant === 'hero' ? 'text-white/70' : 'text-slate-500'}`}>
                                                                 {itemDescription}
                                                             </p>
+                                                        )}
+                                                        {(hasExtras || hasExcludedIngredients) && (
+                                                            <div className="mt-2 flex flex-wrap gap-2">
+                                                                {hasExtras &&
+                                                                    item.selected_extras!.map((extra, extraIndex) => (
+                                                                        <span
+                                                                            key={`${item.id}-page-extra-${extraIndex}`}
+                                                                            className="inline-flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-800"
+                                                                        >
+                                                                            <PlusCircle size={12} className="text-emerald-600" />
+                                                                            {extra.extraName}: {extra.optionName}
+                                                                            {typeof extra.price === 'number' && extra.price > 0 && (
+                                                                                <span className="text-[11px] font-semibold text-emerald-700">(+{formatCurrencyCOP(extra.price)})</span>
+                                                                            )}
+                                                                        </span>
+                                                                    ))}
+                                                                {hasExcludedIngredients &&
+                                                                    excludedIngredientLabels.map((ingredientLabel, ingredientIndex) => (
+                                                                        <span
+                                                                            key={`${item.id}-page-excluded-${ingredientIndex}`}
+                                                                            className="inline-flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700"
+                                                                        >
+                                                                            <Ban size={12} />
+                                                                            Sin {ingredientLabel}
+                                                                        </span>
+                                                                    ))}
+                                                            </div>
                                                         )}
                                                         {itemComment && (
                                                             <div className={`rounded-xl border px-3 py-2 text-sm italic shadow-inner ${
