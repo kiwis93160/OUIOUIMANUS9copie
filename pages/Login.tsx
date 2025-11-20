@@ -454,8 +454,9 @@ const Login: React.FC = () => {
   const bestSellerCount = bestSellersToDisplay.length;
   const menuGridClassName = computeMenuGridClassName(bestSellerCount);
   const menuCardClassName = computeMenuCardClassName(bestSellerCount);
+  const pinHelperId = useMemo(() => 'staff-pin-helper', []);
   const pinIsComplete = pin.length === PIN_LENGTH;
-  const describedByIds = undefined;
+  const describedByIds = pinHelperId;
 
   const attemptSubmit = () => {
     if (!pinIsComplete) {
@@ -1062,6 +1063,7 @@ const Login: React.FC = () => {
                 disabled={loading}
                 onSubmit={attemptSubmit}
               />
+              <span id={pinHelperId} aria-hidden="true" />
             </div>
           </form>
         </div>
