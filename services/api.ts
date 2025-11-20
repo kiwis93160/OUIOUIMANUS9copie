@@ -2612,11 +2612,23 @@ export const api = {
       return supabase.from('order_items').insert(itemsWithOrderId) as Promise<SupabaseResponse<OrderItem[]>>;
     });
 
-    publishOrderChange();
     const updatedOrder = await fetchOrderById(orderId);
     if (!updatedOrder) {
       throw new Error('Order not found after adding items');
     }
+
+    try {
+      const itemsForStock = items.map(item => ({
+        ...item,
+        excluded_ingredients: item.excluded_ingredients ?? [],
+        selected_extras: item.selected_extras ?? [],
+      })) as OrderItem[];
+      await deductIngredientsStockForOrderItems(itemsForStock);
+    } catch (error) {
+      console.error('Failed to deduct ingredient stock after adding order items', error);
+    }
+
+    publishOrderChange();
     return updatedOrder;
   },
 
