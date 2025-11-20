@@ -165,17 +165,17 @@ const TakeawayCard: React.FC<{
                                                                             <PlusCircle size={12} />
                                                                         </span>
                                                                         <span className="font-semibold text-emerald-700">{extra.extraName}:</span>
-                                                                        <span className="text-emerald-800">{extra.optionName}</span>
+                                                                        <span className="font-semibold text-emerald-800">{extra.optionName}</span>
                                                                     </div>
                                                                 ))}
                                                             </div>
                                                         )}
 
                                                         {hasExcludedIngredients && (
-                                                            <p className="ml-12 mt-1 rounded-md border border-red-200 bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">
-                                                                🚫 Sin: {excludedIngredientLabels.join(', ')}
-                                                            </p>
-                                                        )}
+                                                        <p className="ml-12 mt-1 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700">
+                                                            🚫 Sin: {excludedIngredientLabels.join(', ')}
+                                                        </p>
+                                                    )}
 
                                                         {note && (
                                                             <p className="ml-12 rounded-md border border-dashed border-blue-200 bg-blue-50 px-3 py-2 text-xs font-medium italic text-blue-800">

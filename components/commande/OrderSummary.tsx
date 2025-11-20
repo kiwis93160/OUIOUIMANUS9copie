@@ -57,7 +57,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
         }
 
         return (
-            <p className="mt-2 rounded-md bg-white/80 p-2 text-xs font-semibold text-red-600">
+            <p className="mt-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-600">
                 🚫 Sin: {excludedLabels.join(', ')}
             </p>
         );
@@ -76,7 +76,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                             <PlusCircle size={12} />
                         </span>
                         <span className="font-semibold text-emerald-700">{extra.extraName}:</span>
-                        <span className="text-emerald-800">{extra.optionName}</span>
+                        <span className="font-semibold text-emerald-800">{extra.optionName}</span>
                     </div>
                 ))}
             </div>

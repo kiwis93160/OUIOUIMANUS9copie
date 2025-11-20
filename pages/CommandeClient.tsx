@@ -976,18 +976,18 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                                                     </p>
                                                 )}
                                                 {excludedIngredientLabels.length > 0 && (
-                                                    <p className="text-sm font-semibold text-red-700 bg-red-50 border-l-2 border-red-400/70 p-2 rounded">
+                                                    <p className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2 text-sm font-semibold text-red-700">
                                                         🚫 Sin: {excludedIngredientLabels.join(', ')}
                                                     </p>
                                                 )}
                                                 {item.selected_extras && item.selected_extras.length > 0 && (
-                                                    <ul className="text-sm text-gray-700 bg-white/70 border border-orange-200 rounded-lg p-2 space-y-1">
+                                                    <ul className="mt-2 space-y-1 rounded-lg border border-orange-200 bg-white/70 p-2 text-sm font-semibold text-gray-800">
                                                         {item.selected_extras.map((extra, extraIndex) => (
                                                             <li key={`${item.id}-cart-extra-${extraIndex}`} className="flex justify-between">
                                                                 <span>
                                                                     ➕ {extra.extraName}: {extra.optionName}
                                                                 </span>
-                                                                <span className="font-semibold text-gray-900">
+                                                                <span className="text-gray-900">
                                                                     {formatCurrencyCOP(extra.price)}
                                                                 </span>
                                                             </li>
