@@ -302,6 +302,7 @@ type ProductExtraOptionFormState = {
     price: string;
     mode: 'custom' | 'ingredient';
     ingredientId?: string;
+    ingredientUsage?: string;
 };
 
 type ProductExtraFormState = {
@@ -332,6 +333,7 @@ const convertExtrasToFormState = (extras?: ProductExtra[] | null): ProductExtraF
             price: option.price.toString(),
             mode: option.type === 'ingredient' || option.ingredient_id ? 'ingredient' : 'custom',
             ingredientId: option.ingredient_id ?? '',
+            ingredientUsage: option.ingredient_usage != null ? option.ingredient_usage.toString() : '',
         })),
     }));
 };
@@ -346,6 +348,10 @@ const sanitizeExtras = (
             options: extra.options
                 .map(option => {
                     const price = Number.parseFloat(option.price.replace(',', '.')) || 0;
+                    const ingredientUsage = Number.parseFloat((option.ingredientUsage ?? '').replace(',', '.'));
+                    const normalizedIngredientUsage = Number.isFinite(ingredientUsage) && ingredientUsage > 0
+                        ? ingredientUsage
+                        : null;
                     if (option.mode === 'ingredient') {
                         const ingredient = option.ingredientId ? ingredientMap.get(option.ingredientId) : undefined;
                         const label = ingredient?.nom?.trim() ?? '';
@@ -357,6 +363,7 @@ const sanitizeExtras = (
                             price,
                             type: 'ingredient' as const,
                             ingredient_id: option.ingredientId ?? null,
+                            ingredient_usage: normalizedIngredientUsage,
                         };
                     }
 
@@ -370,6 +377,7 @@ const sanitizeExtras = (
                         price,
                         type: 'custom' as const,
                         ingredient_id: null,
+                        ingredient_usage: null,
                     };
                 })
                 .filter((option): option is ProductExtraOption => Boolean(option))
@@ -517,7 +525,7 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                         ...extra,
                         options: [
                             ...extra.options,
-                            { name: '', price: '', mode: 'custom', ingredientId: '' },
+                            { name: '', price: '', mode: 'custom', ingredientId: '', ingredientUsage: '' },
                         ],
                     }
                     : extra,
@@ -557,17 +565,26 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                             ...option,
                             mode: nextMode,
                             ingredientId: nextMode === 'ingredient' ? '' : undefined,
+                            ingredientUsage: nextMode === 'ingredient' ? option.ingredientUsage ?? '' : '',
                             name: nextMode === 'ingredient' ? '' : option.name,
                         };
                     }
 
                     if (field === 'ingredientId') {
                         const ingredientName = value ? ingredientMap.get(value)?.nom ?? '' : '';
+                        const recipeUsage = prev.recipe.find(item => item.ingredient_id === value)?.qte_utilisee;
                         return {
                             ...option,
                             ingredientId: value,
                             name: ingredientName || option.name,
+                            ingredientUsage:
+                                option.ingredientUsage ||
+                                (recipeUsage && Number.isFinite(recipeUsage) ? recipeUsage.toString() : option.ingredientUsage),
                         };
+                    }
+
+                    if (field === 'ingredientUsage') {
+                        return { ...option, ingredientUsage: value };
                     }
 
                     return { ...option, [field]: value };
@@ -845,86 +862,122 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                                             </button>
                                         </div>
                                         <div className="space-y-3">
-                                            <div className="grid grid-cols-1 gap-3 text-xs font-semibold uppercase tracking-wide text-gray-500 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)_minmax(0,1fr)_auto]">
-                                                <span>Type d'option</span>
-                                                <span>Nom / Ingrédient</span>
-                                                <span>Prix additionnel</span>
-                                                <span className="hidden sm:block text-right">Action</span>
-                                            </div>
-                                            {extra.options.map((option, optionIndex) => (
-                                                <div
-                                                    key={optionIndex}
-                                                    className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)_minmax(0,1fr)_auto]"
-                                                >
-                                                    <select
-                                                        value={option.mode}
-                                                        onChange={event =>
-                                                            handleExtraOptionChange(extraIndex, optionIndex, 'mode', event.target.value)
-                                                        }
-                                                        className="ui-select"
+                                        <div className="grid grid-cols-1 gap-3 text-xs font-semibold uppercase tracking-wide text-gray-500 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)_auto]">
+                                            <span>Type d'option</span>
+                                            <span>Nom / Ingrédient</span>
+                                            <span>Quantité ajoutée</span>
+                                            <span>Prix additionnel</span>
+                                            <span className="hidden sm:block text-right">Action</span>
+                                        </div>
+                                            {extra.options.map((option, optionIndex) => {
+                                                const selectedIngredientUnit =
+                                                    option.mode === 'ingredient' && option.ingredientId
+                                                        ? ingredientMap.get(option.ingredientId)?.unite
+                                                        : undefined;
+                                                const extraUsageUnitLabel = selectedIngredientUnit
+                                                    ? getUsageUnitLabel(selectedIngredientUnit)
+                                                    : '';
+
+                                                return (
+                                                    <div
+                                                        key={optionIndex}
+                                                        className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)_auto]"
                                                     >
-                                                        <option value="custom">Texte libre</option>
-                                                        <option value="ingredient">Ingrédient du stock</option>
-                                                    </select>
-                                                    {option.mode === 'ingredient' ? (
                                                         <select
-                                                            value={option.ingredientId ?? ''}
+                                                            value={option.mode}
                                                             onChange={event =>
-                                                                handleExtraOptionChange(
-                                                                    extraIndex,
-                                                                    optionIndex,
-                                                                    'ingredientId',
-                                                                    event.target.value,
-                                                                )
+                                                                handleExtraOptionChange(extraIndex, optionIndex, 'mode', event.target.value)
                                                             }
                                                             className="ui-select"
                                                         >
-                                                            <option value="">Sélectionner un ingrédient</option>
-                                                            {ingredients.map(ingredient => (
-                                                                <option key={ingredient.id} value={ingredient.id}>
-                                                                    {ingredient.nom}
-                                                                </option>
-                                                            ))}
+                                                            <option value="custom">Texte libre</option>
+                                                            <option value="ingredient">Ingrédient du stock</option>
                                                         </select>
-                                                    ) : (
-                                                        <input
-                                                            type="text"
-                                                            value={option.name}
-                                                            onChange={event =>
-                                                                handleExtraOptionChange(
-                                                                    extraIndex,
-                                                                    optionIndex,
-                                                                    'name',
-                                                                    event.target.value,
-                                                                )
-                                                            }
-                                                            placeholder="Nom de l'option"
-                                                            className="ui-input"
-                                                        />
-                                                    )}
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-sm text-gray-500">COP</span>
-                                                        <input
-                                                            type="number"
-                                                            min="0"
-                                                            step="0.01"
-                                                            value={option.price}
-                                                            onChange={event =>
-                                                                handleExtraOptionChange(extraIndex, optionIndex, 'price', event.target.value)
-                                                            }
-                                                            placeholder="0.00"
-                                                            className="ui-input"
-                                                        />
+                                                        {option.mode === 'ingredient' ? (
+                                                            <select
+                                                                value={option.ingredientId ?? ''}
+                                                                onChange={event =>
+                                                                    handleExtraOptionChange(
+                                                                        extraIndex,
+                                                                        optionIndex,
+                                                                        'ingredientId',
+                                                                        event.target.value,
+                                                                    )
+                                                                }
+                                                                className="ui-select"
+                                                            >
+                                                                <option value="">Sélectionner un ingrédient</option>
+                                                                {ingredients.map(ingredient => (
+                                                                    <option key={ingredient.id} value={ingredient.id}>
+                                                                        {ingredient.nom}
+                                                                    </option>
+                                                                ))}
+                                                            </select>
+                                                        ) : (
+                                                            <input
+                                                                type="text"
+                                                                value={option.name}
+                                                                onChange={event =>
+                                                                    handleExtraOptionChange(
+                                                                        extraIndex,
+                                                                        optionIndex,
+                                                                        'name',
+                                                                        event.target.value,
+                                                                    )
+                                                                }
+                                                                placeholder="Nom de l'option"
+                                                                className="ui-input"
+                                                            />
+                                                        )}
+                                                        {option.mode === 'ingredient' ? (
+                                                            <div className="flex items-center gap-2">
+                                                                <input
+                                                                    type="number"
+                                                                    min="0"
+                                                                    step="0.01"
+                                                                    value={option.ingredientUsage ?? ''}
+                                                                    onChange={event =>
+                                                                        handleExtraOptionChange(
+                                                                            extraIndex,
+                                                                            optionIndex,
+                                                                            'ingredientUsage',
+                                                                            event.target.value,
+                                                                        )
+                                                                    }
+                                                                    placeholder="1"
+                                                                    className="ui-input"
+                                                                />
+                                                                {extraUsageUnitLabel ? (
+                                                                    <span className="text-sm text-gray-500 w-12">{extraUsageUnitLabel}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        ) : (
+                                                            <div className="self-center text-sm text-gray-400">N/A</div>
+                                                        )}
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-sm text-gray-500">COP</span>
+                                                            <input
+                                                                type="number"
+                                                                min="0"
+                                                                step="0.01"
+                                                                value={option.price}
+                                                                onChange={event =>
+                                                                    handleExtraOptionChange(extraIndex, optionIndex, 'price', event.target.value)
+                                                                }
+                                                                placeholder="0.00"
+                                                                className="ui-input"
+                                                            />
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeExtraOption(extraIndex, optionIndex)}
+                                                            className="justify-self-start rounded-full bg-red-50 p-2 text-red-500 hover:bg-red-100"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
                                                     </div>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => removeExtraOption(extraIndex, optionIndex)}
-                                                        className="justify-self-start rounded-full bg-red-50 p-2 text-red-500 hover:bg-red-100"
-                                                    >
-                                                        <Trash2 size={16} />
-                                                    </button>
-                                                </div>
-                                            ))}
+                                                );
+                                            })}
                                         </div>
                                         <button
                                             type="button"
