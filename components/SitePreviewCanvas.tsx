@@ -297,7 +297,10 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
           buttonClassName="right-4 top-4"
         >
           <header className="login-header" style={navigationBackgroundStyle}>
-            <div className="layout-container login-header__inner" style={navigationTextStyle}>
+            <div
+              className="layout-container login-header__inner"
+              style={{ ...navigationTextStyle, padding: 0 }}
+            >
               <div className="login-brand" style={navigationTextStyle}>
                 <EditableElement
                   id="navigation.brandLogo"
