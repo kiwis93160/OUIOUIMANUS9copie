@@ -207,7 +207,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
         { name: 'Validacion', icon: CheckCircle, description: 'Esperando la validacion de tu pedido', subtext: 'Enviando a la cocina' },
         { name: 'Preparacion', icon: ChefHat, description: 'Nuestros chefs están preparando tus platos', subtext: 'Tu pedido estará listo pronto' },
         { name: 'Listo', icon: PackageCheck, description: 'Tu pedido está listo para entrega', subtext: 'Puedes pasar a retirarlo' },
-        { name: 'Entregado', icon: TruckIcon, description: 'Tu pedido fue entregado', subtext: '¡Buen provecho!' }
+        { name: 'Entregado', icon: TruckIcon, description: 'Tu pedido fue entregado al domiciliario/cliente', subtext: '¡Buen provecho!' }
     ];
 
     const promotionColorSchemes = useMemo(
@@ -690,6 +690,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                 const isFinalStep = index === steps.length - 1;
                                 const isCompletedStep = index < currentStep || (isFinalStep && isOrderCompleted);
                                 const isValidatedStep = step.name === 'Validacion';
+                                const displayAsActive = isActive && !(isFinalStep && isOrderCompleted);
                                 const useQuantityBadgeTheme = isValidatedStep && (isActive || isCompletedStep);
                                 const pendingCardStyle = { backgroundColor: 'rgba(134, 22, 41, 0.4)', borderColor: 'rgba(255, 255, 255, 0.2)' };
                                 const gradientCardStyle = {
@@ -734,7 +735,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                             <div className={iconWrapperClasses}>
                                                 <step.icon className="tracker-step-icon h-10 w-10 sm:h-12 sm:w-12" />
                                             </div>
-                                            {isActive ? (
+                                            {displayAsActive ? (
                                                 <>
                                                     <p className="text-[11px] sm:text-xs leading-snug text-white/90 font-medium">
                                                         {step.description}
@@ -1211,6 +1212,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                             const isFinalStep = index === steps.length - 1;
                             const isCompleted = index < currentStep || (isFinalStep && isOrderCompleted);
                             const isValidatedStep = step.name === 'Validacion';
+                            const displayAsActive = isActive && !(isFinalStep && isOrderCompleted);
                             const useQuantityBadgeTheme = isValidatedStep && (isActive || isCompleted);
                             const descriptionColor = useQuantityBadgeTheme
                                 ? 'text-white/90'
@@ -1275,7 +1277,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                             )}
                                         </div>
                                         <p className={`text-xs leading-snug ${descriptionColor}`}>{step.description}</p>
-                                        {isActive ? (
+                                        {displayAsActive ? (
                                             <p className={`text-xs font-semibold ${timestampColor}`}>
                                                 ⏱️ {getEstimatedTime(index)}
                                             </p>
