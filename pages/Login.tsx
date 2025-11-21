@@ -618,7 +618,18 @@ const Login: React.FC = () => {
 
       <main>
                    
-        <section id="accueil" className="section section-hero" style={{ ...heroBackgroundStyle, ...heroTextStyle }}>
+        <section
+          id="accueil"
+          className="section section-hero"
+          style={{
+            ...heroBackgroundStyle,
+            ...heroTextStyle,
+            backgroundImage: 'none',
+            backgroundColor: 'transparent',
+            visibility: 'hidden',
+          }}
+          aria-hidden="true"
+        >
           {activeOrderId ? (
             <CustomerOrderTracker
               orderId={activeOrderId}
