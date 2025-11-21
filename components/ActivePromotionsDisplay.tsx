@@ -93,15 +93,15 @@ const ActivePromotionsDisplay: React.FC = () => {
                   className="h-28 w-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/35 to-transparent" />
-                <div className="absolute inset-0 flex items-end p-3.5">
-                  <div className="flex items-start gap-2.5 text-white">
+                <div className="absolute inset-0 flex items-end">
+                  <div className="flex w-full items-stretch p-3.5 text-white">
                     <div
-                      className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-white text-[length:16px] shadow-sm"
+                      className="flex flex-shrink-0 items-center justify-center rounded-l-xl bg-white px-3 py-2.5 text-[length:16px] shadow-sm"
                       style={{ color: accentColor }}
                     >
                       {getPromotionIcon(promo)}
                     </div>
-                    <div className="space-y-0.5">
+                    <div className="space-y-0.5 rounded-r-xl bg-black/10 px-3.5 py-2.5 backdrop-blur-[1px]">
                       <p className="text-base font-bold drop-shadow-sm leading-tight">{promo.name}</p>
                       {(bannerText || description) && (
                         <p className="text-sm text-white/90 drop-shadow-sm line-clamp-2 leading-tight">
@@ -123,15 +123,15 @@ const ActivePromotionsDisplay: React.FC = () => {
             >
               <div className="absolute inset-0 opacity-80" style={{ backgroundImage: PROMO_LINEAR_GRADIENT }} />
               <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.18),rgba(255,255,255,0))] opacity-60" />
-              <div className="relative flex items-center gap-2.5 pl-5 pr-5">
+              <div className="relative flex items-stretch pr-5">
                 <div
-                  className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-white text-[length:16px] shadow-sm"
+                  className="flex flex-shrink-0 items-center justify-center rounded-l-xl bg-white px-3 py-3 text-[length:16px] shadow-sm"
                   style={{ color: accentColor }}
                   aria-hidden
                 >
                   {getPromotionIcon(promo)}
                 </div>
-                <div className="flex flex-1 flex-col gap-0.5 min-w-0 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-1 min-w-0 flex-col gap-0.5 rounded-r-xl bg-white/10 pl-3 pr-0 pt-3 pb-3 sm:flex-row sm:items-center sm:justify-between">
                   <p className="text-sm font-semibold leading-tight text-white sm:text-base truncate">{promo.name}</p>
                   {description && (
                     <p className="text-xs text-white/90 sm:text-sm truncate sm:text-right">{description}</p>
