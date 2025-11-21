@@ -691,24 +691,26 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                 const isCompletedStep = index < currentStep || (isFinalStep && isOrderCompleted);
                                 const isValidatedStep = step.name === 'Validado';
                                 const useQuantityBadgeTheme = isValidatedStep && (isActive || isCompletedStep);
-                                const cardClasses = `tracker-step-card rounded-2xl border p-3 sm:p-4 transition-all ${
-                                    useQuantityBadgeTheme
+                                const pendingCardStyle = { backgroundColor: 'rgba(134, 22, 41, 0.4)', borderColor: 'rgba(255, 255, 255, 0.2)' };
+                                const gradientCardStyle = {
+                                    backgroundImage: `linear-gradient(to bottom right, ${QUANTITY_BADGE_GRADIENT_FROM}, ${QUANTITY_BADGE_GRADIENT_TO})`,
+                                    borderColor: QUANTITY_BADGE_BASE_COLOR,
+                                };
+                                const cardClasses = `tracker-step-card rounded-2xl border p-3 sm:p-4 ${
+                                    useQuantityBadgeTheme || isCompletedStep
                                         ? 'text-white shadow-xl shadow-orange-500/25'
-                                        : isCompletedStep
-                                            ? 'bg-gradient-to-br from-emerald-400/80 to-emerald-600/80 border-white/35 text-white shadow-lg shadow-emerald-500/25'
-                                            : isActive
-                                                ? 'bg-gradient-to-br from-amber-400/95 via-orange-500/90 to-red-500/95 border-white/30 text-white shadow-xl shadow-orange-500/25 tracker-step-active'
-                                                : 'bg-slate-900/40 border-white/15 text-white/70 backdrop-blur-2xl hover:bg-slate-900/45 hover:border-white/25'
-                                } ${isActive ? 'scale-[1.02]' : ''}`;
+                                        : isActive
+                                            ? 'bg-gradient-to-br from-amber-400/95 via-orange-500/90 to-red-500/95 border-white/30 text-white shadow-xl shadow-orange-500/25 tracker-step-active'
+                                            : 'text-white/80 backdrop-blur-2xl'
+                                }`;
                                 const iconWrapperClasses = `tracker-step-icon-wrapper relative flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-2xl bg-black/25 ${
                                     useQuantityBadgeTheme || isCompletedStep || isActive ? 'text-white' : 'text-white/70'
                                 }`;
-                                const cardStyle = useQuantityBadgeTheme
-                                    ? {
-                                        backgroundImage: `linear-gradient(to bottom right, ${QUANTITY_BADGE_GRADIENT_FROM}, ${QUANTITY_BADGE_GRADIENT_TO})`,
-                                        borderColor: QUANTITY_BADGE_BASE_COLOR,
-                                    }
-                                    : undefined;
+                                const cardStyle = useQuantityBadgeTheme || isCompletedStep
+                                    ? gradientCardStyle
+                                    : isActive
+                                        ? undefined
+                                        : pendingCardStyle;
 
                                 return (
                                     <div
@@ -1042,7 +1044,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                     {item.quantite}
                                                 </div>
                                                 <div className="flex items-stretch flex-1">
-                                                    <div className="my-0 flex flex-1 flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between self-stretch">
+                                                    <div className="my-0 flex flex-1 flex-col gap-3 px-5 pt-4 pb-0 sm:flex-row sm:items-center sm:justify-between self-stretch">
                                                         <div className="min-w-0 flex-1">
                                                             <div>
                                                                 <p className="my-0 text-base font-semibold leading-tight text-balance text-slate-900 sm:text-lg">
@@ -1057,9 +1059,9 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                                     {item.selected_extras!.map((extra, extraIndex) => (
                                                                         <div
                                                                             key={`${item.id}-tracker-extra-${extraIndex}`}
-                                                                            className="inline-flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-800"
+                                                                            className="inline-flex items-center gap-1.5 rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1.5 text-xs text-emerald-800"
                                                                         >
-                                                                            <span className="inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600">
+                                                                            <span className="inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600">
                                                                                 <PlusCircle size={12} />
                                                                             </span>
                                                                             <span className="font-semibold text-emerald-700">{extra.extraName}:</span>
@@ -1076,7 +1078,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                                     {excludedIngredientLabels.map((ingredientLabel, ingredientIndex) => (
                                                                         <span
                                                                             key={`${item.id}-excluded-${ingredientIndex}`}
-                                                                            className="inline-flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700"
+                                                                            className="inline-flex items-center gap-1.5 rounded-md border border-red-200 bg-red-50 px-2 py-1.5 text-xs font-semibold text-red-700"
                                                                         >
                                                                             <Ban size={12} />
                                                                             Sin {ingredientLabel}
@@ -1230,37 +1232,39 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                 <div
                                     key={`${step.name}-mobile`}
                                     className={`flex items-start gap-3 rounded-2xl border px-4 py-3 shadow-sm ${
-                                        useQuantityBadgeTheme
+                                        useQuantityBadgeTheme || isCompleted
                                             ? 'text-white'
-                                            : isCompleted
-                                                ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-                                                : isActive
-                                                    ? 'bg-amber-50 border-amber-200 text-amber-900'
-                                                    : 'bg-white border-gray-200 text-gray-600'
+                                            : isActive
+                                                ? 'bg-amber-50 border-amber-200 text-amber-900'
+                                                : 'text-white/80'
                                     }`}
-                                    style={useQuantityBadgeTheme
+                                    style={useQuantityBadgeTheme || isCompleted
                                         ? {
                                             backgroundImage: `linear-gradient(to right, ${QUANTITY_BADGE_GRADIENT_FROM}, ${QUANTITY_BADGE_GRADIENT_TO})`,
                                             borderColor: QUANTITY_BADGE_BASE_COLOR,
                                         }
-                                        : undefined}
+                                        : isActive
+                                            ? undefined
+                                            : { backgroundColor: 'rgba(134, 22, 41, 0.4)', borderColor: 'rgba(255, 255, 255, 0.2)' }}
                                 >
                                     <div
                                         className={`flex h-12 w-12 items-center justify-center rounded-2xl border-2 ${
                                             useQuantityBadgeTheme
                                                 ? 'text-white'
                                                 : isCompleted
-                                                    ? 'bg-emerald-500/10 border-emerald-300 text-emerald-600'
+                                                    ? 'bg-white/10 border-white/50 text-white'
                                                     : isActive
                                                         ? 'bg-amber-500/10 border-amber-300 text-amber-600'
-                                                        : 'bg-gray-100 border-gray-200 text-gray-400'
+                                                        : 'bg-[rgba(134,22,41,0.35)] border-white/25 text-white/80'
                                         }`}
                                         style={useQuantityBadgeTheme
                                             ? {
                                                 backgroundImage: `linear-gradient(to right, ${QUANTITY_BADGE_GRADIENT_FROM}, ${QUANTITY_BADGE_GRADIENT_TO})`,
                                                 borderColor: QUANTITY_BADGE_BASE_COLOR,
                                             }
-                                            : undefined}
+                                            : isCompleted
+                                                ? { backgroundImage: `linear-gradient(to right, ${QUANTITY_BADGE_GRADIENT_FROM}, ${QUANTITY_BADGE_GRADIENT_TO})`, borderColor: QUANTITY_BADGE_BASE_COLOR }
+                                                : undefined}
                                     >
                                         <step.icon className="h-6 w-6" />
                                     </div>
