@@ -132,9 +132,9 @@ const ActivePromotionsDisplay: React.FC = () => {
                   {getPromotionIcon(promo)}
                 </div>
                 <div className="flex flex-1 min-w-0 flex-col items-center gap-0.5 rounded-r-xl bg-white/0 pl-3 pr-0 pt-0 pb-0 sm:flex-row sm:items-center sm:justify-between">
-                  <p className="text-sm font-semibold leading-tight text-white sm:text-base truncate">{promo.name}</p>
+                  <p className="text-sm font-semibold leading-tight text-white sm:text-base truncate mb-0">{promo.name}</p>
                   {description && (
-                    <p className="text-xs text-white/90 sm:text-sm truncate sm:text-right">{description}</p>
+                    <p className="text-xs text-white/90 sm:text-sm truncate sm:text-right mb-0">{description}</p>
                   )}
                 </div>
               </div>
