@@ -608,23 +608,19 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
             return (
                 <div
                     key={`${promotion.promotion_id}-${promotion.name}`}
-                    className="flex items-stretch overflow-hidden rounded-xl py-2 shadow-lg"
+                    className="flex items-center rounded-xl shadow-lg overflow-hidden py-2"
                     style={{
                         backgroundImage: `linear-gradient(to bottom, ${QUANTITY_BADGE_GRADIENT_FROM}, ${QUANTITY_BADGE_GRADIENT_TO})`,
                     }}
                     aria-label={`Promotion ${promotion.name}`}
                 >
-                    <div className="flex aspect-square w-12 flex-shrink-0 items-center justify-center bg-white">
-                        <span
-                            className="bg-gradient-to-b from-[#f59e0b] to-[#f97316] bg-clip-text text-transparent"
-                            style={{
-                                backgroundImage: `linear-gradient(to bottom, ${QUANTITY_BADGE_GRADIENT_FROM}, ${QUANTITY_BADGE_GRADIENT_TO})`,
-                            }}
-                        >
-                            {getPromotionIcon(promotion)}
-                        </span>
+                    <div
+                        className="flex items-center justify-center w-11 flex-shrink-0"
+                        style={{ color: visuals?.badge_color || '#FFFFFF' }}
+                    >
+                        {getPromotionIcon(promotion)}
                     </div>
-                    <div className="flex h-full min-w-0 flex-1 items-center justify-between gap-2 px-2.5">
+                    <div className="flex-1 px-2.5 flex items-center justify-between min-w-0 gap-2 h-full">
                         <p className="font-bold text-white text-sm sm:text-base leading-tight truncate mb-px">
                             {promotion.name}
                         </p>
@@ -1048,7 +1044,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                     {item.quantite}
                                                 </div>
                                                 <div className="flex items-stretch flex-1">
-                                                <div className="my-0 flex flex-1 flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between self-stretch">
+                                                    <div className="my-0 flex flex-1 flex-col gap-3 px-5 pt-4 pb-0 sm:flex-row sm:items-center sm:justify-between self-stretch">
                                                         <div className="min-w-0 flex-1">
                                                             <div>
                                                                 <p className="my-0 text-base font-semibold leading-tight text-balance text-slate-900 sm:text-lg">
@@ -1059,7 +1055,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                                 <p className="my-0 text-sm leading-snug text-slate-600">{itemDescription}</p>
                                                             )}
                                                             {hasExtras && (
-                                                                <div className="mt-2 mb-0 flex flex-wrap gap-2">
+                                                                <div className="mt-2 mb-2 flex flex-wrap gap-2">
                                                                     {item.selected_extras!.map((extra, extraIndex) => (
                                                                         <div
                                                                             key={`${item.id}-tracker-extra-${extraIndex}`}
