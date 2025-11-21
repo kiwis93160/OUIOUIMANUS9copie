@@ -66,15 +66,15 @@ const ActivePromotionsDisplay: React.FC = () => {
   };
 
   return (
-    <div className="mb-4 space-y-3">
-      <div className="flex items-center gap-2 text-sm font-semibold text-green-800">
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-sm">
-          <Gift size={18} className="text-green-700" />
+    <div className="mb-3 space-y-2.5">
+      <div className="flex items-center gap-2 text-sm font-semibold text-white drop-shadow-sm">
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm">
+          <Gift size={16} className="text-black" />
         </div>
-        <span className="text-base">Promociones Activas</span>
+        <span className="text-base leading-tight">Promociones Activas</span>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2.5">
         {visiblePromotions.map((promo) => {
           const accentColor = promo.visuals?.badge_bg_color || PROMO_GRADIENT_TO;
           const bannerImage = promo.visuals?.banner_image;
@@ -90,21 +90,21 @@ const ActivePromotionsDisplay: React.FC = () => {
                 <img
                   src={bannerImage}
                   alt={promo.name}
-                  className="h-32 w-full object-cover"
+                  className="h-28 w-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/35 to-transparent" />
-                <div className="absolute inset-0 flex items-end p-4">
-                  <div className="flex items-start gap-3 text-white">
+                <div className="absolute inset-0 flex items-end p-3.5">
+                  <div className="flex items-start gap-2.5 text-white">
                     <div
-                      className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-white/15 border border-white/30"
+                      className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-white text-[length:16px] shadow-sm"
                       style={{ color: accentColor }}
                     >
                       {getPromotionIcon(promo)}
                     </div>
-                    <div className="space-y-1">
-                      <p className="text-lg font-bold drop-shadow-sm">{promo.name}</p>
+                    <div className="space-y-0.5">
+                      <p className="text-base font-bold drop-shadow-sm leading-tight">{promo.name}</p>
                       {(bannerText || description) && (
-                        <p className="text-sm text-white/90 drop-shadow-sm line-clamp-2">
+                        <p className="text-sm text-white/90 drop-shadow-sm line-clamp-2 leading-tight">
                           {bannerText || description}
                         </p>
                       )}
@@ -122,16 +122,16 @@ const ActivePromotionsDisplay: React.FC = () => {
               style={{ backgroundImage: PROMO_LINEAR_GRADIENT }}
             >
               <div className="absolute inset-0 opacity-80" style={{ backgroundImage: PROMO_LINEAR_GRADIENT }} />
-              <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.22),rgba(255,255,255,0))] opacity-60" />
-              <div className="relative flex items-center gap-3 px-3 py-3">
+              <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.18),rgba(255,255,255,0))] opacity-60" />
+              <div className="relative flex items-center gap-2.5 px-3 py-2.5">
                 <div
-                  className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg bg-white/10 border border-white/25 text-white"
+                  className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-white text-[length:16px] shadow-sm"
                   style={{ color: accentColor }}
                   aria-hidden
                 >
                   {getPromotionIcon(promo)}
                 </div>
-                <div className="flex flex-1 flex-col gap-1 min-w-0 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-1 flex-col gap-0.5 min-w-0 sm:flex-row sm:items-center sm:justify-between">
                   <p className="text-sm font-semibold leading-tight text-white sm:text-base truncate">{promo.name}</p>
                   {description && (
                     <p className="text-xs text-white/90 sm:text-sm truncate sm:text-right">{description}</p>
