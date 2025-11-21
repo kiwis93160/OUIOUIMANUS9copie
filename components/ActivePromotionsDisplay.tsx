@@ -3,6 +3,10 @@ import { fetchActivePromotions } from '../services/promotionsApi';
 import { Promotion } from '../types/promotions';
 import { Tag, Gift, TruckIcon, Clock, Percent } from 'lucide-react';
 
+const PROMO_GRADIENT_FROM = '#f59e0b';
+const PROMO_GRADIENT_TO = '#f97316';
+const PROMO_LINEAR_GRADIENT = `linear-gradient(135deg, ${PROMO_GRADIENT_FROM}, ${PROMO_GRADIENT_TO})`;
+
 const ActivePromotionsDisplay: React.FC = () => {
   const [promotions, setPromotions] = useState<Promotion[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,57 +66,77 @@ const ActivePromotionsDisplay: React.FC = () => {
   };
 
   return (
-    <div className="mb-4 space-y-2">
-      <h3 className="inline-flex items-center gap-2 rounded-full border border-white/60 bg-white/70 px-4 py-2 text-sm font-semibold text-gray-900/90 backdrop-blur-md drop-shadow-md">
-        <Gift size={20} />
-        Promociones Activas
-      </h3>
-      <div className="space-y-2">
+    <div className="mb-4 space-y-3">
+      <div className="flex items-center gap-2 text-sm font-semibold text-green-800">
+        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-sm">
+          <Gift size={18} className="text-green-700" />
+        </div>
+        <span className="text-base">Promociones Activas</span>
+      </div>
+
+      <div className="space-y-3">
         {visiblePromotions.map((promo) => {
-          const bgColor = promo.visuals?.badge_bg_color || '#4CAF50';
+          const accentColor = promo.visuals?.badge_bg_color || PROMO_GRADIENT_TO;
           const bannerImage = promo.visuals?.banner_image;
           const bannerText = promo.visuals?.banner_text;
-          
-          // Si une bannière d'image est disponible, l'afficher en grand
+          const description = getPromotionDescription(promo);
+
           if (bannerImage) {
             return (
               <div
                 key={promo.id}
-                className="relative overflow-hidden rounded-lg shadow-md transition-transform hover:scale-[1.02]"
+                className="relative overflow-hidden rounded-xl shadow-lg"
               >
                 <img
                   src={bannerImage}
                   alt={promo.name}
-                  className="w-full h-32 object-cover"
+                  className="h-32 w-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-orange-700/80 via-orange-600/60 to-transparent flex items-end p-3">
-                  <div className="text-white">
-                    <p className="font-bold text-lg drop-shadow-md">{promo.name}</p>
-                    {bannerText && (
-                      <p className="text-sm drop-shadow-md">{bannerText}</p>
-                    )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/35 to-transparent" />
+                <div className="absolute inset-0 flex items-end p-4">
+                  <div className="flex items-start gap-3 text-white">
+                    <div
+                      className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-white/15 border border-white/30"
+                      style={{ color: accentColor }}
+                    >
+                      {getPromotionIcon(promo)}
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-lg font-bold drop-shadow-sm">{promo.name}</p>
+                      {(bannerText || description) && (
+                        <p className="text-sm text-white/90 drop-shadow-sm line-clamp-2">
+                          {bannerText || description}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
             );
           }
-          
-          // Sinon, afficher le format compact habituel
+
           return (
             <div
               key={promo.id}
-              className="flex items-center rounded-lg shadow-md transition-transform hover:scale-[1.01] overflow-hidden border-l-4 border-transparent bg-gradient-to-r from-orange-500 via-orange-600 to-red-600"
-              style={{ borderLeftColor: bgColor }}
+              className="relative overflow-hidden rounded-xl shadow-lg"
+              style={{ backgroundImage: PROMO_LINEAR_GRADIENT }}
             >
-              <div
-                className="flex h-12 w-12 flex-shrink-0 items-center justify-center text-white"
-                style={{ backgroundColor: bgColor, color: '#FFFFFF' }}
-              >
-                {getPromotionIcon(promo)}
-              </div>
-              <div className="flex-1 px-3 py-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-                <p className="font-bold text-white text-sm drop-shadow-sm">{promo.name}</p>
-                <p className="text-xs text-white/90 truncate sm:ml-2">{getPromotionDescription(promo)}</p>
+              <div className="absolute inset-0 opacity-80" style={{ backgroundImage: PROMO_LINEAR_GRADIENT }} />
+              <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.22),rgba(255,255,255,0))] opacity-60" />
+              <div className="relative flex items-center gap-3 px-3 py-3">
+                <div
+                  className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg bg-white/10 border border-white/25 text-white"
+                  style={{ color: accentColor }}
+                  aria-hidden
+                >
+                  {getPromotionIcon(promo)}
+                </div>
+                <div className="flex flex-1 flex-col gap-1 min-w-0 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-sm font-semibold leading-tight text-white sm:text-base truncate">{promo.name}</p>
+                  {description && (
+                    <p className="text-xs text-white/90 sm:text-sm truncate sm:text-right">{description}</p>
+                  )}
+                </div>
               </div>
             </div>
           );
