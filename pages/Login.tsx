@@ -495,7 +495,10 @@ const Login: React.FC = () => {
   return (
     <div className="login-page">
       <header className="login-header" style={navigationBackgroundStyle}>
-        <div className="layout-container login-header__inner" style={navigationTextStyle}>
+        <div
+          className="layout-container login-header__inner"
+          style={{ ...navigationTextStyle, padding: 0 }}
+        >
           <div className="login-brand" style={navigationTextStyle}>
             <img
               src={brandLogo}
