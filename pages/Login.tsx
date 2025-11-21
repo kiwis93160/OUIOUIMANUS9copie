@@ -454,9 +454,8 @@ const Login: React.FC = () => {
   const bestSellerCount = bestSellersToDisplay.length;
   const menuGridClassName = computeMenuGridClassName(bestSellerCount);
   const menuCardClassName = computeMenuCardClassName(bestSellerCount);
-  const pinHelperId = useMemo(() => 'staff-pin-helper', []);
   const pinIsComplete = pin.length === PIN_LENGTH;
-  const describedByIds = pinHelperId;
+  const describedByIds = undefined;
 
   const attemptSubmit = () => {
     if (!pinIsComplete) {
@@ -1045,14 +1044,11 @@ const Login: React.FC = () => {
           setError('');
         }}
         title=""
-        size="lg"
+        size="xs"
       >
         <div className="login-modal">
           <form onSubmit={handleFormSubmit} className="login-modal__form" aria-describedby={describedByIds}>
             <div className="login-modal__panel">
-              <p className="login-modal__lead" id={pinHelperId}>
-                Accès rapide au tableau de bord sécurisé. Saisissez uniquement le code partagé avec votre équipe.
-              </p>
               <PinInput
                 ref={pinInputRef}
                 pin={pin}
@@ -1063,7 +1059,6 @@ const Login: React.FC = () => {
                 disabled={loading}
                 onSubmit={attemptSubmit}
               />
-              <span id={pinHelperId} aria-hidden="true" />
             </div>
           </form>
         </div>
