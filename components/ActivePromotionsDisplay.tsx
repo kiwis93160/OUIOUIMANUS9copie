@@ -123,7 +123,7 @@ const ActivePromotionsDisplay: React.FC = () => {
             >
               <div className="absolute inset-0 opacity-80" style={{ backgroundImage: PROMO_LINEAR_GRADIENT }} />
               <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.18),rgba(255,255,255,0))] opacity-60" />
-              <div className="relative flex items-center gap-2.5 px-3 py-2.5">
+              <div className="relative flex items-center gap-2.5 pl-5 pr-5">
                 <div
                   className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-white text-[length:16px] shadow-sm"
                   style={{ color: accentColor }}
