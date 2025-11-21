@@ -204,8 +204,8 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
 
     const steps = [
         { name: 'Enviado', icon: FileText, description: 'Tu pedido se envió a la cocina', subtext: 'Estamos verificando tu orden' },
-        { name: 'Validado', icon: CheckCircle, description: 'Esperando la validacion de tu pedido', subtext: 'Enviando a la cocina' },
-        { name: 'En preparacion', icon: ChefHat, description: 'Nuestros chefs están preparando tus platos', subtext: 'Tu pedido estará listo pronto' },
+        { name: 'Validacion', icon: CheckCircle, description: 'Esperando la validacion de tu pedido', subtext: 'Enviando a la cocina' },
+        { name: 'Preparacion', icon: ChefHat, description: 'Nuestros chefs están preparando tus platos', subtext: 'Tu pedido estará listo pronto' },
         { name: 'Listo', icon: PackageCheck, description: 'Tu pedido está listo para entrega', subtext: 'Puedes pasar a retirarlo' },
         { name: 'Entregado', icon: TruckIcon, description: 'Tu pedido fue entregado', subtext: '¡Buen provecho!' }
     ];
@@ -280,9 +280,9 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
         switch (stepIndex) {
             case 0: // Enviado
                 return '2-5 min';
-            case 1: // Validado
+            case 1: // Validacion
                 return '1-3 min';
-            case 2: // En preparacion
+            case 2: // Preparacion
                 const prepTime = baseTime + (itemCount * timePerItem);
                 return `${prepTime}-${prepTime + 5} min`;
             case 3: // Listo
@@ -307,9 +307,9 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
         switch (stepIndex) {
             case 0: // Enviado
                 return formatTime(order.created_at);
-            case 1: // Validado
+            case 1: // Validacion
                 return formatTime(order.date_validado);
-            case 2: // En preparacion
+            case 2: // Preparacion
                 return formatTime(order.date_en_preparacion);
             case 3: // Listo
                 return formatTime(order.date_listo_cuisine);
@@ -689,20 +689,19 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                 const isActive = index === currentStep;
                                 const isFinalStep = index === steps.length - 1;
                                 const isCompletedStep = index < currentStep || (isFinalStep && isOrderCompleted);
-                                const isValidatedStep = step.name === 'Validado';
+                                const isValidatedStep = step.name === 'Validacion';
                                 const useQuantityBadgeTheme = isValidatedStep && (isActive || isCompletedStep);
                                 const pendingCardStyle = { backgroundColor: 'rgba(134, 22, 41, 0.4)', borderColor: 'rgba(255, 255, 255, 0.2)' };
                                 const gradientCardStyle = {
                                     backgroundImage: `linear-gradient(to bottom right, ${QUANTITY_BADGE_GRADIENT_FROM}, ${QUANTITY_BADGE_GRADIENT_TO})`,
                                     borderColor: QUANTITY_BADGE_BASE_COLOR,
                                 };
-                                const cardClasses = `tracker-step-card rounded-2xl border p-3 sm:p-4 ${
-                                    useQuantityBadgeTheme || isCompletedStep
-                                        ? 'text-white shadow-xl shadow-orange-500/25'
-                                        : isActive
-                                            ? 'bg-gradient-to-br from-amber-400/95 via-orange-500/90 to-red-500/95 border-white/30 text-white shadow-xl shadow-orange-500/25 tracker-step-active'
-                                            : 'text-white/80 backdrop-blur-2xl'
-                                }`;
+                                const statusClasses = useQuantityBadgeTheme || isCompletedStep
+                                    ? 'text-white shadow-xl shadow-orange-500/25'
+                                    : isActive
+                                        ? 'bg-gradient-to-br from-amber-400/95 via-orange-500/90 to-red-500/95 border-white/30 text-white shadow-xl shadow-orange-500/25'
+                                        : 'text-white/80 backdrop-blur-2xl';
+                                const cardClasses = `tracker-step-card rounded-2xl border p-3 sm:p-4 ${statusClasses} ${isActive ? 'tracker-step-active' : ''}`;
                                 const iconWrapperClasses = `tracker-step-icon-wrapper relative flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-2xl bg-black/25 ${
                                     useQuantityBadgeTheme || isCompletedStep || isActive ? 'text-white' : 'text-white/70'
                                 }`;
@@ -722,7 +721,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                         <div className="flex flex-col items-center text-center gap-2 sm:gap-3">
                                             <div className="flex items-center gap-1.5">
                                                 <p
-                                                    className={`text-xs sm:text-sm font-semibold tracking-wide ${
+                                                    className={`text-xs sm:text-sm font-semibold tracking-wide uppercase ${
                                                         isCompletedStep || isActive ? 'text-white' : 'text-white/70'
                                                     }`}
                                                 >
@@ -741,7 +740,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                         {step.description}
                                                     </p>
                                                     {getEstimatedTime(index) && (
-                                                        <div className="mt-2 rounded-full bg-black/35 px-2.5 py-1 backdrop-blur-xl">
+                                                        <div className="mt-2 inline-flex items-center justify-center rounded-full bg-black/35 px-2.5 py-1 backdrop-blur-xl">
                                                             <p className="text-[10px] sm:text-xs font-bold text-white">
                                                                 ⏱️ {getEstimatedTime(index)}
                                                             </p>
@@ -1211,7 +1210,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                             const isActive = index === currentStep;
                             const isFinalStep = index === steps.length - 1;
                             const isCompleted = index < currentStep || (isFinalStep && isOrderCompleted);
-                            const isValidatedStep = step.name === 'Validado';
+                            const isValidatedStep = step.name === 'Validacion';
                             const useQuantityBadgeTheme = isValidatedStep && (isActive || isCompleted);
                             const descriptionColor = useQuantityBadgeTheme
                                 ? 'text-white/90'
@@ -1270,7 +1269,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                     </div>
                                     <div className="flex-1 space-y-1">
                                         <div className="flex items-center gap-2">
-                                            <p className="text-sm font-semibold">{step.name}</p>
+                                            <p className="text-sm font-semibold uppercase">{step.name}</p>
                                             {isCompleted && (
                                                 <CheckCircle className="h-4 w-4 text-emerald-500" aria-hidden />
                                             )}
@@ -1299,14 +1298,14 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                             const isActive = index === currentStep;
                             const isFinalStep = index === steps.length - 1;
                             const isCompleted = index < currentStep || (isFinalStep && isOrderCompleted);
-                            const isValidatedStep = step.name === 'Validado';
+                            const isValidatedStep = step.name === 'Validacion';
                             const useQuantityBadgeTheme = isValidatedStep && (isActive || isCompleted);
 
                             return (
                                 <div key={step.name} className="flex flex-1 items-center gap-2 sm:gap-4">
                                     <div className="flex flex-col items-center text-center gap-2 sm:gap-3">
                                         <p
-                                            className={`text-xs sm:text-sm font-semibold ${
+                                            className={`text-xs sm:text-sm font-semibold uppercase ${
                                                 useQuantityBadgeTheme || isCompleted || isActive ? 'text-gray-900' : 'text-gray-400'
                                             }`}
                                         >
