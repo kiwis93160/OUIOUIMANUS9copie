@@ -636,7 +636,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
         cartUpdateTimeouts.current.set(itemId, timeout);
     }, [setCart]);
 
-    const handleReorder = (order: Order) => {
+    const handleReorder = useCallback((order: Order) => {
         const baseTimestamp = Date.now();
         const itemsToReorder = order.items
             .filter(item => !isDeliveryFeeItem(item))
@@ -645,7 +645,36 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                 addedAt: baseTimestamp + index,
             }));
         setCart(itemsToReorder);
-    };
+    }, [setCart]);
+
+    useEffect(() => {
+        if (typeof window === 'undefined') {
+            return;
+        }
+
+        const reorderId = localStorage.getItem('customer-order-reorder-id');
+        if (!reorderId) {
+            return;
+        }
+
+        try {
+            const historyJSON = localStorage.getItem('customer-order-history');
+            if (!historyJSON) {
+                return;
+            }
+
+            const history: Order[] = JSON.parse(historyJSON);
+            const orderToReorder = history.find(order => order.id === reorderId);
+
+            if (orderToReorder) {
+                handleReorder(orderToReorder);
+            }
+        } catch (error) {
+            console.error('Error applying reorder:', error);
+        } finally {
+            localStorage.removeItem('customer-order-reorder-id');
+        }
+    }, [handleReorder]);
 
     const handleApplyPromoCode = async () => {
         const trimmedCode = promoCode.trim().toUpperCase();
