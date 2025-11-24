@@ -578,7 +578,7 @@ const ParaLlevar: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-6">
+            <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-10">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-3">
                         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-blue-600">
@@ -627,7 +627,7 @@ const ParaLlevar: React.FC = () => {
 
             </div>
 
-            <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-6">
+            <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-10">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-3">
                         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
