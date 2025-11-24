@@ -1396,8 +1396,8 @@ export const getBusinessDayStart = (now: Date = new Date()): Date => {
 };
 
 const DASHBOARD_PERIOD_CONFIG: Record<DashboardPeriod, { days: number; label: string }> = {
-  week: { days: 7, label: '7 derniers jours' },
-  month: { days: 30, label: '30 derniers jours' },
+  week: { days: 7, label: 'Últimos 7 días' },
+  month: { days: 30, label: 'Últimos 30 días' },
 };
 
 const resolveDashboardPeriodBounds = (period: DashboardPeriod) => {
@@ -1830,9 +1830,9 @@ export const api = {
       const name =
         config.days === 7
           ? index === config.days - 1
-            ? 'Auj'
-            : `J-${config.days - 1 - index}`
-          : dayStart.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+            ? 'Hoy'
+            : `D-${config.days - 1 - index}`
+          : dayStart.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
 
       return {
         name,

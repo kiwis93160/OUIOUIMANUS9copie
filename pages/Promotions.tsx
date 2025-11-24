@@ -23,10 +23,10 @@ import PromotionDetailsModal from '../components/promotions/PromotionDetailsModa
 import ConfirmationModal from '../components/ConfirmationModal';
 
 const statusLabels: Record<PromotionStatus, string> = {
-  active: 'Active',
-  inactive: 'Inactive',
-  scheduled: 'Programmée',
-  expired: 'Expirée'
+  active: 'Activa',
+  inactive: 'Inactiva',
+  scheduled: 'Programada',
+  expired: 'Expirada'
 };
 
 const statusColors: Record<PromotionStatus, string> = {
@@ -37,14 +37,14 @@ const statusColors: Record<PromotionStatus, string> = {
 };
 
 const typeLabels: Record<PromotionType, string> = {
-  percentage: 'Pourcentage',
-  fixed_amount: 'Montant fixe',
-  promo_code: 'Code promo',
-  buy_x_get_y: '2x1 / Achetez X, obtenez Y',
-  free_product: 'Produit gratuit',
-  free_shipping: 'Livraison gratuite',
+  percentage: 'Porcentaje',
+  fixed_amount: 'Monto fijo',
+  promo_code: 'Código promocional',
+  buy_x_get_y: '2x1 / Compra X, obtén Y',
+  free_product: 'Producto gratis',
+  free_shipping: 'Envío gratis',
   combo: 'Combo',
-  threshold: 'Palier',
+  threshold: 'Umbral',
   happy_hour: 'Happy hour'
 };
 
@@ -82,7 +82,7 @@ const Promotions: React.FC = () => {
       const data = await fetchPromotions();
       setPromotions(data);
     } catch (err) {
-      setError('Erreur lors du chargement des promotions');
+      setError('Error al cargar las promociones');
       console.error(err);
     } finally {
       setLoading(false);
@@ -121,7 +121,7 @@ const Promotions: React.FC = () => {
         p.id === promotion.id ? updatedPromotion : p
       ));
     } catch (err) {
-      setError('Erreur lors de la mise à jour du statut');
+      setError('Error al actualizar el estado');
       console.error(err);
     }
   };
@@ -134,7 +134,7 @@ const Promotions: React.FC = () => {
       setPromotions(promotions.filter(p => p.id !== selectedPromotion.id));
       setIsDeleteModalOpen(false);
     } catch (err) {
-      setError('Erreur lors de la suppression de la promotion');
+      setError('Error al eliminar la promoción');
       console.error(err);
     }
   };
@@ -183,7 +183,7 @@ const Promotions: React.FC = () => {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return new Intl.DateTimeFormat('fr-FR', {
+    return new Intl.DateTimeFormat('es-ES', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
@@ -195,13 +195,13 @@ const Promotions: React.FC = () => {
   return (
     <div className="promotions-page p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Gestion des promotions</h1>
+        <h1 className="text-2xl font-bold">Gestión de promociones</h1>
         <button
           onClick={handleCreatePromotion}
           className="bg-brand-primary hover:bg-brand-primary-dark text-white px-4 py-2 rounded-lg flex items-center gap-2"
         >
           <Plus size={20} />
-          Nouvelle promotion
+          Nueva promoción
         </button>
       </div>
 
@@ -217,7 +217,7 @@ const Promotions: React.FC = () => {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Rechercher une promotion..."
+                placeholder="Buscar una promoción..."
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -231,26 +231,26 @@ const Promotions: React.FC = () => {
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as PromotionStatus | 'all')}
             >
-              <option value="all">Tous les statuts</option>
-              <option value="active">Actives</option>
-              <option value="inactive">Inactives</option>
-              <option value="scheduled">Programmées</option>
-              <option value="expired">Expirées</option>
+              <option value="all">Todos los estados</option>
+              <option value="active">Activas</option>
+              <option value="inactive">Inactivas</option>
+              <option value="scheduled">Programadas</option>
+              <option value="expired">Expiradas</option>
             </select>
             <select
               className="border border-gray-300 rounded-lg px-3 py-2"
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value as PromotionType | 'all')}
             >
-              <option value="all">Tous les types</option>
-              <option value="percentage">Pourcentage</option>
-              <option value="fixed_amount">Montant fixe</option>
-              <option value="promo_code">Code promo</option>
-              <option value="buy_x_get_y">2x1 / Achetez X, obtenez Y</option>
-              <option value="free_product">Produit gratuit</option>
-              <option value="free_shipping">Livraison gratuite</option>
+              <option value="all">Todos los tipos</option>
+              <option value="percentage">Porcentaje</option>
+              <option value="fixed_amount">Monto fijo</option>
+              <option value="promo_code">Código promocional</option>
+              <option value="buy_x_get_y">2x1 / Compra X, obtén Y</option>
+              <option value="free_product">Producto gratis</option>
+              <option value="free_shipping">Envío gratis</option>
               <option value="combo">Combo</option>
-              <option value="threshold">Palier</option>
+              <option value="threshold">Umbral</option>
               <option value="happy_hour">Happy hour</option>
             </select>
             <button
@@ -272,36 +272,36 @@ const Promotions: React.FC = () => {
                     className="flex items-center gap-1 font-semibold text-gray-700"
                     onClick={() => handleSort('name')}
                   >
-                    Nom {renderSortIcon('name')}
+                    Nombre {renderSortIcon('name')}
                   </button>
                 </th>
-                <th className="px-4 py-3 text-left">Type</th>
-                <th className="px-4 py-3 text-left">Statut</th>
+                <th className="px-4 py-3 text-left">Tipo</th>
+                <th className="px-4 py-3 text-left">Estado</th>
                 <th className="px-4 py-3 text-left">
-                  <button 
+                  <button
                     className="flex items-center gap-1 font-semibold text-gray-700"
                     onClick={() => handleSort('priority')}
                   >
-                    Priorité {renderSortIcon('priority')}
+                    Prioridad {renderSortIcon('priority')}
                   </button>
                 </th>
                 <th className="px-4 py-3 text-left">
-                  <button 
+                  <button
                     className="flex items-center gap-1 font-semibold text-gray-700"
                     onClick={() => handleSort('created_at')}
                   >
-                    Créée le {renderSortIcon('created_at')}
+                    Creada el {renderSortIcon('created_at')}
                   </button>
                 </th>
                 <th className="px-4 py-3 text-left">
-                  <button 
+                  <button
                     className="flex items-center gap-1 font-semibold text-gray-700"
                     onClick={() => handleSort('usage_count')}
                   >
-                    Utilisations {renderSortIcon('usage_count')}
+                    Usos {renderSortIcon('usage_count')}
                   </button>
                 </th>
-                <th className="px-4 py-3 text-right">Actions</th>
+                <th className="px-4 py-3 text-right">Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -350,28 +350,28 @@ const Promotions: React.FC = () => {
                         <button
                           onClick={() => handleToggleStatus(promotion)}
                           className="p-1.5 rounded-md hover:bg-gray-100"
-                          title={promotion.status === 'active' ? 'Désactiver' : 'Activer'}
+                          title={promotion.status === 'active' ? 'Desactivar' : 'Activar'}
                         >
                           {promotion.status === 'active' ? <EyeOff size={18} /> : <Eye size={18} />}
                         </button>
                         <button
                           onClick={() => handleViewPromotion(promotion)}
                           className="p-1.5 rounded-md hover:bg-gray-100"
-                          title="Voir les détails"
+                          title="Ver detalles"
                         >
                           <Eye size={18} />
                         </button>
                         <button
                           onClick={() => handleEditPromotion(promotion)}
                           className="p-1.5 rounded-md hover:bg-gray-100"
-                          title="Modifier"
+                          title="Editar"
                         >
                           <Edit size={18} />
                         </button>
                         <button
                           onClick={() => handleDeletePromotion(promotion)}
                           className="p-1.5 rounded-md hover:bg-gray-100 text-red-500"
-                          title="Supprimer"
+                          title="Eliminar"
                         >
                           <Trash2 size={18} />
                         </button>
@@ -422,10 +422,10 @@ const Promotions: React.FC = () => {
           isOpen={isDeleteModalOpen}
           onClose={() => setIsDeleteModalOpen(false)}
           onConfirm={confirmDelete}
-          title="Supprimer la promotion"
-          message={`Êtes-vous sûr de vouloir supprimer la promotion "${selectedPromotion.name}" ? Cette action est irréversible.`}
-          confirmLabel="Supprimer"
-          cancelLabel="Annuler"
+          title="Eliminar promoción"
+          message={`¿Seguro que quieres eliminar la promoción "${selectedPromotion.name}"? Esta acción es irreversible.`}
+          confirmLabel="Eliminar"
+          cancelLabel="Cancelar"
           confirmButtonClass="bg-red-600 hover:bg-red-700"
         />
       )}
