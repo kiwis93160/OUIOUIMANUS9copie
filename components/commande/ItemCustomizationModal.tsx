@@ -116,14 +116,14 @@ const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
                     className="w-full h-48 object-cover rounded-lg"
                 />
                 {product.description && (
-                    <p className="text-gray-200 text-sm">{product.description}</p>
+                    <p className="text-black text-sm">{product.description}</p>
                 )}
                 {displayExtras.length > 0 && (
-                    <div className="space-y-3 rounded-xl border border-gray-700/60 bg-gray-900/40 p-4">
-                        <p className="text-sm font-semibold text-gray-100">Extras del producto</p>
+                    <div className="space-y-3 rounded-xl border border-gray-200 bg-white p-4">
+                        <p className="text-sm font-semibold text-black">Extras del producto</p>
                         {displayExtras.map(extra => (
                             <div key={extra.name} className="space-y-2">
-                                <p className="text-xs uppercase tracking-wide text-gray-400">{extra.name}</p>
+                                <p className="text-xs uppercase tracking-wide text-black">{extra.name}</p>
                                 <div className="space-y-2">
                                     {extra.options.map(option => {
                                         const isRemovalExtra = Boolean(extra.isIngredientRemovalExtra);
@@ -135,8 +135,8 @@ const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
                                                 key={option.name}
                                                 className={`flex items-center justify-between rounded-lg border px-3 py-2 text-sm transition ${
                                                     isSelected
-                                                        ? 'border-brand-primary bg-brand-primary/10 text-white'
-                                                        : 'border-gray-700 text-gray-200'
+                                                        ? 'border-brand-primary bg-brand-primary/10 text-black'
+                                                        : 'border-gray-200 text-black'
                                                 }`}
                                             >
                                                 <span className="flex items-center gap-2">
@@ -156,7 +156,7 @@ const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
                                                     {option.name}
                                                 </span>
                                                 {option.price > 0 && (
-                                                    <span className="text-xs font-semibold text-brand-primary">
+                                                    <span className="text-xs font-semibold text-orange-600">
                                                         + {formatCurrencyCOP(option.price)}
                                                     </span>
                                                 )}
@@ -167,9 +167,9 @@ const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
                             </div>
                         ))}
                         {selectedExtras.length > 0 && (
-                            <div className="rounded-lg bg-black/30 p-3 text-sm text-gray-200">
+                            <div className="rounded-lg bg-white p-3 text-sm text-black border border-gray-200">
                                 <p className="font-semibold">Extras seleccionados</p>
-                                <ul className="mt-2 space-y-1 text-xs text-gray-300">
+                                <ul className="mt-2 space-y-1 text-xs text-black">
                                     {selectedExtras.map((extra, index) => (
                                         <li key={`${extra.extraName}-${extra.optionName}-${index}`}>
                                             {extra.extraName}: {extra.optionName} (+{formatCurrencyCOP(extra.price)})
@@ -181,12 +181,12 @@ const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
                     </div>
                 )}
                 <div>
-                    <label className="block text-sm font-medium text-gray-200">Comentario</label>
+                    <label className="block text-sm font-medium text-black">Comentario</label>
                     <textarea
                         value={comment}
                         onChange={(event) => setComment(event.target.value)}
                         rows={2}
-                        className="mt-1 block w-full rounded-md border border-gray-600 bg-gray-900/60 py-2 px-3 text-sm text-gray-100 focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                        className="mt-1 block w-full rounded-md border border-gray-200 bg-white py-2 px-3 text-sm text-black focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary"
                         placeholder="Alergias, instrucciones específicas..."
                     />
                 </div>
@@ -200,7 +200,7 @@ const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
                         >
                             <Minus size={18} />
                         </button>
-                        <span className="w-8 text-center text-lg font-bold text-gray-100">{quantity}</span>
+                        <span className="w-8 text-center text-lg font-bold text-black">{quantity}</span>
                         <button
                             type="button"
                             onClick={handleIncrease}
@@ -218,9 +218,6 @@ const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
                         Agregar ({formatCurrencyCOP(unitPrice * quantity)})
                     </button>
                 </div>
-                <p className="text-xs text-gray-400">
-                    Precio unitario: {formatCurrencyCOP(unitPrice)}
-                </p>
             </div>
         </Modal>
     );
