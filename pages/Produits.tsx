@@ -729,6 +729,16 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                                         </select>
                                     </div>
                                 </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Descripción</label>
+                                    <textarea
+                                        rows={3}
+                                        value={formData.description}
+                                        onChange={e => setFormData({ ...formData, description: e.target.value })}
+                                        className="mt-1 ui-textarea"
+                                        placeholder="Descripción breve del producto..."
+                                    />
+                                </div>
                             </div>
                             <div className="rounded-2xl border border-brand-border bg-brand-accent/15 p-4 space-y-4 flex-1">
                                 <div className="space-y-3">
@@ -780,16 +790,6 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                                             Selecciona una posición disponible para este destacado.
                                         </p>
                                     )}
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Descripción</label>
-                                    <textarea
-                                        rows={3}
-                                        value={formData.description}
-                                        onChange={e => setFormData({ ...formData, description: e.target.value })}
-                                        className="mt-1 ui-textarea"
-                                        placeholder="Descripción breve del producto..."
-                                    />
                                 </div>
                             </div>
                         </div>
