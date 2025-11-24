@@ -35,7 +35,7 @@ const Ingredients: React.FC = () => {
             setIngredients(data);
             setError(null);
         } catch (err) {
-            setError("Impossible de charger les ingrédients.");
+            setError("No se pudieron cargar los ingredientes.");
             console.error(err);
         } finally {
             setLoading(false);
@@ -73,7 +73,7 @@ const Ingredients: React.FC = () => {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                     <input
                         type="text"
-                        placeholder="Rechercher un ingrédient..."
+                        placeholder="Buscar un ingrediente..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="ui-input pl-10 sm:w-64"
@@ -82,21 +82,21 @@ const Ingredients: React.FC = () => {
                 {canEdit && (
                     <button onClick={() => handleOpenModal('add')} className="w-full md:w-auto ui-btn-primary">
                         <PlusCircle size={20} />
-                        Ajouter un ingrédient
+                        Agregar un ingrediente
                     </button>
                 )}
             </div>
 
-            {loading ? <p className="text-gray-800">Chargement...</p> : error ? <p className="text-red-500">{error}</p> : (
+            {loading ? <p className="text-gray-800">Cargando...</p> : error ? <p className="text-red-500">{error}</p> : (
                 <div className="ui-card p-4 overflow-x-auto">
                     <table className="w-full text-left">
                         <thead className="border-b">
                             <tr>
-                                <th className="p-3 text-sm font-medium text-gray-500 uppercase tracking-wider">Nom</th>
-                                <th className="p-3 text-sm font-medium text-gray-500 uppercase tracking-wider">Stock Actuel</th>
-                                <th className="p-3 text-sm font-medium text-gray-500 uppercase tracking-wider">Stock Minimum</th>
-                                <th className="p-3 text-sm font-medium text-gray-500 uppercase tracking-wider">Prix unitaire moyen (base)</th>
-                                {canEdit && <th className="p-3 text-right text-sm font-medium text-gray-500 uppercase tracking-wider">Actions</th>}
+                                <th className="p-3 text-sm font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                                <th className="p-3 text-sm font-medium text-gray-500 uppercase tracking-wider">Stock actual</th>
+                                <th className="p-3 text-sm font-medium text-gray-500 uppercase tracking-wider">Stock mínimo</th>
+                                <th className="p-3 text-sm font-medium text-gray-500 uppercase tracking-wider">Precio unitario promedio (base)</th>
+                                {canEdit && <th className="p-3 text-right text-sm font-medium text-gray-500 uppercase tracking-wider">Acciones</th>}
                             </tr>
                         </thead>
                         <tbody>
@@ -117,9 +117,9 @@ const Ingredients: React.FC = () => {
                                     {canEdit && (
                                         <td className="p-3 text-right">
                                             <div className="flex justify-end gap-2">
-                                                <button onClick={() => handleOpenModal('resupply', ing)} title="Réapprovisionner" className="p-2 text-green-600 hover:bg-green-100 rounded-full"><PackagePlus size={20} /></button>
-                                                <button onClick={() => handleOpenModal('edit', ing)} title="Modifier" className="p-2 text-blue-600 hover:bg-blue-100 rounded-full"><Edit size={20} /></button>
-                                                <button onClick={() => handleOpenModal('delete', ing)} title="Supprimer" className="p-2 text-red-600 hover:bg-red-100 rounded-full"><Trash2 size={20} /></button>
+                                                <button onClick={() => handleOpenModal('resupply', ing)} title="Reabastecer" className="p-2 text-green-600 hover:bg-green-100 rounded-full"><PackagePlus size={20} /></button>
+                                                <button onClick={() => handleOpenModal('edit', ing)} title="Editar" className="p-2 text-blue-600 hover:bg-blue-100 rounded-full"><Edit size={20} /></button>
+                                                <button onClick={() => handleOpenModal('delete', ing)} title="Eliminar" className="p-2 text-red-600 hover:bg-red-100 rounded-full"><Trash2 size={20} /></button>
                                             </div>
                                         </td>
                                     )}
@@ -203,29 +203,29 @@ const AddEditIngredientModal: React.FC<{ isOpen: boolean; onClose: () => void; o
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title={mode === 'add' ? 'Ajouter un Ingrédient' : 'Modifier l\'Ingrédient'}>
+        <Modal isOpen={isOpen} onClose={onClose} title={mode === 'add' ? 'Agregar ingrediente' : 'Modificar ingrediente'}>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                    <label htmlFor="nom" className="block text-sm font-medium text-gray-700">Nom</label>
+                    <label htmlFor="nom" className="block text-sm font-medium text-gray-700">Nombre</label>
                     <input type="text" id="nom" value={formData.nom} onChange={e => setFormData({...formData, nom: e.target.value})} required className="mt-1 ui-input"/>
                 </div>
                 <div>
-                    <label htmlFor="unite" className="block text-sm font-medium text-gray-700">Unité</label>
+                    <label htmlFor="unite" className="block text-sm font-medium text-gray-700">Unidad</label>
                     <select id="unite" value={formData.unite} onChange={e => setFormData({...formData, unite: e.target.value as Ingredient['unite']})} required className="mt-1 ui-select">
-                        <option value="g">Grammes (g)</option>
-                        <option value="kg">Kilogrammes (kg)</option>
-                        <option value="ml">Millilitres (ml)</option>
-                        <option value="L">Litres (L)</option>
-                        <option value="unite">Unité</option>
+                        <option value="g">Gramos (g)</option>
+                        <option value="kg">Kilogramos (kg)</option>
+                        <option value="ml">Mililitros (ml)</option>
+                        <option value="L">Litros (L)</option>
+                        <option value="unite">Unidad</option>
                     </select>
                 </div>
                  <div>
-                    <label htmlFor="stock_minimum" className="block text-sm font-medium text-gray-700">Stock Minimum</label>
+                    <label htmlFor="stock_minimum" className="block text-sm font-medium text-gray-700">Stock mínimo</label>
                     <input type="number" id="stock_minimum" min="0" value={formData.stock_minimum} onChange={e => setFormData({...formData, stock_minimum: parseFloat(e.target.value)})} required className="mt-1 ui-input"/>
                 </div>
                 {mode === 'edit' && (
                     <div>
-                        <label htmlFor="average_price" className="block text-sm font-medium text-gray-700">Prix unitaire moyen ({getPriceDisplayUnitLabel(formData.unite)})</label>
+                        <label htmlFor="average_price" className="block text-sm font-medium text-gray-700">Precio unitario promedio ({getPriceDisplayUnitLabel(formData.unite)})</label>
                         <input
                             type="number"
                             id="average_price"
@@ -238,12 +238,12 @@ const AddEditIngredientModal: React.FC<{ isOpen: boolean; onClose: () => void; o
                             }}
                             className="mt-1 ui-input"
                         />
-                        <p className="mt-1 text-xs text-gray-500">Ce prix représente le coût moyen actuel par {getPriceDisplayUnitLabel(formData.unite)}.</p>
+                        <p className="mt-1 text-xs text-gray-500">Este precio representa el costo promedio actual por {getPriceDisplayUnitLabel(formData.unite)}.</p>
                     </div>
                 )}
                 <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                    <button type="button" onClick={onClose} className="w-full ui-btn-secondary py-3">Annuler</button>
-                    <button type="submit" disabled={isSubmitting} className="w-full ui-btn-primary py-3 disabled:opacity-60">{isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}</button>
+                    <button type="button" onClick={onClose} className="w-full ui-btn-secondary py-3">Cancelar</button>
+                    <button type="submit" disabled={isSubmitting} className="w-full ui-btn-primary py-3 disabled:opacity-60">{isSubmitting ? 'Guardando...' : 'Guardar'}</button>
                 </div>
             </form>
         </Modal>
@@ -275,10 +275,10 @@ const ResupplyModal: React.FC<{ isOpen: boolean; onClose: () => void; onSuccess:
     };
     
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title={`Réapprovisionner: ${ingredient.nom}`}>
+        <Modal isOpen={isOpen} onClose={onClose} title={`Reabastecer: ${ingredient.nom}`}>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                    <label htmlFor="quantity" className="block text-sm font-medium text-gray-700">Quantité Achetée ({ingredient.unite})</label>
+                    <label htmlFor="quantity" className="block text-sm font-medium text-gray-700">Cantidad comprada ({ingredient.unite})</label>
                     <input type="number" id="quantity" min="0.01" step="0.01" value={quantity} onChange={e => {
                         const value = parseFloat(e.target.value);
                         setQuantity(Number.isNaN(value) ? 0 : value);
@@ -292,8 +292,8 @@ const ResupplyModal: React.FC<{ isOpen: boolean; onClose: () => void; onSuccess:
                     }} required className="mt-1 ui-input"/>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                    <button type="button" onClick={onClose} className="w-full ui-btn-secondary py-3">Annuler</button>
-                    <button type="submit" disabled={isSubmitting} className="w-full ui-btn-success py-3 disabled:opacity-60">{isSubmitting ? 'Ajout...' : 'Ajouter au Stock'}</button>
+                    <button type="button" onClick={onClose} className="w-full ui-btn-secondary py-3">Cancelar</button>
+                    <button type="submit" disabled={isSubmitting} className="w-full ui-btn-success py-3 disabled:opacity-60">{isSubmitting ? 'Agregando...' : 'Agregar al stock'}</button>
                 </div>
             </form>
         </Modal>
@@ -313,19 +313,19 @@ const DeleteModal: React.FC<{ isOpen: boolean; onClose: () => void; onSuccess: (
             onClose();
         } catch (error) {
             console.error("Failed to delete ingredient", error);
-            setErrorMessage("Impossible de supprimer cet ingrédient car il est utilisé dans au moins une recette.");
+            setErrorMessage("No es posible eliminar este ingrediente porque se usa en al menos una receta.");
         } finally {
             setSubmitting(false);
         }
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Confirmer la Suppression">
-            <p className="text-gray-700">Êtes-vous sûr de vouloir supprimer l'ingrédient <strong className="text-gray-900">{ingredient.nom}</strong> ? Cette action est irréversible.</p>
+        <Modal isOpen={isOpen} onClose={onClose} title="Confirmar eliminación">
+            <p className="text-gray-700">¿Seguro que quieres eliminar el ingrediente <strong className="text-gray-900">{ingredient.nom}</strong>? Esta acción es irreversible.</p>
             {errorMessage && <p className="mt-4 text-sm text-red-600">{errorMessage}</p>}
             <div className="flex flex-col sm:flex-row gap-3 pt-6">
-                <button type="button" onClick={onClose} className="w-full ui-btn-secondary py-3">Annuler</button>
-                <button onClick={handleDelete} disabled={isSubmitting} className="w-full ui-btn-danger py-3 disabled:opacity-60">{isSubmitting ? 'Suppression...' : 'Supprimer'}</button>
+                <button type="button" onClick={onClose} className="w-full ui-btn-secondary py-3">Cancelar</button>
+                <button onClick={handleDelete} disabled={isSubmitting} className="w-full ui-btn-danger py-3 disabled:opacity-60">{isSubmitting ? 'Eliminando...' : 'Eliminar'}</button>
             </div>
         </Modal>
     );

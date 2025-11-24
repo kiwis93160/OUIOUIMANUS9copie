@@ -17,11 +17,11 @@ const getStatusInfo = (status: Product['estado']) => {
         case 'disponible':
             return { text: 'Disponible', color: 'bg-green-100 text-green-800', Icon: CheckCircle };
         case 'agotado_temporal':
-            return { text: 'Rupture (Temp.)', color: 'bg-yellow-100 text-yellow-800', Icon: Clock };
+            return { text: 'Agotado (temp.)', color: 'bg-yellow-100 text-yellow-800', Icon: Clock };
         case 'agotado_indefinido':
-            return { text: 'Indisponible', color: 'bg-red-100 text-red-800', Icon: XCircle };
+            return { text: 'No disponible', color: 'bg-red-100 text-red-800', Icon: XCircle };
         default:
-            return { text: 'Inconnu', color: 'bg-gray-100 text-gray-800', Icon: HelpCircle };
+            return { text: 'Desconocido', color: 'bg-gray-100 text-gray-800', Icon: HelpCircle };
     }
 };
 
@@ -59,7 +59,7 @@ const Produits: React.FC = () => {
             setIngredients(ingredientsData);
             setError(null);
         } catch (err) {
-            setError("Impossible de charger les données des produits.");
+            setError("No se pudieron cargar los datos de los productos.");
             console.error(err);
         } finally {
             setLoading(false);
@@ -105,12 +105,12 @@ const Produits: React.FC = () => {
             fetchData();
         } catch (error) {
             console.error("Failed to update status", error);
-            const message = error instanceof Error ? error.message : "Une erreur inconnue s'est produite.";
-            alert(`Échec de la mise à jour du statut du produit : ${message}`);
+            const message = error instanceof Error ? error.message : "Ocurrió un error desconocido.";
+            alert(`No se pudo actualizar el estado del producto: ${message}`);
         }
     }
 
-    if (loading) return <p className="text-gray-800">Chargement des produits...</p>;
+    if (loading) return <p className="text-gray-800">Cargando productos...</p>;
     if (error) return <p className="text-red-500">{error}</p>;
 
     return (
@@ -121,7 +121,7 @@ const Produits: React.FC = () => {
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                         <input
                             type="text"
-                            placeholder="Rechercher un produit..."
+                            placeholder="Buscar un producto..."
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
                             className="ui-input pl-10"
@@ -132,7 +132,7 @@ const Produits: React.FC = () => {
                         onChange={e => setCategoryFilter(e.target.value)}
                         className="ui-select md:w-56"
                     >
-                        <option value="all">Toutes les catégories</option>
+                        <option value="all">Todas las categorías</option>
                         {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.nom}</option>)}
                     </select>
                 </div>
@@ -143,7 +143,7 @@ const Produits: React.FC = () => {
                         </button>
                         <button onClick={() => handleOpenModal('product', 'add')} className="flex-1 lg:flex-initial ui-btn-primary">
                             <PlusCircle size={20} />
-                            Ajouter Produit
+                            Agregar producto
                         </button>
                     </div>
                 )}
@@ -232,7 +232,7 @@ const ProductCard: React.FC<{ product: Product; category?: Category; onEdit: () 
             <div className="p-4 flex flex-col flex-grow">
                 <div className="flex justify-between items-start">
                     <div>
-                        <p className="text-xs text-black">{category?.nom || 'Sans catégorie'}</p>
+                        <p className="text-xs text-black">{category?.nom || 'Sin categoría'}</p>
                         <h3 className="font-bold text-[clamp(1.05rem,2.2vw,1.35rem)] leading-snug text-black break-words text-balance whitespace-normal [hyphens:auto]">
                             {product.nom_produit}
                         </h3>
@@ -253,7 +253,7 @@ const ProductCard: React.FC<{ product: Product; category?: Category; onEdit: () 
                         </button>
                         {canEdit && statusMenuOpen && (
                             <div className="absolute left-0 bottom-full mb-2 w-44 bg-white rounded-md shadow-lg z-10 border">
-                                <p className="px-4 pt-2 pb-1 text-xs text-gray-500">Changer statut :</p>
+                                <p className="px-4 pt-2 pb-1 text-xs text-gray-500">Cambiar estado:</p>
                                 {['disponible', 'agotado_temporal', 'agotado_indefinido'].map(status => (
                                     <button
                                         key={status}
@@ -276,7 +276,7 @@ const ProductCard: React.FC<{ product: Product; category?: Category; onEdit: () 
                                 type="button"
                                 onClick={onEdit}
                                 className="p-2 rounded-full hover:bg-gray-100 hover:text-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
-                                aria-label="Modifier le produit"
+                                aria-label="Editar el producto"
                             >
                                 <Edit size={18} />
                             </button>
@@ -284,7 +284,7 @@ const ProductCard: React.FC<{ product: Product; category?: Category; onEdit: () 
                                 type="button"
                                 onClick={onDelete}
                                 className="p-2 rounded-full hover:bg-gray-100 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-500/40"
-                                aria-label="Supprimer le produit"
+                                aria-label="Eliminar el producto"
                             >
                                 <Trash2 size={18} />
                             </button>
@@ -597,17 +597,17 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (formData.recipe.length === 0) {
-            alert("Veuillez ajouter au moins un ingrédient à la recette.");
+            alert("Por favor añade al menos un ingrediente a la receta.");
             return;
         }
         if (formData.is_best_seller) {
             if (formData.best_seller_rank == null) {
-                alert('Veuillez sélectionner une position de best seller disponible.');
+                alert('Selecciona una posición de producto destacado disponible.');
                 return;
             }
             const occupant = occupiedPositions.get(formData.best_seller_rank);
             if (occupant && occupant.id !== product?.id) {
-                alert(`La position ${formData.best_seller_rank} est déjà occupée par ${occupant.nom_produit}.`);
+                alert(`La posición ${formData.best_seller_rank} ya está ocupada por ${occupant.nom_produit}.`);
                 return;
             }
         }
@@ -637,28 +637,28 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
             onClose();
         } catch (error) {
             console.error("Failed to save product", error);
-            const message = error instanceof Error ? error.message : "Une erreur inconnue s'est produite.";
-            alert(`Échec du téléversement de l'image du produit : ${message}`);
+            const message = error instanceof Error ? error.message : "Ocurrió un error desconocido.";
+            alert(`No se pudo cargar la imagen del producto: ${message}`);
         } finally {
             setSubmitting(false);
         }
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title={mode === 'add' ? 'Ajouter un Produit' : 'Modifier le Produit'} size="half">
+        <Modal isOpen={isOpen} onClose={onClose} title={mode === 'add' ? 'Agregar producto' : 'Modificar producto'} size="half">
             <form onSubmit={handleSubmit} className="space-y-4">
                  <div className="max-h-[65vh] overflow-y-auto pr-2 space-y-5">
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] md:items-stretch">
                         <div className="rounded-2xl border border-brand-border bg-brand-accent/10 p-4 flex flex-col gap-4 h-full">
                             <div>
-                                <p className="text-sm font-semibold text-gray-800">Image du produit</p>
-                                <p className="text-xs text-gray-600">Utilisez une image carrée pour un meilleur rendu.</p>
+                                <p className="text-sm font-semibold text-gray-800">Imagen del producto</p>
+                                <p className="text-xs text-gray-600">Usa una imagen cuadrada para un mejor resultado.</p>
                             </div>
                             <div className="flex-1">
                                 <div className="h-full w-full overflow-hidden rounded-xl bg-white shadow-sm">
                                     <img
                                         src={imageFile ? URL.createObjectURL(imageFile) : resolveProductImageUrl(formData.image)}
-                                        alt="Aperçu du produit"
+                                        alt="Vista previa del producto"
                                         className="h-full w-full object-cover"
                                     />
                                 </div>
@@ -669,7 +669,7 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                             >
                                 <div className="flex items-center justify-center gap-2">
                                     <Upload size={16} />
-                                    <span>Changer l'image</span>
+                                    <span>Cambiar la imagen</span>
                                 </div>
                                 <input
                                     id="product-image-upload"
@@ -682,7 +682,7 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                         <div className="flex flex-col gap-4 h-full">
                             <div className="rounded-2xl border border-brand-border bg-brand-accent/5 p-4 space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">Nom</label>
+                                    <label className="block text-sm font-medium text-gray-700">Nombre</label>
                                     <input
                                         type="text"
                                         value={formData.nom_produit}
@@ -693,7 +693,7 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                                 </div>
                                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700">Prix de vente</label>
+                                        <label className="block text-sm font-medium text-gray-700">Precio de venta</label>
                                         <input
                                             type="number"
                                             step="0.01"
@@ -714,7 +714,7 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700">Catégorie</label>
+                                        <label className="block text-sm font-medium text-gray-700">Categoría</label>
                                         <select
                                             value={formData.categoria_id}
                                             onChange={e => setFormData({ ...formData, categoria_id: e.target.value })}
@@ -747,26 +747,26 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                                         </div>
                                         {formData.is_best_seller && (
                                             <span className="rounded-full bg-white/70 px-3 py-1 text-xs font-medium text-brand-primary">
-                                                Mise en avant
+                                                Destacado
                                             </span>
                                         )}
                                     </div>
                                     <select
-                                        aria-label="Position du best seller"
+                                        aria-label="Posición del producto destacado"
                                         value={formData.best_seller_rank ?? ''}
                                         onChange={handleBestSellerRankChange}
                                         disabled={!formData.is_best_seller}
                                         className="ui-select"
                                     >
-                                        <option value="">Sélectionner une position</option>
+                                        <option value="">Selecciona una posición</option>
                                         {BEST_SELLER_RANKS.map(rank => {
                                             const occupant = occupiedPositions.get(rank);
                                             const isCurrentProduct = occupant?.id === product?.id;
                                             const isDisabled = Boolean(occupant && !isCurrentProduct);
                                             const label = occupant
                                                 ? isCurrentProduct
-                                                    ? `${rank} – Position actuelle`
-                                                    : `${rank} – Occupé par ${occupant.nom_produit}`
+                                                    ? `${rank} – Posición actual`
+                                                    : `${rank} – Ocupado por ${occupant.nom_produit}`
                                                 : `${rank}`;
                                             return (
                                                 <option key={rank} value={rank} disabled={isDisabled}>
@@ -777,18 +777,18 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                                     </select>
                                     {formData.is_best_seller && formData.best_seller_rank === null && (
                                         <p className="text-xs text-red-600">
-                                            Sélectionnez une position disponible pour ce best seller.
+                                            Selecciona una posición disponible para este destacado.
                                         </p>
                                     )}
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">Description</label>
+                                    <label className="block text-sm font-medium text-gray-700">Descripción</label>
                                     <textarea
                                         rows={3}
                                         value={formData.description}
                                         onChange={e => setFormData({ ...formData, description: e.target.value })}
                                         className="mt-1 ui-textarea"
-                                        placeholder="Courte description du produit..."
+                                        placeholder="Descripción breve del producto..."
                                     />
                                 </div>
                             </div>
@@ -798,15 +798,15 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                     <div className="rounded-2xl border border-brand-border bg-brand-accent/5 p-5 space-y-5">
                         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                             <div>
-                                <h4 className="text-base font-semibold text-gray-800">Extras du produit</h4>
-                                <p className="text-sm text-gray-600">Organisez vos suppléments par groupe pour guider la sélection.</p>
+                                <h4 className="text-base font-semibold text-gray-800">Extras del producto</h4>
+                                <p className="text-sm text-gray-600">Organiza tus suplementos por grupo para guiar la selección.</p>
                             </div>
                             <button
                                 type="button"
                                 onClick={addExtraGroup}
                                 className="inline-flex items-center gap-1 rounded-full border border-brand-border bg-white/70 px-4 py-2 text-sm font-medium text-brand-primary hover:bg-white"
                             >
-                                <span>+ Ajouter un extra</span>
+                                <span>+ Agregar un extra</span>
                             </button>
                         </div>
                         <div className="rounded-xl border border-dashed border-brand-border/70 bg-white/70 p-4 text-sm text-gray-700 space-y-2">
@@ -822,15 +822,15 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                                         }))
                                     }
                                 />
-                                <span>Permettre aux clients de retirer des ingrédients</span>
+                                <span>Permitir que los clientes retiren ingredientes</span>
                             </label>
                             <p className="text-xs text-gray-500">
-                                Active un groupe d'extra automatique qui liste les ingrédients de la recette pour que les clients puissent en retirer un sans frais.
+                                Activa un grupo de extras automático que lista los ingredientes de la receta para que los clientes puedan retirarlos sin costo.
                             </p>
                         </div>
                         {formData.extras.length === 0 ? (
                             <div className="rounded-xl border border-dashed border-brand-border bg-white/60 p-4 text-sm text-gray-500">
-                                Aucun extra n'est défini pour ce produit.
+                                No hay extras definidos para este producto.
                             </div>
                         ) : (
                             <div className="space-y-4">
@@ -845,11 +845,11 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                                                     type="text"
                                                     value={extra.name}
                                                     onChange={event => handleExtraNameChange(extraIndex, event.target.value)}
-                                                    placeholder="Nom de l'extra (ex: Sauces)"
+                                                    placeholder="Nombre del extra (ej.: Salsas)"
                                                     className="ui-input flex-1"
                                                 />
                                                 <span className="rounded-full bg-brand-accent/10 px-3 py-1 text-xs font-medium text-brand-primary">
-                                                    {extra.options.length} option{extra.options.length > 1 ? 's' : ''}
+                                                    {extra.options.length} opción{extra.options.length > 1 ? 'es' : ''}
                                                 </span>
                                             </div>
                                             <button
@@ -863,11 +863,11 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                                         </div>
                                         <div className="space-y-3">
                                         <div className="grid grid-cols-1 gap-3 text-xs font-semibold uppercase tracking-wide text-gray-500 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)_auto]">
-                                            <span>Type d'option</span>
-                                            <span>Nom / Ingrédient</span>
-                                            <span>Quantité ajoutée</span>
-                                            <span>Prix additionnel</span>
-                                            <span className="hidden sm:block text-right">Action</span>
+                                            <span>Tipo de opción</span>
+                                            <span>Nombre / Ingrediente</span>
+                                            <span>Cantidad añadida</span>
+                                            <span>Precio adicional</span>
+                                            <span className="hidden sm:block text-right">Acción</span>
                                         </div>
                                             {extra.options.map((option, optionIndex) => {
                                                 const selectedIngredientUnit =
@@ -890,8 +890,8 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                                                             }
                                                             className="ui-select"
                                                         >
-                                                            <option value="custom">Texte libre</option>
-                                                            <option value="ingredient">Ingrédient du stock</option>
+                                                            <option value="custom">Texto libre</option>
+                                                            <option value="ingredient">Ingrediente del inventario</option>
                                                         </select>
                                                         {option.mode === 'ingredient' ? (
                                                             <select
@@ -906,7 +906,7 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                                                                 }
                                                                 className="ui-select"
                                                             >
-                                                                <option value="">Sélectionner un ingrédient</option>
+                                                                <option value="">Selecciona un ingrediente</option>
                                                                 {ingredients.map(ingredient => (
                                                                     <option key={ingredient.id} value={ingredient.id}>
                                                                         {ingredient.nom}
@@ -925,7 +925,7 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                                                                         event.target.value,
                                                                     )
                                                                 }
-                                                                placeholder="Nom de l'option"
+                                                                placeholder="Nombre de la opción"
                                                                 className="ui-input"
                                                             />
                                                         )}
@@ -984,7 +984,7 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                                             onClick={() => addExtraOption(extraIndex)}
                                             className="text-sm font-semibold text-brand-primary hover:underline"
                                         >
-                                            + Ajouter une option
+                                            + Agregar una opción
                                         </button>
                                     </div>
                                 ))}
@@ -994,10 +994,10 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
 
                     <div className="rounded-2xl border border-brand-border bg-brand-accent/5 p-4">
                         <div className="flex flex-col gap-2">
-                            <h4 className="text-md font-semibold text-gray-800">Recette</h4>
+                            <h4 className="text-md font-semibold text-gray-800">Receta</h4>
                             {formData.recipe.length === 0 && (
                                 <div className="text-center p-2 my-2 bg-red-50 border border-red-200 rounded-md">
-                                    <p className="text-sm text-red-600">Un produit doit contenir au moins un ingrédient.</p>
+                                    <p className="text-sm text-red-600">Un producto debe contener al menos un ingrediente.</p>
                                 </div>
                             )}
                             <div className="space-y-2">
@@ -1011,30 +1011,30 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                                             <select value={item.ingredient_id} onChange={event => handleRecipeChange(index, 'ingredient_id', event)} className="ui-select flex-grow">
                                                 {ingredients.map(i => <option key={i.id} value={i.id}>{i.nom}</option>)}
                                             </select>
-                                            <input type="number" placeholder="Qté" value={item.qte_utilisee} onChange={event => handleRecipeChange(index, 'qte_utilisee', event)} className="ui-input w-24" />
+                                            <input type="number" placeholder="Cant." value={item.qte_utilisee} onChange={event => handleRecipeChange(index, 'qte_utilisee', event)} className="ui-input w-24" />
                                             <span className="text-gray-500 text-sm w-12">{usageUnitLabel}</span>
                                             <button type="button" onClick={() => removeRecipeItem(index)} className="p-1 text-red-500 hover:bg-red-100 rounded-full"><Trash2 size={16}/></button>
                                         </div>
                                     );
                                 })}
                             </div>
-                            <button type="button" onClick={addRecipeItem} className="mt-2 text-sm font-semibold text-brand-primary hover:underline">+ Ajouter un ingrédient</button>
+                            <button type="button" onClick={addRecipeItem} className="mt-2 text-sm font-semibold text-brand-primary hover:underline">+ Agregar un ingrediente</button>
                         </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-brand-accent/10 border border-brand-border rounded-2xl p-4 text-sm text-gray-700">
                         <div>
-                            <p className="text-xs uppercase tracking-wide text-gray-500">Coût de revient</p>
+                            <p className="text-xs uppercase tracking-wide text-gray-500">Costo de producción</p>
                             <p className="text-lg font-semibold text-gray-900">{formatCurrencyCOP(recipeCost)}</p>
                         </div>
                         <div>
-                            <p className="text-xs uppercase tracking-wide text-gray-500">Marge</p>
+                            <p className="text-xs uppercase tracking-wide text-gray-500">Margen</p>
                             <p className={`text-lg font-semibold ${marginValue >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
                                 {formatCurrencyCOP(marginValue)}
                             </p>
                         </div>
                         <div>
-                            <p className="text-xs uppercase tracking-wide text-gray-500">Marge %</p>
+                            <p className="text-xs uppercase tracking-wide text-gray-500">Margen %</p>
                             <p className={`text-lg font-semibold ${marginPercentage >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
                                 {Number.isFinite(marginPercentage) ? formatIntegerAmount(marginPercentage) : '0'}%
                             </p>
@@ -1043,8 +1043,8 @@ const AddEditProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSu
                 </div>
 
                 <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t">
-                    <button type="button" onClick={onClose} className="w-full sm:w-auto ui-btn-secondary py-3">Annuler</button>
-                    <button type="submit" disabled={isSubmitting || formData.recipe.length === 0} className="w-full sm:w-auto ui-btn-primary py-3 disabled:opacity-60">{isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}</button>
+                    <button type="button" onClick={onClose} className="w-full sm:w-auto ui-btn-secondary py-3">Cancelar</button>
+                    <button type="submit" disabled={isSubmitting || formData.recipe.length === 0} className="w-full sm:w-auto ui-btn-primary py-3 disabled:opacity-60">{isSubmitting ? 'Guardando...' : 'Guardar'}</button>
                 </div>
             </form>
         </Modal>
@@ -1076,11 +1076,11 @@ const ManageCategoriesModal: React.FC<{ isOpen: boolean; onClose: () => void; on
     };
     
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Gérer les Catégories">
+        <Modal isOpen={isOpen} onClose={onClose} title="Gestionar categorías">
             <div className="space-y-4">
                 <div className="flex gap-2">
-                    <input type="text" value={newCategoryName} onChange={e => setNewCategoryName(e.target.value)} placeholder="Nom de la nouvelle catégorie" className="ui-input flex-grow" />
-                    <button onClick={handleAdd} className="ui-btn-primary px-4">Ajouter</button>
+                    <input type="text" value={newCategoryName} onChange={e => setNewCategoryName(e.target.value)} placeholder="Nombre de la nueva categoría" className="ui-input flex-grow" />
+                    <button onClick={handleAdd} className="ui-btn-primary px-4">Agregar</button>
                 </div>
                 {error && <p className="text-red-500 text-sm">{error}</p>}
                 <ul className="space-y-2 max-h-60 overflow-y-auto">
@@ -1092,7 +1092,7 @@ const ManageCategoriesModal: React.FC<{ isOpen: boolean; onClose: () => void; on
                     ))}
                 </ul>
                  <div className="pt-4 flex">
-                    <button type="button" onClick={onClose} className="w-full ui-btn-secondary py-3">Fermer</button>
+                    <button type="button" onClick={onClose} className="w-full ui-btn-secondary py-3">Cerrar</button>
                 </div>
             </div>
         </Modal>
@@ -1116,11 +1116,11 @@ const DeleteProductModal: React.FC<{ isOpen: boolean; onClose: () => void; onSuc
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Confirmer la Suppression">
-            <p className="text-gray-700">Êtes-vous sûr de vouloir supprimer le produit <strong className="text-gray-900">{product.nom_produit}</strong> ? Cette action est irréversible.</p>
+        <Modal isOpen={isOpen} onClose={onClose} title="Confirmar eliminación">
+            <p className="text-gray-700">¿Seguro que quieres eliminar el producto <strong className="text-gray-900">{product.nom_produit}</strong>? Esta acción es irreversible.</p>
             <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6">
-                <button type="button" onClick={onClose} className="w-full sm:w-auto ui-btn-secondary py-3">Annuler</button>
-                <button onClick={handleDelete} disabled={isSubmitting} className="w-full sm:w-auto ui-btn-danger py-3">{isSubmitting ? 'Suppression...' : 'Supprimer'}</button>
+                <button type="button" onClick={onClose} className="w-full sm:w-auto ui-btn-secondary py-3">Cancelar</button>
+                <button onClick={handleDelete} disabled={isSubmitting} className="w-full sm:w-auto ui-btn-danger py-3">{isSubmitting ? 'Eliminando...' : 'Eliminar'}</button>
             </div>
         </Modal>
     );
