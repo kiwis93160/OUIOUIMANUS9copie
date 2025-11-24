@@ -340,9 +340,6 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, selectedPr
                     >
                         Agregar al carrito - {formatCurrencyCOP(unitPrice * quantity)}
                     </button>
-                    <p className="mt-2 text-xs text-gray-500">
-                        Precio unitario con extras: {formatCurrencyCOP(unitPrice)}
-                    </p>
                 </div>
             </div>
         </div>
