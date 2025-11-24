@@ -140,9 +140,9 @@ const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
                                                 return (
                                                     <label
                                                         key={option.name}
-                                                        className={`flex items-center justify-between rounded-lg border px-3 py-2 text-sm transition ${
+                                                        className={`flex items-center justify-between rounded-lg border bg-white px-3 py-2 text-sm transition shadow-sm ${
                                                             isSelected
-                                                                ? 'border-brand-primary bg-brand-primary/10 text-black'
+                                                                ? 'border-brand-primary text-black'
                                                                 : 'border-gray-200 text-black'
                                                         }`}
                                                     >
@@ -193,9 +193,9 @@ const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
                                                 return (
                                                     <label
                                                         key={option.name}
-                                                        className={`flex items-center justify-between rounded-lg border px-3 py-2 text-sm transition ${
+                                                        className={`flex items-center justify-between rounded-lg border bg-white px-3 py-2 text-sm transition shadow-sm ${
                                                             isSelected
-                                                                ? 'border-brand-primary bg-brand-primary/10 text-black'
+                                                                ? 'border-brand-primary text-black'
                                                                 : 'border-gray-200 text-black'
                                                         }`}
                                                     >
