@@ -47,6 +47,14 @@ const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
             : []
     ), [product]);
 
+    const [standardExtras, removalExtras] = useMemo(() => {
+        const extras = displayExtras ?? [];
+        return [
+            extras.filter(extra => !extra.isIngredientRemovalExtra),
+            extras.filter(extra => Boolean(extra.isIngredientRemovalExtra)),
+        ];
+    }, [displayExtras]);
+
     if (!product) {
         return null;
     }
@@ -119,63 +127,99 @@ const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
                     <p className="text-black text-sm">{product.description}</p>
                 )}
                 {displayExtras.length > 0 && (
-                    <div className="space-y-3 rounded-xl border border-gray-200 bg-white p-4">
-                        <p className="text-sm font-semibold text-black">Extras del producto</p>
-                        {displayExtras.map(extra => (
-                            <div key={extra.name} className="space-y-2">
-                                <p className="text-xs uppercase tracking-wide text-black">{extra.name}</p>
-                                <div className="space-y-2">
-                                    {extra.options.map(option => {
-                                        const isRemovalExtra = Boolean(extra.isIngredientRemovalExtra);
-                                        const isSelected = isRemovalExtra
-                                            ? Boolean(option.ingredient_id && excludedIngredientIds.includes(option.ingredient_id))
-                                            : (selectedExtrasState[extra.name] ?? []).includes(option.name);
-                                        return (
-                                            <label
-                                                key={option.name}
-                                                className={`flex items-center justify-between rounded-lg border px-3 py-2 text-sm transition ${
-                                                    isSelected
-                                                        ? 'border-brand-primary bg-brand-primary/10 text-black'
-                                                        : 'border-gray-200 text-black'
-                                                }`}
-                                            >
-                                                <span className="flex items-center gap-2">
-                                                    <input
-                                                        type="checkbox"
-                                                        className="accent-brand-primary"
-                                                        checked={isSelected}
-                                                        disabled={isRemovalExtra && !option.ingredient_id}
-                                                        onChange={() => {
-                                                            if (isRemovalExtra && option.ingredient_id) {
-                                                                toggleExcludedIngredient(option.ingredient_id);
-                                                            } else {
-                                                                toggleExtraOption(extra.name, option.name);
-                                                            }
-                                                        }}
-                                                    />
-                                                    {option.name}
-                                                </span>
-                                                {option.price > 0 && (
-                                                    <span className="text-xs font-semibold text-orange-600">
-                                                        + {formatCurrencyCOP(option.price)}
-                                                    </span>
-                                                )}
-                                            </label>
-                                        );
-                                    })}
-                                </div>
+                    <div className="space-y-3">
+                        {standardExtras.length > 0 && (
+                            <div className="space-y-3 rounded-xl border border-orange-100 bg-gradient-to-br from-orange-50 via-rose-50 to-red-50 p-4">
+                                <p className="text-sm font-semibold text-black">Extras del producto</p>
+                                {standardExtras.map(extra => (
+                                    <div key={extra.name} className="space-y-2">
+                                        <p className="text-xs uppercase tracking-wide text-black">{extra.name}</p>
+                                        <div className="space-y-2">
+                                            {extra.options.map(option => {
+                                                const isSelected = (selectedExtrasState[extra.name] ?? []).includes(option.name);
+                                                return (
+                                                    <label
+                                                        key={option.name}
+                                                        className={`flex items-center justify-between rounded-lg border bg-white px-3 py-2 text-sm transition shadow-sm ${
+                                                            isSelected
+                                                                ? 'border-brand-primary text-black'
+                                                                : 'border-gray-200 text-black'
+                                                        }`}
+                                                    >
+                                                        <span className="flex items-center gap-2">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="accent-brand-primary"
+                                                                checked={isSelected}
+                                                                onChange={() => toggleExtraOption(extra.name, option.name)}
+                                                            />
+                                                            {option.name}
+                                                        </span>
+                                                        {option.price > 0 && (
+                                                            <span className="text-xs font-semibold text-orange-600">
+                                                                + {formatCurrencyCOP(option.price)}
+                                                            </span>
+                                                        )}
+                                                    </label>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                ))}
+                                {selectedExtras.length > 0 && (
+                                    <div className="rounded-lg bg-white p-3 text-sm text-black border border-gray-200">
+                                        <p className="font-semibold">Extras seleccionados</p>
+                                        <ul className="mt-2 space-y-1 text-xs text-black">
+                                            {selectedExtras.map((extra, index) => (
+                                                <li key={`${extra.extraName}-${extra.optionName}-${index}`}>
+                                                    {extra.extraName}: {extra.optionName} (+{formatCurrencyCOP(extra.price)})
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
                             </div>
-                        ))}
-                        {selectedExtras.length > 0 && (
-                            <div className="rounded-lg bg-white p-3 text-sm text-black border border-gray-200">
-                                <p className="font-semibold">Extras seleccionados</p>
-                                <ul className="mt-2 space-y-1 text-xs text-black">
-                                    {selectedExtras.map((extra, index) => (
-                                        <li key={`${extra.extraName}-${extra.optionName}-${index}`}>
-                                            {extra.extraName}: {extra.optionName} (+{formatCurrencyCOP(extra.price)})
-                                        </li>
-                                    ))}
-                                </ul>
+                        )}
+
+                        {removalExtras.length > 0 && (
+                            <div className="space-y-3 rounded-xl border border-orange-100 bg-gradient-to-br from-orange-50 via-rose-50 to-red-50 p-4">
+                                <p className="text-sm font-semibold text-black">Ingredientes para quitar</p>
+                                {removalExtras.map(extra => (
+                                    <div key={extra.name} className="space-y-2">
+                                        <p className="text-xs uppercase tracking-wide text-black">{extra.name}</p>
+                                        <div className="space-y-2">
+                                            {extra.options.map(option => {
+                                                const isSelected = Boolean(option.ingredient_id && excludedIngredientIds.includes(option.ingredient_id));
+                                                return (
+                                                    <label
+                                                        key={option.name}
+                                                        className={`flex items-center justify-between rounded-lg border bg-white px-3 py-2 text-sm transition shadow-sm ${
+                                                            isSelected
+                                                                ? 'border-brand-primary text-black'
+                                                                : 'border-gray-200 text-black'
+                                                        }`}
+                                                    >
+                                                        <span className="flex items-center gap-2">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="accent-brand-primary"
+                                                                checked={isSelected}
+                                                                disabled={!option.ingredient_id}
+                                                                onChange={() => option.ingredient_id && toggleExcludedIngredient(option.ingredient_id)}
+                                                            />
+                                                            {option.name}
+                                                        </span>
+                                                        {option.price > 0 && (
+                                                            <span className="text-xs font-semibold text-orange-600">
+                                                                + {formatCurrencyCOP(option.price)}
+                                                            </span>
+                                                        )}
+                                                    </label>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         )}
                     </div>

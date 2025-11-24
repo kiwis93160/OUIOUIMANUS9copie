@@ -155,6 +155,13 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, selectedPr
         }
         return getDisplayableProductExtras(product);
     }, [product]);
+    const [standardExtras, removalExtras] = useMemo(() => {
+        const extras = displayExtras ?? [];
+        return [
+            extras.filter(extra => !extra.isIngredientRemovalExtra),
+            extras.filter(extra => Boolean(extra.isIngredientRemovalExtra)),
+        ];
+    }, [displayExtras]);
     const removalLabels = useMemo(() => {
         if (!product) {
             return [];
@@ -252,71 +259,109 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, selectedPr
                     </div>
                     
                     {displayExtras.length > 0 && (
-                        <div className="mb-4">
-                            <p className="font-bold text-gray-800 mb-2">Extras del producto</p>
-                            <div className="space-y-3">
-                                {displayExtras.map(extra => (
-                                    <div key={extra.name} className="rounded-lg border border-gray-200 p-3">
-                                        <p className="text-sm font-semibold text-gray-700">{extra.name}</p>
-                                        <div className="mt-2 space-y-2">
-                                            {extra.options.map(option => {
-                                                const isRemovalExtra = Boolean(extra.isIngredientRemovalExtra);
-                                                const isSelected = isRemovalExtra
-                                                    ? Boolean(option.ingredient_id && excludedIngredientIds.includes(option.ingredient_id))
-                                                    : (selectedExtrasState[extra.name] ?? []).includes(option.name);
-                                                return (
-                                                    <label
-                                                        key={option.name}
-                                                        className={`flex items-center justify-between rounded-md border px-3 py-2 text-sm transition ${
-                                                            isSelected
-                                                                ? 'border-brand-primary bg-brand-primary/10 text-gray-900'
-                                                                : 'border-gray-200'
-                                                        }`}
-                                                    >
-                                                        <span className="flex items-center gap-2">
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={isSelected}
-                                                                disabled={isRemovalExtra && !option.ingredient_id}
-                                                                onChange={() => {
-                                                                    if (isRemovalExtra && option.ingredient_id) {
-                                                                        toggleExcludedIngredient(option.ingredient_id);
-                                                                    } else {
-                                                                        toggleExtraOption(extra.name, option.name);
-                                                                    }
-                                                                }}
-                                                                className="accent-brand-primary"
-                                                            />
-                                                            {option.name}
-                                                        </span>
-                                                        {option.price > 0 && (
-                                                            <span className="text-xs font-semibold text-brand-primary">
-                                                                + {formatCurrencyCOP(option.price)}
-                                                            </span>
-                                                        )}
-                                                    </label>
-                                                );
-                                            })}
-                                        </div>
+                        <div className="mb-4 space-y-3">
+                            {standardExtras.length > 0 && (
+                                <div className="space-y-3 rounded-xl border border-orange-100 bg-gradient-to-br from-orange-50 via-rose-50 to-red-50 p-3">
+                                    <p className="font-bold text-gray-800">Extras del producto</p>
+                                    <div className="space-y-3">
+                                        {standardExtras.map(extra => (
+                                            <div key={extra.name} className="rounded-lg border border-gray-200 bg-white/70 p-3">
+                                                <p className="text-sm font-semibold text-gray-700">{extra.name}</p>
+                                                <div className="mt-2 space-y-2">
+                                                    {extra.options.map(option => {
+                                                        const isSelected = (selectedExtrasState[extra.name] ?? []).includes(option.name);
+                                                        return (
+                                                            <label
+                                                                key={option.name}
+                                                                className={`flex items-center justify-between rounded-md border px-3 py-2 text-sm transition ${
+                                                                    isSelected
+                                                                        ? 'border-brand-primary bg-brand-primary/10 text-gray-900'
+                                                                        : 'border-gray-200'
+                                                                }`}
+                                                            >
+                                                                <span className="flex items-center gap-2">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        checked={isSelected}
+                                                                        onChange={() => toggleExtraOption(extra.name, option.name)}
+                                                                        className="accent-brand-primary"
+                                                                    />
+                                                                    {option.name}
+                                                                </span>
+                                                                {option.price > 0 && (
+                                                                    <span className="text-xs font-semibold text-brand-primary">
+                                                                        + {formatCurrencyCOP(option.price)}
+                                                                    </span>
+                                                                )}
+                                                            </label>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
-                                ))}
-                            </div>
-                            {removalLabels.length > 0 && (
-                                <div className="mt-3 rounded-lg bg-rose-50 p-3 text-sm text-gray-700">
-                                    <p className="font-semibold">Sin ingredientes</p>
-                                    <p className="text-xs text-gray-600">{removalLabels.join(', ')}</p>
+                                    {selectedExtras.length > 0 && (
+                                        <div className="rounded-lg bg-white/70 p-3 text-sm text-gray-700 border border-gray-200">
+                                            <p className="font-semibold">Extras seleccionados</p>
+                                            <ul className="mt-1 space-y-1 text-xs text-gray-600">
+                                                {selectedExtras.map((extra, index) => (
+                                                    <li key={`${extra.extraName}-${extra.optionName}-${index}`}>
+                                                        {extra.extraName}: {extra.optionName} (+{formatCurrencyCOP(extra.price)})
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
                                 </div>
                             )}
-                            {selectedExtras.length > 0 && (
-                                <div className="mt-3 rounded-lg bg-orange-50 p-3 text-sm text-gray-700">
-                                    <p className="font-semibold">Extras seleccionados</p>
-                                    <ul className="mt-1 space-y-1 text-xs text-gray-600">
-                                        {selectedExtras.map((extra, index) => (
-                                            <li key={`${extra.extraName}-${extra.optionName}-${index}`}>
-                                                {extra.extraName}: {extra.optionName} (+{formatCurrencyCOP(extra.price)})
-                                            </li>
+
+                            {removalExtras.length > 0 && (
+                                <div className="space-y-3 rounded-xl border border-orange-100 bg-gradient-to-br from-orange-50 via-rose-50 to-red-50 p-3">
+                                    <p className="font-bold text-gray-800">Ingredientes para quitar</p>
+                                    <div className="space-y-3">
+                                        {removalExtras.map(extra => (
+                                            <div key={extra.name} className="rounded-lg border border-gray-200 bg-white/70 p-3">
+                                                <p className="text-sm font-semibold text-gray-700">{extra.name}</p>
+                                                <div className="mt-2 space-y-2">
+                                                    {extra.options.map(option => {
+                                                        const isSelected = Boolean(option.ingredient_id && excludedIngredientIds.includes(option.ingredient_id));
+                                                        return (
+                                                            <label
+                                                                key={option.name}
+                                                                className={`flex items-center justify-between rounded-md border px-3 py-2 text-sm transition ${
+                                                                    isSelected
+                                                                        ? 'border-brand-primary bg-brand-primary/10 text-gray-900'
+                                                                        : 'border-gray-200'
+                                                                }`}
+                                                            >
+                                                                <span className="flex items-center gap-2">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        checked={isSelected}
+                                                                        disabled={!option.ingredient_id}
+                                                                        onChange={() => option.ingredient_id && toggleExcludedIngredient(option.ingredient_id)}
+                                                                        className="accent-brand-primary"
+                                                                    />
+                                                                    {option.name}
+                                                                </span>
+                                                                {option.price > 0 && (
+                                                                    <span className="text-xs font-semibold text-brand-primary">
+                                                                        + {formatCurrencyCOP(option.price)}
+                                                                    </span>
+                                                                )}
+                                                            </label>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
                                         ))}
-                                    </ul>
+                                    </div>
+                                    {removalLabels.length > 0 && (
+                                        <div className="rounded-lg bg-white/70 p-3 text-sm text-gray-700 border border-gray-200">
+                                            <p className="font-semibold">Sin ingredientes</p>
+                                            <p className="text-xs text-gray-600">{removalLabels.join(', ')}</p>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>
