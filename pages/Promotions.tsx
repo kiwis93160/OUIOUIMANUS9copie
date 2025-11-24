@@ -193,15 +193,57 @@ const Promotions: React.FC = () => {
   };
 
   return (
-    <div className="promotions-page p-6">
-      <div className="flex justify-end items-center mb-6">
-        <button
-          onClick={handleCreatePromotion}
-          className="bg-brand-primary hover:bg-brand-primary-dark text-white px-4 py-2 rounded-lg flex items-center gap-2"
-        >
-          <Plus size={20} />
-          Nueva promoción
-        </button>
+    <div className="promotions-page space-y-6 p-6">
+      <div className="mt-6 ui-card p-4 flex flex-col lg:flex-row justify-between items-center gap-4">
+        <div className="flex flex-col md:flex-row gap-4 w-full">
+          <div className="relative flex-grow md:max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+            <input
+              type="text"
+              placeholder="Buscar una promoción..."
+              className="ui-input pl-10"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <select
+            className="ui-select md:w-48"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as PromotionStatus | 'all')}
+          >
+            <option value="all">Todos los estados</option>
+            <option value="active">Activas</option>
+            <option value="inactive">Inactivas</option>
+            <option value="scheduled">Programadas</option>
+            <option value="expired">Expiradas</option>
+          </select>
+          <select
+            className="ui-select md:w-52"
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value as PromotionType | 'all')}
+          >
+            <option value="all">Todos los tipos</option>
+            <option value="percentage">Porcentaje</option>
+            <option value="fixed_amount">Monto fijo</option>
+            <option value="promo_code">Código promocional</option>
+            <option value="buy_x_get_y">2x1 / Compra X, obtén Y</option>
+            <option value="free_product">Producto gratis</option>
+            <option value="free_shipping">Envío gratis</option>
+            <option value="combo">Combo</option>
+            <option value="threshold">Umbral</option>
+            <option value="happy_hour">Happy hour</option>
+          </select>
+        </div>
+        <div className="flex gap-2 w-full lg:w-auto">
+          <button onClick={loadPromotions} className="flex-1 lg:flex-initial ui-btn-secondary">
+            <RefreshCw size={18} />
+            <span className="hidden sm:inline">Actualizar</span>
+          </button>
+          <button onClick={handleCreatePromotion} className="flex-1 lg:flex-initial ui-btn-primary">
+            <Plus size={20} />
+            Nueva promoción
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -211,56 +253,6 @@ const Promotions: React.FC = () => {
       )}
 
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
-          <div className="flex-1">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Buscar una promoción..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
-            </div>
-          </div>
-          <div className="flex gap-4">
-            <select
-              className="border border-gray-300 rounded-lg px-3 py-2"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as PromotionStatus | 'all')}
-            >
-              <option value="all">Todos los estados</option>
-              <option value="active">Activas</option>
-              <option value="inactive">Inactivas</option>
-              <option value="scheduled">Programadas</option>
-              <option value="expired">Expiradas</option>
-            </select>
-            <select
-              className="border border-gray-300 rounded-lg px-3 py-2"
-              value={typeFilter}
-              onChange={(e) => setTypeFilter(e.target.value as PromotionType | 'all')}
-            >
-              <option value="all">Todos los tipos</option>
-              <option value="percentage">Porcentaje</option>
-              <option value="fixed_amount">Monto fijo</option>
-              <option value="promo_code">Código promocional</option>
-              <option value="buy_x_get_y">2x1 / Compra X, obtén Y</option>
-              <option value="free_product">Producto gratis</option>
-              <option value="free_shipping">Envío gratis</option>
-              <option value="combo">Combo</option>
-              <option value="threshold">Umbral</option>
-              <option value="happy_hour">Happy hour</option>
-            </select>
-            <button
-              onClick={loadPromotions}
-              className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg flex items-center gap-2"
-            >
-              <RefreshCw size={18} />
-              <span className="hidden md:inline">Actualiser</span>
-            </button>
-          </div>
-        </div>
 
         <div className="overflow-x-auto">
           <table className="w-full">
