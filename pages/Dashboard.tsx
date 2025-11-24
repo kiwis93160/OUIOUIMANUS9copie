@@ -116,7 +116,7 @@ const StockAlertIndicator: React.FC<{ variant: StockAlertVariant }> = ({ variant
                 : 'bg-gray-100 text-gray-400 border-gray-200';
 
     return (
-        <div className={`rounded-full border-2 shadow-inner shadow-black/10 p-2 ${variantClass}`} title="Stock bas">
+        <div className={`rounded-full border-2 shadow-inner shadow-black/10 p-2 ${variantClass}`} title="Inventario bajo">
             <AlertTriangle size={28} />
         </div>
     );
@@ -159,7 +159,7 @@ const Dashboard: React.FC = () => {
             setStats(statsData);
             setSalesByProduct(productSalesData);
         } catch (error) {
-            console.error("Failed to fetch dashboard stats", error);
+            console.error("No se pudieron obtener las estadísticas del panel", error);
         } finally {
             setLoading(false);
         }
@@ -285,7 +285,7 @@ const Dashboard: React.FC = () => {
                     value={profitMargin !== null ? `${formatDecimal(profitMargin)}%` : '0%'}
                     icon={<Percent size={24} />}
                     comparison={previousProfitMargin !== null ? profitMarginTrend : null}
-                    previousValue={previousProfitMargin !== null ? `${formatDecimal(previousProfitMargin)}%` : 'N/A'}
+                    previousValue={previousProfitMargin !== null ? `${formatDecimal(previousProfitMargin)}%` : 'No disponible'}
                 />
                 <MainStatCard
                     title="Pedidos procesados"
