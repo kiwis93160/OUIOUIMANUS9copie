@@ -146,12 +146,8 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
                         const handlePointerDown = handleProductPointerDown(product);
                         const handleKeyDown = handleProductKeyDown(product);
                         const iconColorClasses = stockStatus?.hasOutOfStock
-                            ? isSelected
-                                ? 'bg-white/20 text-red-200 border-red-200 focus-visible:ring-red-200/80'
-                                : 'bg-red-50 text-red-600 border border-red-200 focus-visible:ring-red-400'
-                            : isSelected
-                                ? 'bg-white/20 text-amber-100 border-amber-200 focus-visible:ring-amber-100/60'
-                                : 'bg-amber-50 text-amber-600 border border-amber-200 focus-visible:ring-amber-400';
+                            ? 'bg-red-50 text-red-600 border border-red-200 focus-visible:ring-red-400'
+                            : 'bg-amber-50 text-amber-600 border border-amber-200 focus-visible:ring-amber-400';
                         const stockIconAriaLabel = stockStatus?.hasOutOfStock
                             ? stockIndicatorAriaLabel.out
                             : stockIndicatorAriaLabel.low;
@@ -164,14 +160,12 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
                                 onKeyDown={handleKeyDown}
                                 role="button"
                                 tabIndex={0}
-                                className={`relative flex cursor-pointer flex-col items-center rounded-xl p-2 text-center transition-all focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 focus:ring-offset-gray-900 ${
-                                    isSelected
-                                        ? 'bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 text-white shadow-xl shadow-orange-500/30'
-                                        : 'border border-gray-200 bg-white text-black hover:shadow-lg'
-                                } ${hasStockIssue && !isSelected ? 'border-2 border-amber-500' : ''}`}
+                                className={`relative flex cursor-pointer flex-col items-center rounded-2xl p-4 text-center transition-all focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 focus:ring-offset-gray-900 border border-white/60 bg-white/90 shadow-lg backdrop-blur-md hover:shadow-xl ${
+                                    isSelected ? 'ring-2 ring-orange-400 shadow-orange-300/60 scale-[1.01]' : ''
+                                } ${hasStockIssue ? 'border-amber-300' : ''}`}
                             >
                                 {quantityInCart > 0 && (
-                                    <div className="absolute left-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-brand-accent text-xs font-bold text-white">
+                                    <div className="absolute left-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 text-xs font-bold text-white shadow-md">
                                         {quantityInCart}
                                     </div>
                                 )}
@@ -233,21 +227,20 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
                                 <img
                                     src={product.image}
                                     alt={product.nom_produit}
-                                    className="mb-1.5 aspect-square w-full rounded-md object-cover"
+                                    className="mb-4 aspect-[4/3] w-full rounded-xl object-cover shadow-sm"
                                 />
                                 <p
-                                    className={`text-[clamp(0.85rem,1.6vw,0.95rem)] font-semibold leading-tight ${isSelected ? 'text-white' : 'text-black'} text-balance text-center break-words whitespace-normal [hyphens:auto]`}
+                                    className="text-[clamp(1rem,2vw,1.2rem)] font-extrabold leading-snug text-gray-900 text-balance text-center break-words whitespace-normal [hyphens:auto]"
                                     style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
                                 >
                                     {product.nom_produit}
                                 </p>
                                 <p
-                                    className={`mt-0.5 w-full text-[0.7rem] ${isSelected ? 'text-white/90' : 'text-black/70'} text-center leading-tight`}
-                                    style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+                                    className="mt-2 w-full text-sm text-gray-600 text-center leading-tight px-1 line-clamp-2"
                                 >
                                     {product.description}
                                 </p>
-                                <p className={`mt-1.5 font-bold text-sm ${isSelected ? 'text-white' : 'text-black'}`}>
+                                <p className="mt-2 font-bold text-lg text-gray-800">
                                     {formatCurrencyCOP(product.prix_vente)}
                                 </p>
                             </div>
