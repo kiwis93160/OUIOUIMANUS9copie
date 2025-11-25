@@ -655,30 +655,25 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
     }, [setCart, setModalOpen]);
 
     const handleCartItemQuantityChange = useCallback((itemId: string, delta: number) => {
-        // Annuler le timeout précédent pour cet item
+        // Annuler et nettoyer tout timeout existant pour éviter les effets indésirables
         const existingTimeout = cartUpdateTimeouts.current.get(itemId);
         if (existingTimeout) {
             clearTimeout(existingTimeout);
+            cartUpdateTimeouts.current.delete(itemId);
         }
 
         // Mise à jour immédiate de l'UI
         setCart(prevCart => {
-            return prevCart.map(item => {
+            const updatedCart = prevCart.map(item => {
                 if (item.id === itemId) {
                     const newQuantity = Math.max(0, item.quantite + delta);
                     return { ...item, quantite: newQuantity };
                 }
                 return item;
             });
+
+            return updatedCart.filter(item => item.quantite > 0);
         });
-
-        // Supprimer les items à 0 après un délai
-        const timeout = setTimeout(() => {
-            setCart(prevCart => prevCart.filter(item => item.quantite > 0));
-            cartUpdateTimeouts.current.delete(itemId);
-        }, 300);
-
-        cartUpdateTimeouts.current.set(itemId, timeout);
     }, [setCart]);
 
     const handleReorder = useCallback((order: Order) => {

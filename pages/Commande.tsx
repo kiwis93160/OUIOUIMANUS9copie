@@ -564,40 +564,33 @@ const Commande: React.FC = () => {
         
         const targetItemId = currentOrder.items[itemIndex].id;
         
-        // Annuler le timeout précédent pour cet item
+        // Nettoyer tout délai existant pour cet item
         const existingTimeout = quantityUpdateTimeouts.current.get(targetItemId);
         if (existingTimeout) {
             clearTimeout(existingTimeout);
+            quantityUpdateTimeouts.current.delete(targetItemId);
         }
-        
+
         // Mise à jour immédiate
         applyLocalItemsUpdate(items => {
             const actualIndex = items.findIndex(item => item.id === targetItemId);
             if (actualIndex === -1) return items;
-            
+
             const currentQuantity = items[actualIndex].quantite;
             const newQuantity = Math.max(0, currentQuantity + change);
-            
-            return items.map(item => 
-                item.id === targetItemId 
+
+            const updatedItems = items.map(item =>
+                item.id === targetItemId
                     ? { ...item, quantite: newQuantity }
                     : item
             );
+
+            if (newQuantity === 0) {
+                return updatedItems.filter(item => item.id !== targetItemId);
+            }
+
+            return updatedItems;
         });
-
-        // Supprimer l'item après un délai s'il est à 0
-        const timeout = setTimeout(() => {
-            applyLocalItemsUpdate(items => {
-                const item = items.find(i => i.id === targetItemId);
-                if (item && item.quantite <= 0) {
-                    return items.filter(i => i.id !== targetItemId);
-                }
-                return items;
-            });
-            quantityUpdateTimeouts.current.delete(targetItemId);
-        }, 300);
-
-        quantityUpdateTimeouts.current.set(targetItemId, timeout);
     }, [applyLocalItemsUpdate]);
 
     const handleCommentChange = useCallback((itemIndex: number, newComment: string) => {
