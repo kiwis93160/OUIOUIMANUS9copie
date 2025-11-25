@@ -100,10 +100,10 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
                     <div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto pb-1">
                         <button
                             onClick={() => onSelectCategory('all')}
-                            className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-semibold whitespace-nowrap transition ${
+                            className={`shrink-0 rounded-full px-5 py-2 text-sm font-bold whitespace-nowrap transition-all ${
                                 activeCategoryId === 'all'
-                                    ? 'bg-brand-primary text-brand-secondary shadow'
-                                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                    ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg scale-105 border-2 border-orange-600'
+                                    : 'bg-white text-gray-800 shadow-md hover:bg-gray-100 border-2 border-gray-300'
                             }`}
                         >
                             Tous
@@ -112,10 +112,10 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
                             <button
                                 key={cat.id}
                                 onClick={() => onSelectCategory(cat.id)}
-                                className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-semibold whitespace-nowrap transition ${
+                                className={`shrink-0 rounded-full px-5 py-2 text-sm font-bold whitespace-nowrap transition-all ${
                                     activeCategoryId === cat.id
-                                        ? 'bg-brand-primary text-brand-secondary shadow'
-                                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                        ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg scale-105 border-2 border-orange-600'
+                                        : 'bg-white text-gray-800 shadow-md hover:bg-gray-100 border-2 border-gray-300'
                                 }`}
                             >
                                 {cat.nom}
