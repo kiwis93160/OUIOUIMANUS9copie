@@ -142,9 +142,9 @@ const PromotionModal: React.FC<PromotionModalProps> = ({ isOpen, onClose, onSave
   if (!isOpen) return null;
 
   return (
-    <div className="promotion-modal fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 px-4 py-6 text-black backdrop-blur-sm">
-      <div className="promotion-modal__content flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-black shadow-2xl">
-        <div className="flex flex-col gap-3 border-b border-slate-200 bg-white px-6 py-5 text-black sm:flex-row sm:items-center sm:justify-between">
+    <div className="promotion-modal fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 px-3 py-6 text-black backdrop-blur-sm">
+      <div className="promotion-modal__content flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 text-black shadow-2xl ring-1 ring-slate-100">
+        <div className="flex flex-col gap-3 border-b border-slate-200/80 bg-white/90 px-6 py-4 text-black sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-xl font-semibold leading-snug sm:text-2xl">
             {promotion ? 'Modifier la promotion' : 'Nouvelle promotion'}
           </h2>
@@ -163,7 +163,7 @@ const PromotionModal: React.FC<PromotionModalProps> = ({ isOpen, onClose, onSave
           </div>
         )}
 
-        <div className="flex flex-wrap gap-2 border-b border-slate-200 bg-slate-50/80 px-4 py-3 sm:px-6">
+        <div className="flex flex-wrap gap-2 border-b border-slate-200/80 bg-slate-100/70 px-4 py-3 sm:px-6">
           <button
             className={`rounded-full px-4 py-2 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-primary ${
               activeTab === 'general'
@@ -206,10 +206,10 @@ const PromotionModal: React.FC<PromotionModalProps> = ({ isOpen, onClose, onSave
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto bg-white px-4 py-6 text-black sm:px-6">
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-4 py-6 text-black sm:px-6">
           {activeTab === 'general' && (
             <div className="space-y-4">
-              <div className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50/80 p-5 shadow-sm">
+              <div className="space-y-4 rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-lg ring-1 ring-slate-100">
                 <div>
                   <label htmlFor="name" className="block text-xs font-semibold uppercase tracking-wide text-black">
                     Nom de la promotion
@@ -287,7 +287,7 @@ const PromotionModal: React.FC<PromotionModalProps> = ({ isOpen, onClose, onSave
 
           {activeTab === 'conditions' && (
             <div className="space-y-4">
-              <div className="space-y-6 rounded-2xl border border-slate-200 bg-slate-50/80 p-5 shadow-sm">
+              <div className="space-y-6 rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-lg ring-1 ring-slate-100">
                 {type === 'promo_code' && (
                   <div>
                     <label htmlFor="promo_code" className="block text-xs font-semibold uppercase tracking-wide text-black">
@@ -512,7 +512,7 @@ const PromotionModal: React.FC<PromotionModalProps> = ({ isOpen, onClose, onSave
 
           {activeTab === 'discount' && (
             <div className="space-y-4">
-              <div className="space-y-6 rounded-2xl border border-slate-200 bg-slate-50/80 p-5 shadow-sm">
+              <div className="space-y-6 rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-lg ring-1 ring-slate-100">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
                     <label htmlFor="discount_type" className="block text-xs font-semibold uppercase tracking-wide text-black">
@@ -596,7 +596,7 @@ const PromotionModal: React.FC<PromotionModalProps> = ({ isOpen, onClose, onSave
 
           {activeTab === 'visuals' && (
             <div className="space-y-4">
-              <div className="space-y-6 rounded-2xl border border-slate-200 bg-slate-50/80 p-5 shadow-sm">
+              <div className="space-y-6 rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-lg ring-1 ring-slate-100">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
                     <label htmlFor="badge_text" className="block text-xs font-semibold uppercase tracking-wide text-black">
@@ -758,7 +758,7 @@ const PromotionModal: React.FC<PromotionModalProps> = ({ isOpen, onClose, onSave
           )}
         </form>
 
-        <div className="flex flex-col gap-3 border-t border-slate-200 bg-slate-50/80 p-6 sm:flex-row sm:items-center sm:justify-end">
+        <div className="flex flex-col gap-3 border-t border-slate-200/80 bg-white/90 p-6 sm:flex-row sm:items-center sm:justify-end">
           <button
             type="button"
             onClick={onClose}

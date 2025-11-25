@@ -1,6 +1,7 @@
 import { supabase } from './supabaseClient';
 import { normalizeCloudinaryImageUrl, resolveProductImageUrl } from './cloudinary';
 import { clearRoleLoginsBefore, fetchRoleLoginsSince, logRoleLogin } from './roleLogins';
+import { recordPromotionUsagesForOrder } from './promotionsApi';
 
 import {
   Role,
@@ -3495,6 +3496,12 @@ export const api = {
       await deductIngredientsStockForOrderItems(finalItems);
     } catch (error) {
       console.error('Failed to deduct ingredient stock after order creation', error);
+    }
+
+    try {
+      await recordPromotionUsagesForOrder(finalOrder);
+    } catch (error) {
+      console.error('Failed to record promotion usages for order', error);
     }
 
     publishOrderChange({ includeNotifications: true });

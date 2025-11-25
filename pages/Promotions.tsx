@@ -72,7 +72,7 @@ const Promotions: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<PromotionStatus | 'all'>('all');
   const [typeFilter, setTypeFilter] = useState<PromotionType | 'all'>('all');
-  const [sortField, setSortField] = useState<'name' | 'priority' | 'created_at' | 'usage_count'>('priority');
+  const [sortField, setSortField] = useState<'name' | 'priority' | 'period' | 'usage_count'>('priority');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
   const loadPromotions = async () => {
@@ -115,9 +115,9 @@ const Promotions: React.FC = () => {
 
   const handleToggleStatus = async (promotion: Promotion) => {
     try {
-      const newStatus = promotion.active ? 'inactive' : 'active';
+      const newStatus = promotion.status === 'active' ? 'inactive' : 'active';
       const updatedPromotion = await updatePromotionStatus(promotion.id, newStatus);
-      setPromotions(promotions.map(p => 
+      setPromotions(promotions.map(p =>
         p.id === promotion.id ? updatedPromotion : p
       ));
     } catch (err) {
@@ -165,9 +165,11 @@ const Promotions: React.FC = () => {
         case 'priority':
           comparison = a.priority - b.priority;
           break;
-        case 'created_at':
-          comparison = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        case 'period': {
+          const getStart = (p: Promotion) => new Date(p.conditions.start_date ?? p.created_at).getTime();
+          comparison = getStart(a) - getStart(b);
           break;
+        }
         case 'usage_count':
           comparison = a.usage_count - b.usage_count;
           break;
@@ -190,6 +192,19 @@ const Promotions: React.FC = () => {
       hour: '2-digit',
       minute: '2-digit'
     }).format(date);
+  };
+
+  const formatPeriod = (promotion: Promotion) => {
+    const { start_date, end_date } = promotion.conditions;
+
+    if (!start_date && !end_date) {
+      return 'Sin fechas definidas';
+    }
+
+    const start = start_date ? formatDate(start_date) : 'Inicio abierto';
+    const end = end_date ? formatDate(end_date) : 'Sin fecha fin';
+
+    return `${start} → ${end}`;
   };
 
   return (
@@ -279,9 +294,9 @@ const Promotions: React.FC = () => {
                 <th className="px-4 py-3 text-left">
                   <button
                     className="flex items-center gap-1 font-semibold text-gray-700"
-                    onClick={() => handleSort('created_at')}
+                    onClick={() => handleSort('period')}
                   >
-                    Creada el {renderSortIcon('created_at')}
+                    Periodo {renderSortIcon('period')}
                   </button>
                 </th>
                 <th className="px-4 py-3 text-left">
@@ -334,7 +349,12 @@ const Promotions: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-4 py-4">{promotion.priority}</td>
-                    <td className="px-4 py-4">{formatDate(promotion.created_at)}</td>
+                    <td className="px-4 py-4">
+                      <div className="text-sm text-gray-700">
+                        <div className="font-medium">{formatPeriod(promotion)}</div>
+                        <div className="text-xs text-gray-500">Creada el {formatDate(promotion.created_at)}</div>
+                      </div>
+                    </td>
                     <td className="px-4 py-4">{promotion.usage_count}</td>
                     <td className="px-4 py-4 text-right">
                       <div className="flex justify-end gap-2">
