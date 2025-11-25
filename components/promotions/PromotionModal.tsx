@@ -52,8 +52,11 @@ const PromotionModal: React.FC<PromotionModalProps> = ({ isOpen, onClose, onSave
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'general' | 'conditions' | 'discount' | 'visuals'>('general');
+  const [activeTab, setActiveTab] = useState<'general' | 'conditions' | 'periodo' | 'discount' | 'visuals'>('general');
   const [imageUploading, setImageUploading] = useState(false);
+
+  const formatDateTimeLocal = (value?: string) =>
+    value ? new Date(value).toISOString().slice(0, 16) : '';
 
   // Initialiser le formulaire avec les valeurs de la promotion existante
   useEffect(() => {
@@ -186,6 +189,16 @@ const PromotionModal: React.FC<PromotionModalProps> = ({ isOpen, onClose, onSave
           </button>
           <button
             className={`rounded-full px-4 py-2 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-primary ${
+              activeTab === 'periodo'
+                ? 'border border-brand-primary bg-brand-primary/10 text-black shadow'
+                : 'border border-transparent text-black hover:bg-slate-100'
+            }`}
+            onClick={() => setActiveTab('periodo')}
+          >
+            Periodo
+          </button>
+          <button
+            className={`rounded-full px-4 py-2 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-primary ${
               activeTab === 'discount'
                 ? 'border border-brand-primary bg-brand-primary/10 text-black shadow'
                 : 'border border-transparent text-black hover:bg-slate-100'
@@ -287,224 +300,261 @@ const PromotionModal: React.FC<PromotionModalProps> = ({ isOpen, onClose, onSave
 
           {activeTab === 'conditions' && (
             <div className="space-y-4">
-              <div className="space-y-6 rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-lg ring-1 ring-slate-100">
-                {type === 'promo_code' && (
-                  <div>
-                    <label htmlFor="promo_code" className="block text-xs font-semibold uppercase tracking-wide text-black">
-                      Code promo
-                    </label>
-                    <input
-                      type="text"
-                      id="promo_code"
-                      value={conditions.promo_code || ''}
-                      onChange={(e) => setConditions({ ...conditions, promo_code: e.target.value })}
-                      className="ui-input mt-2"
-                      required={type === 'promo_code'}
-                    />
-                  </div>
-                )}
+              <div className="grid gap-4 lg:grid-cols-2">
+                <div className="space-y-4 rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-lg ring-1 ring-slate-100">
+                  {type === 'promo_code' && (
+                    <div className="space-y-2">
+                      <label htmlFor="promo_code" className="block text-xs font-semibold uppercase tracking-wide text-black">
+                        Code promo
+                      </label>
+                      <input
+                        type="text"
+                        id="promo_code"
+                        value={conditions.promo_code || ''}
+                        onChange={(e) => setConditions({ ...conditions, promo_code: e.target.value })}
+                        className="ui-input"
+                        required={type === 'promo_code'}
+                      />
+                    </div>
+                  )}
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div>
-                    <label htmlFor="min_order_amount" className="block text-xs font-semibold uppercase tracking-wide text-black">
-                      Montant minimum de commande
-                    </label>
-                    <input
-                      type="number"
-                      id="min_order_amount"
-                      value={conditions.min_order_amount || ''}
-                      onChange={(e) => setConditions({ ...conditions, min_order_amount: parseFloat(e.target.value) || undefined })}
-                      className="ui-input mt-2"
-                      min="0"
-                      step="0.01"
-                    />
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <label htmlFor="min_order_amount" className="block text-xs font-semibold uppercase tracking-wide text-black">
+                        Montant minimum de commande
+                      </label>
+                      <input
+                        type="number"
+                        id="min_order_amount"
+                        value={conditions.min_order_amount || ''}
+                        onChange={(e) => setConditions({ ...conditions, min_order_amount: parseFloat(e.target.value) || undefined })}
+                        className="ui-input"
+                        min="0"
+                        step="0.01"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label htmlFor="max_order_amount" className="block text-xs font-semibold uppercase tracking-wide text-black">
+                        Montant maximum de commande
+                      </label>
+                      <input
+                        type="number"
+                        id="max_order_amount"
+                        value={conditions.max_order_amount || ''}
+                        onChange={(e) => setConditions({ ...conditions, max_order_amount: parseFloat(e.target.value) || undefined })}
+                        className="ui-input"
+                        min="0"
+                        step="0.01"
+                      />
+                    </div>
                   </div>
 
-                  <div>
-                    <label htmlFor="max_order_amount" className="block text-xs font-semibold uppercase tracking-wide text-black">
-                      Montant maximum de commande
-                    </label>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <label htmlFor="max_uses" className="block text-xs font-semibold uppercase tracking-wide text-black">
+                        Nombre maximum d'utilisations
+                      </label>
+                      <input
+                        type="number"
+                        id="max_uses"
+                        value={conditions.max_uses_total || ''}
+                        onChange={(e) => setConditions({ ...conditions, max_uses_total: parseInt(e.target.value) || undefined })}
+                        className="ui-input"
+                        min="0"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label htmlFor="max_uses_per_customer" className="block text-xs font-semibold uppercase tracking-wide text-black">
+                        Maximum par client
+                      </label>
+                      <input
+                        type="number"
+                        id="max_uses_per_customer"
+                        value={conditions.max_uses_per_customer || ''}
+                        onChange={(e) => setConditions({ ...conditions, max_uses_per_customer: parseInt(e.target.value) || undefined })}
+                        className="ui-input"
+                        min="0"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white/80 px-4 py-3 shadow-sm">
                     <input
-                      type="number"
-                      id="max_order_amount"
-                      value={conditions.max_order_amount || ''}
-                      onChange={(e) => setConditions({ ...conditions, max_order_amount: parseFloat(e.target.value) || undefined })}
-                      className="ui-input mt-2"
-                      min="0"
-                      step="0.01"
+                      type="checkbox"
+                      id="first_order_only"
+                      checked={conditions.first_order_only || false}
+                      onChange={(e) => setConditions({ ...conditions, first_order_only: e.target.checked })}
+                      className="h-4 w-4 rounded border-slate-300 text-black focus:ring-black"
                     />
+                    <label htmlFor="first_order_only" className="text-sm font-medium text-black">
+                      Uniquement pour la première commande
+                    </label>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div>
-                    <label htmlFor="start_date" className="block text-xs font-semibold uppercase tracking-wide text-black">
-                      Date de début
-                    </label>
-                    <input
-                      type="datetime-local"
-                      id="start_date"
-                      value={conditions.start_date ? new Date(conditions.start_date).toISOString().slice(0, 16) : ''}
-                      onChange={(e) => setConditions({ ...conditions, start_date: e.target.value ? new Date(e.target.value).toISOString() : undefined })}
-                      className="ui-input mt-2"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="end_date" className="block text-xs font-semibold uppercase tracking-wide text-black">
-                      Date de fin
-                    </label>
-                    <input
-                      type="datetime-local"
-                      id="end_date"
-                      value={conditions.end_date ? new Date(conditions.end_date).toISOString().slice(0, 16) : ''}
-                      onChange={(e) => setConditions({ ...conditions, end_date: e.target.value ? new Date(e.target.value).toISOString() : undefined })}
-                      className="ui-input mt-2"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wide text-black">
-                    Jours de la semaine
-                  </label>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'].map((day, index) => (
-                      <label key={index} className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-3 py-1 text-sm text-black shadow-sm">
+                <div className="space-y-4 rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-lg ring-1 ring-slate-100">
+                  {type === 'buy_x_get_y' && (
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <div className="space-y-2">
+                        <label htmlFor="buy_quantity" className="block text-xs font-semibold uppercase tracking-wide text-black">
+                          Quantité à acheter
+                        </label>
                         <input
-                          type="checkbox"
-                          checked={conditions.days_of_week?.includes(index) || false}
-                          onChange={(e) => {
-                            const days = conditions.days_of_week || [];
-                            if (e.target.checked) {
-                              setConditions({ ...conditions, days_of_week: [...days, index] });
-                            } else {
-                              setConditions({ ...conditions, days_of_week: days.filter(d => d !== index) });
-                            }
-                          }}
-                          className="h-4 w-4 rounded border-slate-300 text-black focus:ring-black"
+                          type="number"
+                          id="buy_quantity"
+                          value={conditions.buy_quantity || ''}
+                          onChange={(e) => setConditions({ ...conditions, buy_quantity: parseInt(e.target.value) || undefined })}
+                          className="ui-input"
+                          min="1"
+                          required={type === 'buy_x_get_y'}
                         />
-                        <span>{day}</span>
-                      </label>
-                    ))}
+                      </div>
+
+                      <div className="space-y-2">
+                        <label htmlFor="get_quantity" className="block text-xs font-semibold uppercase tracking-wide text-black">
+                          Quantité offerte
+                        </label>
+                        <input
+                          type="number"
+                          id="get_quantity"
+                          value={conditions.get_quantity || ''}
+                          onChange={(e) => setConditions({ ...conditions, get_quantity: parseInt(e.target.value) || undefined })}
+                          className="ui-input"
+                          min="1"
+                          required={type === 'buy_x_get_y'}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="rounded-xl border border-dashed border-slate-200 bg-white/60 px-4 py-3 text-sm text-black">
+                    Ajoutez des conditions spécifiques pour ajuster la promotion sans multiplier les onglets.
                   </div>
                 </div>
+              </div>
+            </div>
+          )}
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div>
-                    <label htmlFor="hours_start" className="block text-xs font-semibold uppercase tracking-wide text-black">
-                      Heure de début
-                    </label>
-                    <input
-                      type="time"
-                      id="hours_start"
-                      value={conditions.hours_of_day?.start || ''}
-                      onChange={(e) => setConditions({
-                        ...conditions,
-                        hours_of_day: {
-                          ...(conditions.hours_of_day || {}),
-                          start: e.target.value
-                        }
-                      })}
-                      className="ui-input mt-2"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="hours_end" className="block text-xs font-semibold uppercase tracking-wide text-black">
-                      Heure de fin
-                    </label>
-                    <input
-                      type="time"
-                      id="hours_end"
-                      value={conditions.hours_of_day?.end || ''}
-                      onChange={(e) => setConditions({
-                        ...conditions,
-                        hours_of_day: {
-                          ...(conditions.hours_of_day || {}),
-                          end: e.target.value
-                        }
-                      })}
-                      className="ui-input mt-2"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div>
-                    <label htmlFor="max_uses" className="block text-xs font-semibold uppercase tracking-wide text-black">
-                      Nombre maximum d'utilisations
-                    </label>
-                    <input
-                      type="number"
-                      id="max_uses"
-                      value={conditions.max_uses_total || ''}
-                      onChange={(e) => setConditions({ ...conditions, max_uses_total: parseInt(e.target.value) || undefined })}
-                      className="ui-input mt-2"
-                      min="0"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="max_uses_per_customer" className="block text-xs font-semibold uppercase tracking-wide text-black">
-                      Maximum par client
-                    </label>
-                    <input
-                      type="number"
-                      id="max_uses_per_customer"
-                      value={conditions.max_uses_per_customer || ''}
-                      onChange={(e) => setConditions({ ...conditions, max_uses_per_customer: parseInt(e.target.value) || undefined })}
-                      className="ui-input mt-2"
-                      min="0"
-                    />
-                  </div>
-                </div>
-
-                {type === 'buy_x_get_y' && (
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <div>
-                      <label htmlFor="buy_quantity" className="block text-xs font-semibold uppercase tracking-wide text-black">
-                        Quantité à acheter
+          {activeTab === 'periodo' && (
+            <div className="space-y-4">
+              <div className="grid gap-4 lg:grid-cols-2">
+                <div className="space-y-6 rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-lg ring-1 ring-slate-100">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <label htmlFor="start_date" className="block text-xs font-semibold uppercase tracking-wide text-black">
+                        Date de début
                       </label>
                       <input
-                        type="number"
-                        id="buy_quantity"
-                        value={conditions.buy_quantity || ''}
-                        onChange={(e) => setConditions({ ...conditions, buy_quantity: parseInt(e.target.value) || undefined })}
-                        className="ui-input mt-2"
-                        min="1"
-                        required={type === 'buy_x_get_y'}
+                        type="datetime-local"
+                        id="start_date"
+                        value={formatDateTimeLocal(conditions.start_date)}
+                        onChange={(e) =>
+                          setConditions({
+                            ...conditions,
+                            start_date: e.target.value ? new Date(e.target.value).toISOString() : undefined
+                          })
+                        }
+                        className="ui-input"
                       />
                     </div>
 
-                    <div>
-                      <label htmlFor="get_quantity" className="block text-xs font-semibold uppercase tracking-wide text-black">
-                        Quantité offerte
+                    <div className="space-y-2">
+                      <label htmlFor="end_date" className="block text-xs font-semibold uppercase tracking-wide text-black">
+                        Date de fin
                       </label>
                       <input
-                        type="number"
-                        id="get_quantity"
-                        value={conditions.get_quantity || ''}
-                        onChange={(e) => setConditions({ ...conditions, get_quantity: parseInt(e.target.value) || undefined })}
-                        className="ui-input mt-2"
-                        min="1"
-                        required={type === 'buy_x_get_y'}
+                        type="datetime-local"
+                        id="end_date"
+                        value={formatDateTimeLocal(conditions.end_date)}
+                        onChange={(e) =>
+                          setConditions({
+                            ...conditions,
+                            end_date: e.target.value ? new Date(e.target.value).toISOString() : undefined
+                          })
+                        }
+                        className="ui-input"
                       />
                     </div>
                   </div>
-                )}
 
-                <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white/80 px-4 py-3 shadow-sm">
-                  <input
-                    type="checkbox"
-                    id="first_order_only"
-                    checked={conditions.first_order_only || false}
-                    onChange={(e) => setConditions({ ...conditions, first_order_only: e.target.checked })}
-                    className="h-4 w-4 rounded border-slate-300 text-black focus:ring-black"
-                  />
-                  <label htmlFor="first_order_only" className="text-sm font-medium text-black">
-                    Uniquement pour la première commande
-                  </label>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <label htmlFor="hours_start" className="block text-xs font-semibold uppercase tracking-wide text-black">
+                        Heure de début
+                      </label>
+                      <input
+                        type="time"
+                        id="hours_start"
+                        value={conditions.hours_of_day?.start || ''}
+                        onChange={(e) =>
+                          setConditions({
+                            ...conditions,
+                            hours_of_day: {
+                              ...(conditions.hours_of_day || {}),
+                              start: e.target.value
+                            }
+                          })
+                        }
+                        className="ui-input"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label htmlFor="hours_end" className="block text-xs font-semibold uppercase tracking-wide text-black">
+                        Heure de fin
+                      </label>
+                      <input
+                        type="time"
+                        id="hours_end"
+                        value={conditions.hours_of_day?.end || ''}
+                        onChange={(e) =>
+                          setConditions({
+                            ...conditions,
+                            hours_of_day: {
+                              ...(conditions.hours_of_day || {}),
+                              end: e.target.value
+                            }
+                          })
+                        }
+                        className="ui-input"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4 rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-lg ring-1 ring-slate-100">
+                  <div>
+                    <label className="block text-xs font-semibold uppercase tracking-wide text-black">Jours de la semaine</label>
+                    <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                      {['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'].map((day, index) => (
+                        <label
+                          key={index}
+                          className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white/80 px-3 py-2 text-sm text-black shadow-sm hover:border-brand-primary"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={conditions.days_of_week?.includes(index) || false}
+                            onChange={(e) => {
+                              const days = conditions.days_of_week || [];
+                              if (e.target.checked) {
+                                setConditions({ ...conditions, days_of_week: [...days, index] });
+                              } else {
+                                setConditions({ ...conditions, days_of_week: days.filter((d) => d !== index) });
+                              }
+                            }}
+                            className="h-4 w-4 rounded border-slate-300 text-black focus:ring-black"
+                          />
+                          <span className="truncate">{day}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl border border-dashed border-slate-200 bg-white/60 px-4 py-3 text-sm text-black">
+                    Définissez précisément les périodes pour éviter de scroller dans les autres onglets.
+                  </div>
                 </div>
               </div>
             </div>
