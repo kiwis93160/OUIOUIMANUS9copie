@@ -371,6 +371,7 @@ const Commande: React.FC = () => {
                         name: 'Ingrédient indisponible',
                         currentStock: 0,
                         minimumStock: 0,
+                        unit: 'unite',
                         status: 'out',
                     });
                     return;
@@ -382,6 +383,7 @@ const Commande: React.FC = () => {
                         name: ingredient.nom,
                         currentStock: ingredient.stock_actuel,
                         minimumStock: ingredient.stock_minimum,
+                        unit: ingredient.unite,
                         status: ingredient.stock_actuel <= 0 ? 'out' : 'low',
                     });
                 }
