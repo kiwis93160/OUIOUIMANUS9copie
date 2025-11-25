@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, Calendar, Clock, Tag, Percent, Package, Info, ExternalLink } from 'lucide-react';
+import { X, Calendar, Clock, Percent, Package, ExternalLink } from 'lucide-react';
 import { Promotion, PromotionUsage } from '../../types';
-import { getAccessibleTextColor } from '../../utils/color';
 import { fetchPromotionUsages } from '../../services/promotionsApi';
 
 interface PromotionDetailsModalProps {
@@ -82,9 +81,6 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
     return `${start} → ${end}`;
   };
 
-  const badgeBackgroundColor = promotion.visuals?.badge_bg_color || '#F9A826';
-  const badgeTextColor = getAccessibleTextColor(badgeBackgroundColor);
-
   if (!isOpen) return null;
 
   return (
@@ -126,8 +122,8 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
 
         <div className="flex-1 overflow-y-auto bg-white/80 px-4 py-5 text-black sm:px-6">
           {activeTab === 'details' && (
-            <div className="space-y-6">
-              <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 shadow-lg">
+            <div className="space-y-5">
+              <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-4 shadow-lg">
                 <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                   <div>
                     <h3 className="text-lg font-semibold text-black">{promotion.name}</h3>
@@ -138,57 +134,32 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
                       <span className="text-sm font-medium text-black">{typeLabels[promotion.type]}</span>
                     </div>
                   </div>
-                  <div className="flex flex-wrap gap-2 text-sm font-semibold text-black">
-                    <span className="rounded-full border border-slate-200 bg-white/90 px-4 py-1.5 shadow-sm">Prioridad: {promotion.priority}</span>
-                    <span className="rounded-full border border-slate-200 bg-white/90 px-4 py-1.5 shadow-sm">Periodo: {formatPeriod(promotion)}</span>
+                  <div className="flex flex-wrap gap-2 text-xs font-semibold text-black sm:text-sm">
+                    <span className="rounded-full border border-slate-200 bg-white/90 px-3 py-1 shadow-sm">Prioridad: {promotion.priority}</span>
+                    <span className="rounded-full border border-slate-200 bg-white/90 px-3 py-1 shadow-sm">Periodo: {formatPeriod(promotion)}</span>
                   </div>
                 </div>
 
-                <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-                  <div className="rounded-xl border border-slate-200 bg-white/90 p-3 shadow-sm">
-                    <p className="text-xs uppercase tracking-wide text-slate-500">Usos registrados</p>
-                    <p className="text-2xl font-bold text-black">{promotion.usage_count}</p>
+                <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
+                  <div className="rounded-xl border border-slate-200 bg-white/90 p-2 shadow-sm">
+                    <p className="text-[11px] uppercase tracking-wide text-slate-500">Usos registrados</p>
+                    <p className="text-lg font-semibold text-black">{promotion.usage_count}</p>
                   </div>
-                  <div className="rounded-xl border border-slate-200 bg-white/90 p-3 shadow-sm">
-                    <p className="text-xs uppercase tracking-wide text-slate-500">Creada</p>
-                    <p className="text-base font-semibold text-black">{formatDate(promotion.created_at)}</p>
+                  <div className="rounded-xl border border-slate-200 bg-white/90 p-2 shadow-sm">
+                    <p className="text-[11px] uppercase tracking-wide text-slate-500">Creada</p>
+                    <p className="text-sm font-semibold text-black">{formatDate(promotion.created_at)}</p>
                   </div>
-                  <div className="rounded-xl border border-slate-200 bg-white/90 p-3 shadow-sm">
-                    <p className="text-xs uppercase tracking-wide text-slate-500">Última actualización</p>
-                    <p className="text-base font-semibold text-black">{formatDate(promotion.updated_at)}</p>
+                  <div className="rounded-xl border border-slate-200 bg-white/90 p-2 shadow-sm">
+                    <p className="text-[11px] uppercase tracking-wide text-slate-500">Última actualización</p>
+                    <p className="text-sm font-semibold text-black">{formatDate(promotion.updated_at)}</p>
                   </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                <div className="space-y-6">
-                  <div className="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm">
-                    <h4 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-black">
-                      <Info size={16} />
-                      Información general
-                    </h4>
-                    <dl className="space-y-2 text-sm text-black">
-                      <div className="flex items-center justify-between">
-                        <dt className="font-medium">ID</dt>
-                        <dd className="rounded bg-white/80 px-2 py-0.5 font-mono text-black shadow-sm">{promotion.id}</dd>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <dt className="font-medium">Creada el</dt>
-                        <dd>{formatDate(promotion.created_at)}</dd>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <dt className="font-medium">Actualizada</dt>
-                        <dd>{formatDate(promotion.updated_at)}</dd>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <dt className="font-medium">Usos</dt>
-                        <dd>{promotion.usage_count}</dd>
-                      </div>
-                    </dl>
-                  </div>
-
-                  <div className="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm">
-                    <h4 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-black">
+              <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+                <div className="space-y-5">
+                  <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm">
+                    <h4 className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-black">
                       <Calendar size={16} />
                       Condiciones
                     </h4>
@@ -283,9 +254,9 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
                   </div>
                 </div>
 
-                <div className="space-y-6">
-                  <div className="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm">
-                    <h4 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-black">
+                <div className="space-y-5">
+                  <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm">
+                    <h4 className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-black">
                       <Percent size={16} />
                       Descuento
                     </h4>
@@ -317,56 +288,6 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
                       </div>
                     </dl>
                   </div>
-
-                  {promotion.visuals && Object.keys(promotion.visuals).length > 0 && (
-                    <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5 shadow-sm">
-                        <h4 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-black">
-                        <Tag size={16} />
-                        Elementos visuales
-                      </h4>
-                      <div className="grid grid-cols-1 gap-4 text-sm text-black md:grid-cols-2">
-                        {promotion.visuals.badge_text && (
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium">Badge</span>
-                            <span
-                              className="rounded-full px-3 py-1 text-xs font-semibold"
-                              style={{
-                                backgroundColor: badgeBackgroundColor,
-                                color: badgeTextColor,
-                              }}
-                            >
-                              {promotion.visuals.badge_text}
-                            </span>
-                          </div>
-                        )}
-
-                        {promotion.visuals.banner_text && (
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium">Texto del banner</span>
-                            <span className="text-right text-black">{promotion.visuals.banner_text}</span>
-                          </div>
-                        )}
-
-                        {promotion.visuals.banner_cta && (
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium">Botón</span>
-                            <span className="text-right text-black">{promotion.visuals.banner_cta}</span>
-                          </div>
-                        )}
-                      </div>
-
-                      {promotion.visuals.banner_image && (
-                        <div className="mt-4">
-                          <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-black">Imagen del banner</span>
-                          <img
-                            src={promotion.visuals.banner_image}
-                            alt="Banner promocional"
-                            className="w-full max-h-40 rounded-xl object-cover shadow-sm"
-                          />
-                        </div>
-                      )}
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
