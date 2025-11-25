@@ -142,8 +142,8 @@ const PromotionModal: React.FC<PromotionModalProps> = ({ isOpen, onClose, onSave
   if (!isOpen) return null;
 
   return (
-    <div className="promotion-modal fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 px-3 py-6 text-black backdrop-blur-sm">
-      <div className="promotion-modal__content flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 text-black shadow-2xl ring-1 ring-slate-100">
+    <div className="promotion-modal fixed inset-0 z-50 flex items-start justify-center bg-slate-950/80 px-3 py-4 text-black backdrop-blur-sm sm:py-6 sm:items-center">
+      <div className="promotion-modal__content flex w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 text-black shadow-2xl ring-1 ring-slate-100 max-h-[70vh] sm:max-w-4xl sm:max-h-[70vh] lg:max-h-[60vh] lg:max-w-5xl">
         <div className="flex flex-col gap-3 border-b border-slate-200/80 bg-white/90 px-6 py-4 text-black sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-xl font-semibold leading-snug sm:text-2xl">
             {promotion ? 'Modifier la promotion' : 'Nouvelle promotion'}
