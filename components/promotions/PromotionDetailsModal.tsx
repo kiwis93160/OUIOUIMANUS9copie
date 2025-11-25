@@ -73,15 +73,24 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
     }).format(date);
   };
 
+  const formatPeriod = (promo: Promotion) => {
+    const start = promo.conditions.start_date ? formatDate(promo.conditions.start_date) : 'Inicio abierto';
+    const end = promo.conditions.end_date ? formatDate(promo.conditions.end_date) : 'Sin fecha fin';
+    if (!promo.conditions.start_date && !promo.conditions.end_date) {
+      return 'Sin fechas definidas';
+    }
+    return `${start} → ${end}`;
+  };
+
   const badgeBackgroundColor = promotion.visuals?.badge_bg_color || '#F9A826';
   const badgeTextColor = getAccessibleTextColor(badgeBackgroundColor);
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 px-4 py-6 backdrop-blur-sm">
-      <div className="flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-black shadow-2xl">
-        <div className="flex flex-col gap-3 border-b border-slate-200 bg-white px-6 py-5 text-black sm:flex-row sm:items-center sm:justify-between">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 px-3 py-6 backdrop-blur-sm">
+      <div className="flex w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 text-black shadow-2xl ring-1 ring-slate-100">
+        <div className="flex flex-col gap-3 border-b border-slate-200/80 bg-white/90 px-5 py-4 text-black sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-xl font-semibold leading-snug sm:text-2xl">Detalles de la promoción</h2>
           <button
             onClick={onClose}
@@ -92,7 +101,7 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
           </button>
         </div>
 
-        <div className="flex flex-wrap gap-2 border-b border-slate-200 bg-slate-50/80 px-4 py-3 sm:px-6">
+        <div className="flex flex-wrap gap-2 border-b border-slate-200/80 bg-slate-100/60 px-4 py-3 sm:px-6">
           <button
             className={`rounded-full px-4 py-2 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-primary ${
               activeTab === 'details'
@@ -115,10 +124,10 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto bg-white px-4 py-6 sm:px-6">
+        <div className="flex-1 overflow-y-auto px-4 py-5 sm:px-6">
           {activeTab === 'details' && (
             <div className="space-y-6">
-              <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5 shadow-sm">
+              <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 shadow-lg">
                 <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                   <div>
                     <h3 className="text-lg font-semibold text-black">{promotion.name}</h3>
@@ -129,14 +138,30 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
                       <span className="text-sm font-medium text-black">{typeLabels[promotion.type]}</span>
                     </div>
                   </div>
-                  <div className="rounded-full border border-slate-200 bg-white/80 px-4 py-1.5 text-sm font-semibold text-black shadow-sm">
-                    Prioridad: {promotion.priority}
+                  <div className="flex flex-wrap gap-2 text-sm font-semibold text-black">
+                    <span className="rounded-full border border-slate-200 bg-white/90 px-4 py-1.5 shadow-sm">Prioridad: {promotion.priority}</span>
+                    <span className="rounded-full border border-slate-200 bg-white/90 px-4 py-1.5 shadow-sm">Periodo: {formatPeriod(promotion)}</span>
+                  </div>
+                </div>
+
+                <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  <div className="rounded-xl border border-slate-200 bg-white/90 p-3 shadow-sm">
+                    <p className="text-xs uppercase tracking-wide text-slate-500">Usos registrados</p>
+                    <p className="text-2xl font-bold text-black">{promotion.usage_count}</p>
+                  </div>
+                  <div className="rounded-xl border border-slate-200 bg-white/90 p-3 shadow-sm">
+                    <p className="text-xs uppercase tracking-wide text-slate-500">Creada</p>
+                    <p className="text-base font-semibold text-black">{formatDate(promotion.created_at)}</p>
+                  </div>
+                  <div className="rounded-xl border border-slate-200 bg-white/90 p-3 shadow-sm">
+                    <p className="text-xs uppercase tracking-wide text-slate-500">Última actualización</p>
+                    <p className="text-base font-semibold text-black">{formatDate(promotion.updated_at)}</p>
                   </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5 shadow-sm">
+                <div className="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm">
                   <h4 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-black">
                     <Info size={16} />
                     Información general
@@ -161,7 +186,7 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
                   </dl>
                 </div>
 
-                <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5 shadow-sm">
+                <div className="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm">
                   <h4 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-black">
                     <Percent size={16} />
                     Descuento
@@ -196,7 +221,7 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5 shadow-sm">
+              <div className="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm">
                 <h4 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-black">
                   <Calendar size={16} />
                   Condiciones
@@ -352,23 +377,23 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
               )}
 
               {loading ? (
-                <div className="flex items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-slate-50/80 py-10 text-black shadow-sm">
+                <div className="flex items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white/90 py-10 text-black shadow-sm">
                   <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-brand-primary"></div>
                   <span>Cargando...</span>
                 </div>
               ) : usages.length === 0 ? (
-                <div className="rounded-2xl border border-slate-200 bg-slate-50/80 py-10 text-center text-sm font-medium text-black shadow-sm">
+                <div className="rounded-2xl border border-slate-200 bg-white/80 py-10 text-center text-sm font-medium text-black shadow-sm">
                   No hay usos registrados para esta promoción
                 </div>
               ) : (
-                <div className="overflow-hidden rounded-2xl border border-slate-200 shadow-sm">
+                <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                   <table className="w-full divide-y divide-slate-200 text-sm text-black">
-                    <thead className="bg-slate-50/90 text-xs font-semibold uppercase tracking-wide text-black">
+                    <thead className="bg-slate-50/90 text-xs font-semibold uppercase tracking-wide text-slate-700">
                       <tr>
-                        <th className="px-4 py-3 text-left">Date</th>
+                        <th className="px-4 py-3 text-left">Fecha</th>
                         <th className="px-4 py-3 text-left">Pedido</th>
-                        <th className="px-4 py-3 text-left">Client</th>
-                        <th className="px-4 py-3 text-right">Monto</th>
+                        <th className="px-4 py-3 text-left">Cliente</th>
+                        <th className="px-4 py-3 text-right">Descuento</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
