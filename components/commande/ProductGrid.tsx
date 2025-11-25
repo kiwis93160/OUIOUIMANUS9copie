@@ -28,6 +28,7 @@ export interface ProductStockIssue {
     name: string;
     currentStock: number;
     minimumStock: number;
+    unit: 'kg' | 'g' | 'L' | 'ml' | 'unite';
     status: ProductStockIssueStatus;
 }
 
@@ -53,6 +54,15 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
     onQuickAdd,
 }) => {
     const [activeStockProductId, setActiveStockProductId] = useState<string | null>(null);
+
+    const formatUnit = useCallback((unit: ProductStockIssue['unit']) => {
+        switch (unit) {
+            case 'unite':
+                return 'unités';
+            default:
+                return unit;
+        }
+    }, []);
 
     const closeStockPopover = useCallback(() => {
         setActiveStockProductId(null);
@@ -223,7 +233,7 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
                                                                         : 'text-amber-600'
                                                                 }`}
                                                             >
-                                                                {ingredient.currentStock} / {ingredient.minimumStock}
+                                                                {ingredient.currentStock} / {ingredient.minimumStock} {formatUnit(ingredient.unit)}
                                                             </span>
                                                         </div>
                                                     ))}
