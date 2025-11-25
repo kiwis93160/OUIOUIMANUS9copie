@@ -19,7 +19,7 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({ pro
   return (
     <div
       onClick={() => product.estado === 'disponible' && onClick()}
-      className={`relative rounded-2xl border border-white/60 bg-white/70 backdrop-blur-md p-6 flex flex-col items-center text-center transition-shadow shadow-lg ${
+      className={`relative rounded-2xl border border-white/60 bg-white/70 backdrop-blur-md p-6 flex h-full flex-col items-center text-center transition-shadow shadow-lg ${
         product.estado === 'disponible' ? 'cursor-pointer hover:shadow-xl' : 'opacity-60'
       }`}
     >
@@ -40,34 +40,38 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({ pro
       />
       
       {/* Nom du produit */}
-      <p
-        className="font-extrabold flex-grow text-gray-900 leading-snug text-[clamp(1rem,2.2vw,1.2rem)] break-words text-balance whitespace-normal [hyphens:auto] tracking-tight"
-      >
-        {product.nom_produit}
-      </p>
-
-      {/* Description */}
-      <p className="text-sm text-gray-600 mt-2 px-1 max-h-10 overflow-hidden line-clamp-2">
-        {product.description}
-      </p>
-
-      {/* Prix */}
-      <p className="font-bold text-lg text-gray-800 mt-2">
-        {formatCurrencyCOP(product.prix_vente)}
-      </p>
-      
-      {/* Statut */}
-      {product.estado !== 'disponible' && (
-        <span className="text-xs text-red-500 font-bold mt-1">Agotado</span>
-      )}
-      {product.estado === 'disponible' && (
-        <button
-          onClick={(e) => { e.stopPropagation(); onClick(); }}
-          className="mt-4 w-full rounded-lg bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-2 font-bold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:from-orange-600 hover:via-orange-700 hover:to-red-700"
+      <div className="flex w-full flex-1 flex-col items-center">
+        <p
+          className="font-extrabold text-gray-900 leading-snug text-[clamp(1rem,2.2vw,1.2rem)] break-words text-balance whitespace-normal [hyphens:auto] tracking-tight"
         >
-          Agregar
-        </button>
-      )}
+          {product.nom_produit}
+        </p>
+
+        {/* Description */}
+        <p className="text-sm text-gray-600 mt-2 px-1 max-h-10 overflow-hidden line-clamp-2">
+          {product.description}
+        </p>
+
+        {/* Prix */}
+        <p className="font-bold text-lg text-gray-800 mt-2">
+          {formatCurrencyCOP(product.prix_vente)}
+        </p>
+        <div className="mt-auto w-full pt-3">
+          {/* Statut */}
+          {product.estado !== 'disponible' && (
+            <span className="text-xs text-red-500 font-bold">Agotado</span>
+          )}
+          {product.estado === 'disponible' && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onClick(); }}
+              className="w-full rounded-lg bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-2 font-bold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:from-orange-600 hover:via-orange-700 hover:to-red-700"
+            >
+              Agregar
+            </button>
+          )}
+        </div>
+      </div>
+
     </div>
   );
 };

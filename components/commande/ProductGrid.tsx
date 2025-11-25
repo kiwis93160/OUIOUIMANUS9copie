@@ -168,7 +168,7 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
                                 onKeyDown={handleKeyDown}
                                 role="button"
                                 tabIndex={0}
-                                className={`relative flex cursor-pointer flex-col items-center rounded-2xl p-4 text-center transition-all focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 focus:ring-offset-gray-900 border border-white/60 bg-white/90 shadow-lg backdrop-blur-md hover:shadow-xl ${
+                                className={`relative flex h-full cursor-pointer flex-col items-center rounded-2xl p-4 text-center transition-all focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 focus:ring-offset-gray-900 border border-white/60 bg-white/90 shadow-lg backdrop-blur-md hover:shadow-xl ${
                                     isSelected ? 'ring-2 ring-orange-400 shadow-orange-300/60 scale-[1.01]' : ''
                                 } ${hasStockIssue ? 'border-amber-300' : ''}`}
                             >
@@ -237,35 +237,37 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
                                     alt={product.nom_produit}
                                     className="mb-4 aspect-[4/3] w-full rounded-xl object-cover shadow-sm"
                                 />
-                                <p
-                                    className="text-[clamp(1rem,2vw,1.2rem)] font-extrabold leading-snug text-gray-900 text-balance text-center break-words whitespace-normal [hyphens:auto]"
-                                    style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
-                                >
-                                    {product.nom_produit}
-                                </p>
-                                <p
-                                    className="mt-2 w-full text-sm text-gray-600 text-center leading-tight px-1 line-clamp-2"
-                                >
-                                    {product.description}
-                                </p>
-                                <p className="mt-2 font-bold text-lg text-gray-800">
-                                    {formatCurrencyCOP(product.prix_vente)}
-                                </p>
-                                <div className="mt-3 w-full">
-                                    <button
-                                        type="button"
-                                        onClick={(event) => {
-                                            event.stopPropagation();
-                                            if (!isAvailable) {
-                                                return;
-                                            }
-                                            onQuickAdd(product);
-                                        }}
-                                        disabled={!isAvailable}
-                                        className="w-full rounded-lg bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-2 font-bold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:from-orange-600 hover:via-orange-700 hover:to-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                                <div className="flex w-full flex-1 flex-col items-center">
+                                    <p
+                                        className="text-[clamp(1rem,2vw,1.2rem)] font-extrabold leading-snug text-gray-900 text-balance text-center break-words whitespace-normal [hyphens:auto]"
+                                        style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
                                     >
-                                        Agregar
-                                    </button>
+                                        {product.nom_produit}
+                                    </p>
+                                    <p
+                                        className="mt-2 w-full text-sm text-gray-600 text-center leading-tight px-1 line-clamp-2"
+                                    >
+                                        {product.description}
+                                    </p>
+                                    <p className="mt-2 font-bold text-lg text-gray-800">
+                                        {formatCurrencyCOP(product.prix_vente)}
+                                    </p>
+                                    <div className="mt-auto w-full pt-3">
+                                        <button
+                                            type="button"
+                                            onClick={(event) => {
+                                                event.stopPropagation();
+                                                if (!isAvailable) {
+                                                    return;
+                                                }
+                                                onQuickAdd(product);
+                                            }}
+                                            disabled={!isAvailable}
+                                            className="w-full rounded-lg bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-2 font-bold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:from-orange-600 hover:via-orange-700 hover:to-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                                        >
+                                            Agregar
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         );
