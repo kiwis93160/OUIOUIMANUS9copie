@@ -464,6 +464,7 @@ const Commande: React.FC = () => {
                     .filter(item => isPersistedItemId(item.id) && !finalItems.some(finalItem => finalItem.id === item.id))
                     .map(item => item.id);
 
+                const requestSnapshot = createOrderItemsSnapshot(finalItems);
                 const updatedOrder = await api.updateOrder(
                     currentOrder.id,
                     {
@@ -472,6 +473,14 @@ const Commande: React.FC = () => {
                     },
                     { includeNotifications: false },
                 );
+
+                const currentOrderSnapshot = getCachedSnapshot(orderRef.current?.items, currentItemsSnapshotCacheRef);
+
+                if (!areOrderItemSnapshotsEqual(currentOrderSnapshot, requestSnapshot)) {
+                    pendingServerOrderRef.current = cloneOrder(updatedOrder);
+                    serverOrderRef.current = cloneOrder(updatedOrder);
+                    return;
+                }
                 setOrder(updatedOrder);
                 orderRef.current = updatedOrder;
                 updateSnapshotCache(currentItemsSnapshotCacheRef, updatedOrder.items);
