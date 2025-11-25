@@ -530,6 +530,19 @@ const Commande: React.FC = () => {
         setSelectedProductForCustomization(product);
     }, []);
 
+    const handleQuickAddProduct = useCallback((product: Product) => {
+        const defaultSelection: ItemCustomizationResult = {
+            quantity: 1,
+            comment: '',
+            selectedExtras: [],
+            excludedIngredientIds: [],
+        };
+
+        applyLocalItemsUpdate(items =>
+            mergeProductIntoPendingItems(items, product, defaultSelection, generateTempId),
+        );
+    }, [applyLocalItemsUpdate]);
+
     const closeCustomizationModal = useCallback(() => {
         setSelectedProductForCustomization(null);
     }, []);
@@ -782,6 +795,7 @@ const Commande: React.FC = () => {
                     filteredProducts={filteredProducts}
                     quantities={productQuantitiesInCart}
                     onAdd={handleProductSelection}
+                    onQuickAdd={handleQuickAddProduct}
                     activeCategoryId={activeCategoryId}
                     categories={categories}
                     onSelectCategory={setActiveCategoryId}

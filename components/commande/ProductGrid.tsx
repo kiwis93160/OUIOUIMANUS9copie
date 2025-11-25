@@ -7,6 +7,7 @@ export interface ProductGridProps {
     filteredProducts: Product[];
     quantities: Record<string, number>;
     onAdd: (product: Product) => void;
+    onQuickAdd: (product: Product) => void;
     activeCategoryId: string;
     categories: Category[];
     onSelectCategory: (categoryId: string) => void;
@@ -49,6 +50,7 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
     handleProductKeyDown,
     productStockStatuses,
     onNavigateToPlan,
+    onQuickAdd,
 }) => {
     const [activeStockProductId, setActiveStockProductId] = useState<string | null>(null);
 
@@ -126,7 +128,7 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
                         <button
                             type="button"
                             onClick={onNavigateToPlan}
-                            className="inline-flex items-center gap-2 rounded-full border border-brand-primary px-4 py-2 text-sm font-semibold text-brand-primary transition hover:bg-brand-primary hover:text-brand-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+                            className="inline-flex items-center gap-2 rounded-full border border-brand-primary bg-white px-4 py-2 text-sm font-semibold text-brand-primary shadow-sm transition hover:bg-brand-primary hover:text-brand-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
                             title="Plan de salle"
                         >
                             <LayoutDashboard size={16} />
@@ -142,7 +144,13 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
                         const hasStockIssue = Boolean(stockStatus?.affectedIngredients?.length);
                         const quantityInCart = quantities[product.id] || 0;
                         const isSelected = quantityInCart > 0;
-                        const handleProductClick = () => onAdd(product);
+                        const isAvailable = product.estado === 'disponible';
+                        const handleProductClick = () => {
+                            if (!isAvailable) {
+                                return;
+                            }
+                            onAdd(product);
+                        };
                         const handlePointerDown = handleProductPointerDown(product);
                         const handleKeyDown = handleProductKeyDown(product);
                         const iconColorClasses = stockStatus?.hasOutOfStock
@@ -243,6 +251,22 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
                                 <p className="mt-2 font-bold text-lg text-gray-800">
                                     {formatCurrencyCOP(product.prix_vente)}
                                 </p>
+                                <div className="mt-3 w-full">
+                                    <button
+                                        type="button"
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            if (!isAvailable) {
+                                                return;
+                                            }
+                                            onQuickAdd(product);
+                                        }}
+                                        disabled={!isAvailable}
+                                        className="w-full rounded-lg bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-2 font-bold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:from-orange-600 hover:via-orange-700 hover:to-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                                    >
+                                        Agregar
+                                    </button>
+                                </div>
                             </div>
                         );
                     })}
