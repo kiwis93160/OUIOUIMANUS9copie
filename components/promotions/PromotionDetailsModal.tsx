@@ -89,7 +89,7 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 px-3 py-6 backdrop-blur-sm">
-      <div className="flex w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 text-black shadow-2xl ring-1 ring-slate-100">
+      <div className="flex w-full max-w-4xl max-h-[90vh] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 text-black shadow-2xl ring-1 ring-slate-100">
         <div className="flex flex-col gap-3 border-b border-slate-200/80 bg-white/90 px-5 py-4 text-black sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-xl font-semibold leading-snug sm:text-2xl">Detalles de la promoción</h2>
           <button
@@ -124,7 +124,7 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 py-5 sm:px-6">
+        <div className="flex-1 overflow-y-auto bg-white/80 px-4 py-5 text-black sm:px-6">
           {activeTab === 'details' && (
             <div className="space-y-6">
               <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 shadow-lg">
@@ -160,211 +160,215 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div className="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm">
-                  <h4 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-black">
-                    <Info size={16} />
-                    Información general
-                  </h4>
-                  <dl className="space-y-2 text-sm text-black">
-                    <div className="flex items-center justify-between">
-                      <dt className="font-medium">ID</dt>
-                      <dd className="rounded bg-white/80 px-2 py-0.5 font-mono text-black shadow-sm">{promotion.id}</dd>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <dt className="font-medium">Creada el</dt>
-                      <dd>{formatDate(promotion.created_at)}</dd>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <dt className="font-medium">Actualizada</dt>
-                      <dd>{formatDate(promotion.updated_at)}</dd>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <dt className="font-medium">Usos</dt>
-                      <dd>{promotion.usage_count}</dd>
-                    </div>
-                  </dl>
-                </div>
-
-                <div className="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm">
-                  <h4 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-black">
-                    <Percent size={16} />
-                    Descuento
-                  </h4>
-                  <dl className="space-y-2 text-sm text-black">
-                    <div className="flex items-center justify-between">
-                      <dt className="font-medium">Tipo</dt>
-                      <dd>{promotion.discount.type === 'percentage' ? 'Porcentaje' : 'Monto fijo'}</dd>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <dt className="font-medium">Valor</dt>
-                      <dd className="font-semibold text-black">
-                        {promotion.discount.value}
-                        {promotion.discount.type === 'percentage' ? '%' : '€'}
-                      </dd>
-                    </div>
-                    {promotion.discount.max_discount_amount && (
-                      <div className="flex items-center justify-between">
-                        <dt className="font-medium">Máximo</dt>
-                        <dd>{promotion.discount.max_discount_amount}€</dd>
-                      </div>
-                    )}
-                    <div className="flex items-center justify-between">
-                      <dt className="font-medium">Aplicación</dt>
-                      <dd>
-                        {promotion.discount.applies_to === 'total' && 'Total del pedido'}
-                        {promotion.discount.applies_to === 'products' && 'Productos específicos'}
-                        {promotion.discount.applies_to === 'shipping' && 'Costo de envío'}
-                      </dd>
-                    </div>
-                  </dl>
-                </div>
-              </div>
-
-              <div className="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm">
-                <h4 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-black">
-                  <Calendar size={16} />
-                  Condiciones
-                </h4>
-                <dl className="grid grid-cols-1 gap-3 text-sm text-black md:grid-cols-2">
-                  {promotion.conditions.promo_code && (
-                    <div className="flex items-center justify-between">
-                      <dt className="font-medium">Código promocional</dt>
-                      <dd className="rounded bg-white/80 px-2 py-0.5 font-mono text-black shadow-sm">
-                        {promotion.conditions.promo_code}
-                      </dd>
-                    </div>
-                  )}
-
-                  {promotion.conditions.min_order_amount && (
-                    <div className="flex items-center justify-between">
-                      <dt className="font-medium">Monto mínimo</dt>
-                      <dd>{promotion.conditions.min_order_amount}€</dd>
-                    </div>
-                  )}
-
-                  {promotion.conditions.max_order_amount && (
-                    <div className="flex items-center justify-between">
-                      <dt className="font-medium">Monto máximo</dt>
-                      <dd>{promotion.conditions.max_order_amount}€</dd>
-                    </div>
-                  )}
-
-                  {promotion.conditions.start_date && (
-                    <div className="flex items-center justify-between">
-                      <dt className="font-medium">Fecha de inicio</dt>
-                      <dd>{formatDate(promotion.conditions.start_date)}</dd>
-                    </div>
-                  )}
-
-                  {promotion.conditions.end_date && (
-                    <div className="flex items-center justify-between">
-                      <dt className="font-medium">Fecha de finalización</dt>
-                      <dd>{formatDate(promotion.conditions.end_date)}</dd>
-                    </div>
-                  )}
-
-                  {promotion.conditions.days_of_week && promotion.conditions.days_of_week.length > 0 && (
-                    <div className="flex items-center justify-between">
-                      <dt className="font-medium">Días</dt>
-                      <dd>{promotion.conditions.days_of_week.map(day => ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'][day]).join(', ')}</dd>
-                    </div>
-                  )}
-
-                  {promotion.conditions.hours_of_day && (
-                    <div className="flex items-center justify-between">
-                      <dt className="font-medium">Horarios</dt>
-                      <dd>
-                        {promotion.conditions.hours_of_day.start} - {promotion.conditions.hours_of_day.end}
-                      </dd>
-                    </div>
-                  )}
-
-                  {promotion.conditions.max_uses_total && (
-                    <div className="flex items-center justify-between">
-                      <dt className="font-medium">Usos máximos</dt>
-                      <dd>{promotion.conditions.max_uses_total}</dd>
-                    </div>
-                  )}
-
-                  {promotion.conditions.max_uses_per_customer && (
-                    <div className="flex items-center justify-between">
-                      <dt className="font-medium">Máx. por cliente</dt>
-                      <dd>{promotion.conditions.max_uses_per_customer}</dd>
-                    </div>
-                  )}
-
-                  {promotion.conditions.first_order_only && (
-                    <div className="flex items-center justify-between">
-                      <dt className="font-medium">Primer pedido</dt>
-                      <dd>Sí</dd>
-                    </div>
-                  )}
-
-                  {promotion.type === 'buy_x_get_y' && (
-                    <>
-                      <div className="flex items-center justify-between">
-                        <dt className="font-medium">Compra</dt>
-                        <dd>{promotion.conditions.buy_quantity}</dd>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <dt className="font-medium">Recibe</dt>
-                        <dd>{promotion.conditions.get_quantity}</dd>
-                      </div>
-                    </>
-                  )}
-                </dl>
-              </div>
-
-              {promotion.visuals && Object.keys(promotion.visuals).length > 0 && (
-                <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5 shadow-sm">
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <div className="space-y-6">
+                  <div className="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm">
                     <h4 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-black">
-                    <Tag size={16} />
-                    Elementos visuales
-                  </h4>
-                  <div className="grid grid-cols-1 gap-4 text-sm text-black md:grid-cols-2">
-                    {promotion.visuals.badge_text && (
+                      <Info size={16} />
+                      Información general
+                    </h4>
+                    <dl className="space-y-2 text-sm text-black">
                       <div className="flex items-center justify-between">
-                        <span className="font-medium">Badge</span>
-                        <span
-                          className="rounded-full px-3 py-1 text-xs font-semibold"
-                          style={{
-                            backgroundColor: badgeBackgroundColor,
-                            color: badgeTextColor,
-                          }}
-                        >
-                          {promotion.visuals.badge_text}
-                        </span>
+                        <dt className="font-medium">ID</dt>
+                        <dd className="rounded bg-white/80 px-2 py-0.5 font-mono text-black shadow-sm">{promotion.id}</dd>
                       </div>
-                    )}
-
-                    {promotion.visuals.banner_text && (
                       <div className="flex items-center justify-between">
-                        <span className="font-medium">Texto del banner</span>
-                        <span className="text-right text-black">{promotion.visuals.banner_text}</span>
+                        <dt className="font-medium">Creada el</dt>
+                        <dd>{formatDate(promotion.created_at)}</dd>
                       </div>
-                    )}
-
-                    {promotion.visuals.banner_cta && (
                       <div className="flex items-center justify-between">
-                        <span className="font-medium">Botón</span>
-                        <span className="text-right text-black">{promotion.visuals.banner_cta}</span>
+                        <dt className="font-medium">Actualizada</dt>
+                        <dd>{formatDate(promotion.updated_at)}</dd>
                       </div>
-                    )}
+                      <div className="flex items-center justify-between">
+                        <dt className="font-medium">Usos</dt>
+                        <dd>{promotion.usage_count}</dd>
+                      </div>
+                    </dl>
                   </div>
 
-                  {promotion.visuals.banner_image && (
-                    <div className="mt-4">
-                      <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-black">Imagen del banner</span>
-                      <img
-                        src={promotion.visuals.banner_image}
-                        alt="Banner promocional"
-                        className="w-full max-h-40 rounded-xl object-cover shadow-sm"
-                      />
+                  <div className="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm">
+                    <h4 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-black">
+                      <Calendar size={16} />
+                      Condiciones
+                    </h4>
+                    <dl className="grid grid-cols-1 gap-3 text-sm text-black md:grid-cols-2">
+                      {promotion.conditions.promo_code && (
+                        <div className="flex items-center justify-between">
+                          <dt className="font-medium">Código promocional</dt>
+                          <dd className="rounded bg-white/80 px-2 py-0.5 font-mono text-black shadow-sm">
+                            {promotion.conditions.promo_code}
+                          </dd>
+                        </div>
+                      )}
+
+                      {promotion.conditions.min_order_amount && (
+                        <div className="flex items-center justify-between">
+                          <dt className="font-medium">Monto mínimo</dt>
+                          <dd>{promotion.conditions.min_order_amount}€</dd>
+                        </div>
+                      )}
+
+                      {promotion.conditions.max_order_amount && (
+                        <div className="flex items-center justify-between">
+                          <dt className="font-medium">Monto máximo</dt>
+                          <dd>{promotion.conditions.max_order_amount}€</dd>
+                        </div>
+                      )}
+
+                      {promotion.conditions.start_date && (
+                        <div className="flex items-center justify-between">
+                          <dt className="font-medium">Fecha de inicio</dt>
+                          <dd>{formatDate(promotion.conditions.start_date)}</dd>
+                        </div>
+                      )}
+
+                      {promotion.conditions.end_date && (
+                        <div className="flex items-center justify-between">
+                          <dt className="font-medium">Fecha de finalización</dt>
+                          <dd>{formatDate(promotion.conditions.end_date)}</dd>
+                        </div>
+                      )}
+
+                      {promotion.conditions.days_of_week && promotion.conditions.days_of_week.length > 0 && (
+                        <div className="flex items-center justify-between">
+                          <dt className="font-medium">Días</dt>
+                          <dd>{promotion.conditions.days_of_week.map(day => ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'][day]).join(', ')}</dd>
+                        </div>
+                      )}
+
+                      {promotion.conditions.hours_of_day && (
+                        <div className="flex items-center justify-between">
+                          <dt className="font-medium">Horarios</dt>
+                          <dd>
+                            {promotion.conditions.hours_of_day.start} - {promotion.conditions.hours_of_day.end}
+                          </dd>
+                        </div>
+                      )}
+
+                      {promotion.conditions.max_uses_total && (
+                        <div className="flex items-center justify-between">
+                          <dt className="font-medium">Usos máximos</dt>
+                          <dd>{promotion.conditions.max_uses_total}</dd>
+                        </div>
+                      )}
+
+                      {promotion.conditions.max_uses_per_customer && (
+                        <div className="flex items-center justify-between">
+                          <dt className="font-medium">Máx. por cliente</dt>
+                          <dd>{promotion.conditions.max_uses_per_customer}</dd>
+                        </div>
+                      )}
+
+                      {promotion.conditions.first_order_only && (
+                        <div className="flex items-center justify-between">
+                          <dt className="font-medium">Primer pedido</dt>
+                          <dd>Sí</dd>
+                        </div>
+                      )}
+
+                      {promotion.type === 'buy_x_get_y' && (
+                        <>
+                          <div className="flex items-center justify-between">
+                            <dt className="font-medium">Compra</dt>
+                            <dd>{promotion.conditions.buy_quantity}</dd>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <dt className="font-medium">Recibe</dt>
+                            <dd>{promotion.conditions.get_quantity}</dd>
+                          </div>
+                        </>
+                      )}
+                    </dl>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm">
+                    <h4 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-black">
+                      <Percent size={16} />
+                      Descuento
+                    </h4>
+                    <dl className="space-y-2 text-sm text-black">
+                      <div className="flex items-center justify-between">
+                        <dt className="font-medium">Tipo</dt>
+                        <dd>{promotion.discount.type === 'percentage' ? 'Porcentaje' : 'Monto fijo'}</dd>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <dt className="font-medium">Valor</dt>
+                        <dd className="font-semibold text-black">
+                          {promotion.discount.value}
+                          {promotion.discount.type === 'percentage' ? '%' : '€'}
+                        </dd>
+                      </div>
+                      {promotion.discount.max_discount_amount && (
+                        <div className="flex items-center justify-between">
+                          <dt className="font-medium">Máximo</dt>
+                          <dd>{promotion.discount.max_discount_amount}€</dd>
+                        </div>
+                      )}
+                      <div className="flex items-center justify-between">
+                        <dt className="font-medium">Aplicación</dt>
+                        <dd>
+                          {promotion.discount.applies_to === 'total' && 'Total del pedido'}
+                          {promotion.discount.applies_to === 'products' && 'Productos específicos'}
+                          {promotion.discount.applies_to === 'shipping' && 'Costo de envío'}
+                        </dd>
+                      </div>
+                    </dl>
+                  </div>
+
+                  {promotion.visuals && Object.keys(promotion.visuals).length > 0 && (
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5 shadow-sm">
+                        <h4 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-black">
+                        <Tag size={16} />
+                        Elementos visuales
+                      </h4>
+                      <div className="grid grid-cols-1 gap-4 text-sm text-black md:grid-cols-2">
+                        {promotion.visuals.badge_text && (
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium">Badge</span>
+                            <span
+                              className="rounded-full px-3 py-1 text-xs font-semibold"
+                              style={{
+                                backgroundColor: badgeBackgroundColor,
+                                color: badgeTextColor,
+                              }}
+                            >
+                              {promotion.visuals.badge_text}
+                            </span>
+                          </div>
+                        )}
+
+                        {promotion.visuals.banner_text && (
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium">Texto del banner</span>
+                            <span className="text-right text-black">{promotion.visuals.banner_text}</span>
+                          </div>
+                        )}
+
+                        {promotion.visuals.banner_cta && (
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium">Botón</span>
+                            <span className="text-right text-black">{promotion.visuals.banner_cta}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {promotion.visuals.banner_image && (
+                        <div className="mt-4">
+                          <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-black">Imagen del banner</span>
+                          <img
+                            src={promotion.visuals.banner_image}
+                            alt="Banner promocional"
+                            className="w-full max-h-40 rounded-xl object-cover shadow-sm"
+                          />
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
-              )}
+              </div>
             </div>
           )}
 
