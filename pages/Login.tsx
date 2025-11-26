@@ -477,13 +477,13 @@ const Login: React.FC = () => {
         <div className="menu-card__overlay">
           <img src={product.image} alt={product.nom_produit} className="menu-card__media menu-card__media--overlay" />
           <div className="menu-card__overlay-content">
-            <h3 className="menu-card__title" style={menuTextStyle}>
+            <h3 className="menu-card__title" style={{ ...menuTextStyle, color: '#ffffff' }}>
               {product.nom_produit}
             </h3>
-            <p className="menu-card__description" style={menuBodyTextStyle}>
+            <p className="menu-card__description" style={{ ...menuBodyTextStyle, color: 'rgba(255, 255, 255, 0.92)' }}>
               {product.description}
             </p>
-            <p className="menu-card__price" style={menuBodyTextStyle}>
+            <p className="menu-card__price" style={{ ...menuBodyTextStyle, color: '#ffffff' }}>
               {formatCurrencyCOP(product.prix_vente)}
             </p>
           </div>
