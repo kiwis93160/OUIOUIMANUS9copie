@@ -626,21 +626,21 @@ const PromotionModal: React.FC<PromotionModalProps> = ({ isOpen, onClose, onSave
           {activeTab === 'visuals' && (
             <div className="space-y-4">
               <div className="space-y-4 rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-lg ring-1 ring-slate-100">
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  <div className="space-y-1.5">
-                    <label htmlFor="badge_text" className="block text-xs font-semibold uppercase tracking-wide text-black">
-                      Texte du badge
-                    </label>
-                    <input
-                      type="text"
-                      id="badge_text"
-                      value={visuals.badge_text || ''}
-                      onChange={(e) => setVisuals({ ...visuals, badge_text: e.target.value })}
-                      className="ui-input mt-1.5"
-                      placeholder="Ex: 2x1, -20%, etc."
-                    />
-                  </div>
+                <div className="space-y-1.5">
+                  <label htmlFor="badge_text" className="block text-xs font-semibold uppercase tracking-wide text-black">
+                    Texte du badge
+                  </label>
+                  <input
+                    type="text"
+                    id="badge_text"
+                    value={visuals.badge_text || ''}
+                    onChange={(e) => setVisuals({ ...visuals, badge_text: e.target.value })}
+                    className="ui-input mt-1.5"
+                    placeholder="Ex: 2x1, -20%, etc."
+                  />
+                </div>
 
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div className="space-y-1.5">
                     <label htmlFor="badge_color" className="block text-xs font-semibold uppercase tracking-wide text-black">
                       Couleur du texte du badge
@@ -666,24 +666,39 @@ const PromotionModal: React.FC<PromotionModalProps> = ({ isOpen, onClose, onSave
                       className="mt-1.5 h-10 w-full rounded-lg border border-slate-200 bg-white"
                     />
                   </div>
+                </div>
 
+                <div className="space-y-1.5">
+                  <label htmlFor="banner_text" className="block text-xs font-semibold uppercase tracking-wide text-black">
+                    Texte de la bannière
+                  </label>
+                  <input
+                    type="text"
+                    id="banner_text"
+                    value={visuals.banner_text || ''}
+                    onChange={(e) => setVisuals({ ...visuals, banner_text: e.target.value })}
+                    className="ui-input mt-1.5"
+                    placeholder="Ex: Offre spéciale : 20% de réduction sur tous les tacos !"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div className="space-y-1.5">
-                    <label htmlFor="banner_text" className="block text-xs font-semibold uppercase tracking-wide text-black">
-                      Texte de la bannière
+                    <label htmlFor="banner_text_color" className="block text-xs font-semibold uppercase tracking-wide text-black">
+                      Couleur du texte de la bannière
                     </label>
                     <input
-                      type="text"
-                      id="banner_text"
-                      value={visuals.banner_text || ''}
-                      onChange={(e) => setVisuals({ ...visuals, banner_text: e.target.value })}
-                      className="ui-input mt-1.5"
-                      placeholder="Ex: Offre spéciale : 20% de réduction sur tous les tacos !"
+                      type="color"
+                      id="banner_text_color"
+                      value={visuals.banner_text_color || '#000000'}
+                      onChange={(e) => setVisuals({ ...visuals, banner_text_color: e.target.value })}
+                      className="mt-1.5 h-10 w-full rounded-lg border border-slate-200 bg-white"
                     />
                   </div>
 
-                  <div className="space-y-1.5 sm:col-span-2">
+                  <div className="space-y-1.5">
                     <label htmlFor="banner_bg_color" className="block text-xs font-semibold uppercase tracking-wide text-black">
-                      Color del fondo del bannier
+                      Couleur de fond de la bannière
                     </label>
                     <input
                       type="color"
