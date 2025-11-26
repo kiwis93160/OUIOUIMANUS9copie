@@ -209,6 +209,44 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
 
   useCustomFonts(content.assets.library);
 
+  const bestSellersToDisplay = bestSellerProducts.slice(0, 4);
+  const featuredProduct = bestSellersToDisplay[0];
+  const secondaryProducts = bestSellersToDisplay.slice(1);
+  const topRowProducts = secondaryProducts.slice(0, 2);
+  const bottomProduct = secondaryProducts[2];
+  const hasSecondaryProducts = secondaryProducts.length > 0;
+
+  const renderMenuCard = (product: Product, variant: 'featured' | 'small' | 'medium') => {
+    const hasImage = Boolean(product.image);
+
+    return (
+      <article key={product.id} className={`ui-card menu-card best-seller-card best-seller-card--${variant}`}>
+        {hasImage ? (
+          <img
+            src={product.image}
+            alt={product.nom_produit}
+            className="menu-card__media"
+          />
+        ) : (
+          <div className="menu-card__media bg-gradient-to-br from-orange-200 via-amber-100 to-orange-50" />
+        )}
+        <div className="menu-card__body">
+          <h3 className="menu-card__title" style={menuTextStyle}>
+            {product.nom_produit}
+          </h3>
+          {product.description && (
+            <p className="menu-card__description" style={menuBodyTextStyle}>
+              {product.description}
+            </p>
+          )}
+          <p className="menu-card__price" style={menuBodyTextStyle}>
+            {formatCurrencyCOP(product.prix_vente)}
+          </p>
+        </div>
+      </article>
+    );
+  };
+
   const elementStyles = content.elementStyles ?? {};
   const elementRichText = content.elementRichText ?? {};
   const isCustomizationMode = showEditButtons;
@@ -661,37 +699,21 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
                   />
                 </EditableElement>
               )}
-              <div className="menu-grid">
-                {bestSellerProducts.length > 0 ? (
-                  bestSellerProducts.map(product => {
-                    const hasImage = Boolean(product.image);
-                    return (
-                      <article key={product.id} className="ui-card menu-card">
-                        {hasImage ? (
-                          <img
-                            src={product.image}
-                            alt={product.nom_produit}
-                            className="h-40 w-full rounded-t-xl object-cover"
-                          />
-                        ) : (
-                          <div className="h-40 w-full rounded-t-xl bg-gradient-to-br from-orange-200 via-amber-100 to-orange-50" />
-                        )}
-                        <div className="menu-card__body">
-                          <h3 className="menu-card__title" style={menuTextStyle}>
-                            {product.nom_produit}
-                          </h3>
-                          {product.description && (
-                            <p className="menu-card__description" style={menuBodyTextStyle}>
-                              {product.description}
-                            </p>
-                          )}
-                          <p className="menu-card__price" style={menuBodyTextStyle}>
-                            {formatCurrencyCOP(product.prix_vente)}
-                          </p>
+              <div
+                className={`menu-grid ${hasSecondaryProducts ? 'menu-grid--best-sellers' : 'menu-grid--best-sellers-single'}`}
+              >
+                {bestSellersToDisplay.length > 0 ? (
+                  <>
+                    {featuredProduct && renderMenuCard(featuredProduct, 'featured')}
+                    {hasSecondaryProducts && (
+                      <div className="best-seller-rail">
+                        <div className="best-seller-top">
+                          {topRowProducts.map(product => renderMenuCard(product, 'small'))}
                         </div>
-                      </article>
-                    );
-                  })
+                        {bottomProduct && renderMenuCard(bottomProduct, 'medium')}
+                      </div>
+                    )}
+                  </>
                 ) : (
                   <div className="col-span-full rounded-2xl border border-dashed border-slate-300 bg-white/70 p-6 text-center">
                     <p className="text-sm text-slate-500" style={menuBodyTextStyle}>

@@ -1799,7 +1799,7 @@ export const api = {
         }
         return rankA - rankB;
       })
-      .slice(0, 6);
+      .slice(0, 4);
 
     const tablesOccupees = tables.filter(table => table.statut !== 'libre').length;
     const clientsActuels = tables.reduce((sum, table) => sum + (table.couverts ?? 0), 0);
@@ -2012,7 +2012,7 @@ export const api = {
           return query.limit(0);
         }
 
-        return query.eq('is_best_seller', true).order('best_seller_rank', { ascending: true, nullsFirst: false }).limit(6);
+        return query.eq('is_best_seller', true).order('best_seller_rank', { ascending: true, nullsFirst: false }).limit(4);
       }, { includeRecipes: false }),
       fetchIngredientsOrWarn('getBestSellerProducts'),
     ]);
@@ -2031,7 +2031,7 @@ export const api = {
       })
       .map(row => mapProductRow(row, ingredientMap))
       .filter(product => product.is_best_seller)
-      .slice(0, 6);
+      .slice(0, 4);
   },
 
   getCategories: async (): Promise<Category[]> => {
