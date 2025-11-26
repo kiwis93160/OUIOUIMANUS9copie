@@ -186,7 +186,6 @@ const computeMenuGridClassName = (count: number): string => {
   if (count === 1) return 'menu-grid menu-grid--single';
   if (count === 2) return 'menu-grid menu-grid--double';
   if (count === 3) return 'menu-grid menu-grid--triple';
-  if (count === 4) return 'menu-grid menu-grid--featured';
   if (count >= 6) return 'menu-grid menu-grid--six';
   if (count > 0) return 'menu-grid menu-grid--multi';
   return 'menu-grid';
@@ -197,20 +196,8 @@ const computeMenuCardClassName = (count: number): string => {
   if (count === 1) return `${baseClass} menu-card--single`;
   if (count === 2) return `${baseClass} menu-card--double`;
   if (count === 3) return `${baseClass} menu-card--triple`;
-  if (count === 4) return `${baseClass} menu-card--featured`;
   if (count >= 6) return `${baseClass} menu-card--compact`;
   return baseClass;
-};
-
-const getMenuCardFeaturedClassName = (index: number, count: number): string => {
-  if (count !== 4) {
-    return '';
-  }
-
-  if (index === 0) return 'menu-card--featured-primary';
-  if (index === 1) return 'menu-card--featured-secondary';
-  if (index === 2) return 'menu-card--featured-tertiary';
-  return 'menu-card--featured-quaternary';
 };
 
 
@@ -463,7 +450,7 @@ const Login: React.FC = () => {
   const whatsappInternationalNumber = `33${whatsappTestNumber.replace(/^0/, '')}`;
   const whatsappUrl = `https://wa.me/${whatsappInternationalNumber}`;
   const activeOrderId = activeOrder?.orderId ?? null;
-  const bestSellersToDisplay = bestSellers.slice(0, 4);
+  const bestSellersToDisplay = bestSellers.slice(0, 6);
   const bestSellerCount = bestSellersToDisplay.length;
   const menuGridClassName = computeMenuGridClassName(bestSellerCount);
   const menuCardClassName = computeMenuCardClassName(bestSellerCount);
@@ -821,11 +808,8 @@ const Login: React.FC = () => {
               )
             ) : bestSellersToDisplay.length > 0 ? (
               <div className={menuGridClassName}>
-                {bestSellersToDisplay.map((product, index) => (
-                  <article
-                    key={product.id}
-                    className={`${menuCardClassName} ${getMenuCardFeaturedClassName(index, bestSellerCount)}`.trim()}
-                  >
+                {bestSellersToDisplay.map(product => (
+                  <article key={product.id} className={menuCardClassName}>
                     <img src={product.image} alt={product.nom_produit} className="menu-card__media" />
                     <div className="menu-card__body">
                       <h3 className="menu-card__title" style={menuTextStyle}>
