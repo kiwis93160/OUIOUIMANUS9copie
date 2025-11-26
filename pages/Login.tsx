@@ -325,6 +325,36 @@ const Login: React.FC = () => {
     return React.createElement(Component, props, fallback);
   };
 
+  const renderHeroTitle = () => {
+    const Tag: 'h2' = 'h2';
+    const animatedHighlight = (
+      <span className="ml-3 text-orange-500 inline-block transform hover:rotate-3 transition-transform cursor-default">
+        OUI
+      </span>
+    );
+    const heroTitleProps = {
+      className: 'hero-title',
+      style: getElementTextStyle('hero.title'),
+    } satisfies React.ComponentPropsWithoutRef<typeof Tag>;
+
+    const html = getRichTextHtml('hero.title');
+    if (html) {
+      return (
+        <Tag {...heroTitleProps}>
+          <span dangerouslySetInnerHTML={{ __html: html }} />
+          {animatedHighlight}
+        </Tag>
+      );
+    }
+
+    return (
+      <Tag {...heroTitleProps}>
+        {hero.title}
+        {animatedHighlight}
+      </Tag>
+    );
+  };
+
   const [bestSellers, setBestSellers] = useState<Product[]>([]);
   const [orderHistory, setOrderHistory] = useState<Order[]>([]);
   const [menuLoading, setMenuLoading] = useState(true);
@@ -628,15 +658,7 @@ const Login: React.FC = () => {
             />
           ) : (
             <div className="hero-content" style={heroTextStyle}>
-              {renderRichTextElement(
-                'hero.title',
-                'h2',
-                {
-                  className: 'hero-title',
-                  style: getElementTextStyle('hero.title'),
-                },
-                hero.title,
-              )}
+              {renderHeroTitle()}
               {renderRichTextElement(
                 'hero.subtitle',
                 'p',
