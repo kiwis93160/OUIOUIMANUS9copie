@@ -470,30 +470,6 @@ const Login: React.FC = () => {
   const pinIsComplete = pin.length === PIN_LENGTH;
   const describedByIds = undefined;
 
-  const renderMenuCard = (
-    product: Product,
-    index: number,
-    extraClasses = '',
-  ) => (
-    <article
-      key={`${product.id}-${index}`}
-      className={`${menuCardClassName} ${extraClasses}`.trim()}
-    >
-      <img src={product.image} alt={product.nom_produit} className="menu-card__media" />
-      <div className="menu-card__body">
-        <h3 className="menu-card__title" style={menuTextStyle}>
-          {product.nom_produit}
-        </h3>
-        <p className="menu-card__description" style={menuBodyTextStyle}>
-          {product.description}
-        </p>
-        <p className="menu-card__price" style={menuBodyTextStyle}>
-          {formatCurrencyCOP(product.prix_vente)}
-        </p>
-      </div>
-    </article>
-  );
-
   const attemptSubmit = () => {
     if (!pinIsComplete) {
       setError(`Veuillez saisir les ${PIN_LENGTH} chiffres du code personnel.`);
@@ -844,44 +820,27 @@ const Login: React.FC = () => {
                 menuContent.loadingLabel,
               )
             ) : bestSellersToDisplay.length > 0 ? (
-              bestSellerCount === 4 ? (
-                <div className="menu-grid menu-grid--featured-custom">
-                  {renderMenuCard(
-                    bestSellersToDisplay[0],
-                    0,
-                    `${getMenuCardFeaturedClassName(0, bestSellerCount)} menu-card--hero`,
-                  )}
-                  <div className="menu-featured-column">
-                    <div className="menu-featured-row">
-                      {renderMenuCard(
-                        bestSellersToDisplay[1],
-                        1,
-                        `${getMenuCardFeaturedClassName(1, bestSellerCount)} menu-card--compact`,
-                      )}
-                      {renderMenuCard(
-                        bestSellersToDisplay[2],
-                        2,
-                        `${getMenuCardFeaturedClassName(2, bestSellerCount)} menu-card--compact`,
-                      )}
+              <div className={menuGridClassName}>
+                {bestSellersToDisplay.map((product, index) => (
+                  <article
+                    key={product.id}
+                    className={`${menuCardClassName} ${getMenuCardFeaturedClassName(index, bestSellerCount)}`.trim()}
+                  >
+                    <img src={product.image} alt={product.nom_produit} className="menu-card__media" />
+                    <div className="menu-card__body">
+                      <h3 className="menu-card__title" style={menuTextStyle}>
+                        {product.nom_produit}
+                      </h3>
+                      <p className="menu-card__description" style={menuBodyTextStyle}>
+                        {product.description}
+                      </p>
+                      <p className="menu-card__price" style={menuBodyTextStyle}>
+                        {formatCurrencyCOP(product.prix_vente)}
+                      </p>
                     </div>
-                    {renderMenuCard(
-                      bestSellersToDisplay[3],
-                      3,
-                      `${getMenuCardFeaturedClassName(3, bestSellerCount)} menu-card--horizontal`,
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <div className={menuGridClassName}>
-                  {bestSellersToDisplay.map((product, index) =>
-                    renderMenuCard(
-                      product,
-                      index,
-                      getMenuCardFeaturedClassName(index, bestSellerCount),
-                    ),
-                  )}
-                </div>
-              )
+                  </article>
+                ))}
+              </div>
             ) : (
               <p className="section-text section-text--muted" style={menuBodyTextStyle}>
                 Ningún producto destacado está disponible por el momento.
