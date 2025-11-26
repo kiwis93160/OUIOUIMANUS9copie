@@ -667,7 +667,7 @@ body {
   padding: clamp(1rem, 3vw, 1.75rem);
   border-radius: 1.25rem;
   border: 1px solid rgba(148, 163, 184, 0.35);
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.75) 0%, rgba(30, 41, 59, 0.62) 100%);
+  background: rgba(100, 0, 50, 0.3);
   box-shadow: 0 24px 55px rgba(2, 6, 23, 0.42);
   display: flex;
   flex-direction: column;
@@ -677,7 +677,7 @@ body {
 .hero-history__title {
   font-size: clamp(1.05rem, 2vw, 1.25rem);
   font-weight: 700;
-  color: var(--color-surface);
+  color: #ffffff;
   margin: 0;
 }
 
@@ -702,13 +702,13 @@ body {
 }
 
 .hero-history__date {
-  color: var(--color-surface);
+  color: #ffffff;
   font-weight: 600;
   margin: 0;
 }
 
 .hero-history__details {
-  color: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  color: #ffffff;
   font-size: 0.9rem;
   margin: 0;
 }
@@ -721,7 +721,7 @@ body {
   border-radius: 999px;
   border: 1px solid rgba(253, 224, 71, 0.55);
   background: rgba(253, 224, 71, 0.18);
-  color: var(--color-surface);
+  color: #ffffff;
   font-size: 0.9rem;
   font-weight: 600;
   transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
@@ -892,7 +892,8 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(249, 249, 249, 0.94));
+  background: rgba(17, 24, 39, 0.2);
+  color: #ffffff;
 }
 
 
@@ -1092,7 +1093,8 @@ body {
   justify-content: center;
   gap: 0.65rem;
   padding: clamp(1.25rem, 3vw, 1.75rem);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(249, 249, 249, 0.92));
+  background: rgba(17, 24, 39, 0.2);
+  color: #ffffff;
 }
 
 .menu-card__overlay-content .menu-card__title,
@@ -1113,6 +1115,15 @@ body {
   flex-direction: column;
   gap: 0.75rem;
   flex: 1;
+}
+
+.best-seller-card--featured .menu-card__title,
+.best-seller-card--featured .menu-card__description,
+.best-seller-card--featured .menu-card__price,
+.menu-card__body--side .menu-card__title,
+.menu-card__body--side .menu-card__description,
+.menu-card__body--side .menu-card__price {
+  color: #ffffff;
 }
 
 .menu-card__title {
