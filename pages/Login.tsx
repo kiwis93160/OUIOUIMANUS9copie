@@ -480,12 +480,6 @@ const Login: React.FC = () => {
             <h3 className="menu-card__title" style={{ ...menuTextStyle, color: '#ffffff' }}>
               {product.nom_produit}
             </h3>
-            <p className="menu-card__description" style={{ ...menuBodyTextStyle, color: 'rgba(255, 255, 255, 0.92)' }}>
-              {product.description}
-            </p>
-            <p className="menu-card__price" style={{ ...menuBodyTextStyle, color: '#ffffff' }}>
-              {formatCurrencyCOP(product.prix_vente)}
-            </p>
           </div>
         </div>
       )}
