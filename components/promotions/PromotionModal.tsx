@@ -9,7 +9,6 @@ import {
   PromotionVisuals
 } from '../../types';
 import { createPromotion, updatePromotion } from '../../services/promotionsApi';
-import { normalizeCloudinaryImageUrl, uploadCustomizationAsset } from '../../services/cloudinary';
 
 interface PromotionModalProps {
   isOpen: boolean;
@@ -53,8 +52,6 @@ const PromotionModal: React.FC<PromotionModalProps> = ({ isOpen, onClose, onSave
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'general' | 'conditions' | 'periodo' | 'discount' | 'visuals'>('general');
-  const [imageUploading, setImageUploading] = useState(false);
-
   const formatDateTimeLocal = (value?: string) =>
     value ? new Date(value).toISOString().slice(0, 16) : '';
 
@@ -121,24 +118,6 @@ const PromotionModal: React.FC<PromotionModalProps> = ({ isOpen, onClose, onSave
       setError(err instanceof Error ? err.message : 'Une erreur est survenue');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setImageUploading(true);
-    try {
-      const url = await uploadCustomizationAsset(file);
-      setVisuals({
-        ...visuals,
-        banner_image: normalizeCloudinaryImageUrl(url)
-      });
-    } catch (err) {
-      setError('Erreur lors du téléchargement de l\'image');
-    } finally {
-      setImageUploading(false);
     }
   };
 
@@ -690,59 +669,6 @@ const PromotionModal: React.FC<PromotionModalProps> = ({ isOpen, onClose, onSave
                 </div>
 
                 <div>
-                  <label htmlFor="badge_bg_image" className="block text-xs font-semibold uppercase tracking-wide text-black">
-                    Image de fond du badge (optionnel)
-                  </label>
-                  <p className="mt-1 text-xs text-black">
-                    Si vous uploadez une image, elle remplacera la couleur de fond du badge
-                  </p>
-                  <div className="mt-3 flex flex-wrap items-center gap-4">
-                    <label className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2 text-sm font-semibold text-black shadow-sm transition hover:bg-slate-100">
-                      <input
-                        type="file"
-                        id="badge_bg_image"
-                        onChange={async (e) => {
-                          const file = e.target.files?.[0];
-                          if (!file) return;
-
-                          setImageUploading(true);
-                          try {
-                            const url = await uploadCustomizationAsset(file, { tags: ['badge-background'] });
-                            setVisuals({
-                              ...visuals,
-                              badge_bg_image: normalizeCloudinaryImageUrl(url)
-                            });
-                          } catch (err) {
-                            setError('Erreur lors du téléchargement de l\'image du badge');
-                          } finally {
-                            setImageUploading(false);
-                          }
-                        }}
-                        className="sr-only"
-                        accept="image/*"
-                      />
-                      <span>{imageUploading ? 'Téléchargement...' : 'Choisir une image'}</span>
-                    </label>
-                    {visuals.badge_bg_image && (
-                      <div className="relative">
-                        <img
-                          src={visuals.badge_bg_image}
-                          alt="Aperçu de l'image de fond du badge"
-                          className="h-16 w-auto rounded-lg object-cover shadow-sm"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setVisuals({ ...visuals, badge_bg_image: undefined })}
-                          className="absolute -top-2 -right-2 inline-flex h-7 w-7 items-center justify-center rounded-full border border-red-500 bg-white text-black shadow hover:bg-red-100"
-                        >
-                          <X size={12} />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div>
                   <label htmlFor="banner_text" className="block text-xs font-semibold uppercase tracking-wide text-black">
                     Texte de la bannière
                   </label>
@@ -757,50 +683,15 @@ const PromotionModal: React.FC<PromotionModalProps> = ({ isOpen, onClose, onSave
                 </div>
 
                 <div>
-                  <label htmlFor="banner_image" className="block text-xs font-semibold uppercase tracking-wide text-black">
-                    Image de la bannière
-                  </label>
-                  <div className="mt-3 flex flex-wrap items-center gap-4">
-                    <label className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2 text-sm font-semibold text-black shadow-sm transition hover:bg-slate-100">
-                      <input
-                        type="file"
-                        id="banner_image"
-                        onChange={handleImageUpload}
-                        className="sr-only"
-                        accept="image/*"
-                      />
-                      <span>{imageUploading ? 'Téléchargement...' : 'Choisir une image'}</span>
-                    </label>
-                    {visuals.banner_image && (
-                      <div className="relative">
-                        <img
-                          src={visuals.banner_image}
-                          alt="Aperçu de la bannière"
-                          className="h-20 w-auto rounded-lg object-cover shadow-sm"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setVisuals({ ...visuals, banner_image: undefined })}
-                          className="absolute -top-2 -right-2 inline-flex h-7 w-7 items-center justify-center rounded-full border border-red-500 bg-white text-black shadow hover:bg-red-100"
-                        >
-                          <X size={12} />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="banner_cta" className="block text-xs font-semibold uppercase tracking-wide text-black">
-                    Texte du bouton d'appel à l'action
+                  <label htmlFor="banner_bg_color" className="block text-xs font-semibold uppercase tracking-wide text-black">
+                    Color del fondo del bannier
                   </label>
                   <input
-                    type="text"
-                    id="banner_cta"
-                    value={visuals.banner_cta || ''}
-                    onChange={(e) => setVisuals({ ...visuals, banner_cta: e.target.value })}
-                    className="ui-input mt-2"
-                    placeholder="Ex: En profiter maintenant"
+                    type="color"
+                    id="banner_bg_color"
+                    value={visuals.banner_bg_color || '#FFFFFF'}
+                    onChange={(e) => setVisuals({ ...visuals, banner_bg_color: e.target.value })}
+                    className="mt-2 h-12 w-full rounded-lg border border-slate-200 bg-white"
                   />
                 </div>
               </div>
