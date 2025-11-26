@@ -10,7 +10,7 @@ import { PlusCircle, Edit, Trash2, Search, Settings, GripVertical, CheckCircle, 
 import { formatCurrencyCOP, formatIntegerAmount } from '../utils/formatIntegerAmount';
 import { convertPriceToUsageUnit, getUsageUnitLabel } from '../utils/ingredientUnits';
 
-const BEST_SELLER_RANKS = [1, 2, 3, 4, 5, 6];
+const BEST_SELLER_RANKS = [1, 2, 3, 4];
 
 const getStatusInfo = (status: Product['estado']) => {
     switch (status) {

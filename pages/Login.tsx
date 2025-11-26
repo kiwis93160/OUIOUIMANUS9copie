@@ -182,24 +182,6 @@ PinInput.displayName = 'PinInput';
 
 const PIN_LENGTH = 6;
 
-const computeMenuGridClassName = (count: number): string => {
-  if (count === 1) return 'menu-grid menu-grid--single';
-  if (count === 2) return 'menu-grid menu-grid--double';
-  if (count === 3) return 'menu-grid menu-grid--triple';
-  if (count >= 6) return 'menu-grid menu-grid--six';
-  if (count > 0) return 'menu-grid menu-grid--multi';
-  return 'menu-grid';
-};
-
-const computeMenuCardClassName = (count: number): string => {
-  const baseClass = 'ui-card menu-card';
-  if (count === 1) return `${baseClass} menu-card--single`;
-  if (count === 2) return `${baseClass} menu-card--double`;
-  if (count === 3) return `${baseClass} menu-card--triple`;
-  if (count >= 6) return `${baseClass} menu-card--compact`;
-  return baseClass;
-};
-
 
 const Login: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -450,10 +432,29 @@ const Login: React.FC = () => {
   const whatsappInternationalNumber = `33${whatsappTestNumber.replace(/^0/, '')}`;
   const whatsappUrl = `https://wa.me/${whatsappInternationalNumber}`;
   const activeOrderId = activeOrder?.orderId ?? null;
-  const bestSellersToDisplay = bestSellers.slice(0, 6);
-  const bestSellerCount = bestSellersToDisplay.length;
-  const menuGridClassName = computeMenuGridClassName(bestSellerCount);
-  const menuCardClassName = computeMenuCardClassName(bestSellerCount);
+  const bestSellersToDisplay = bestSellers.slice(0, 4);
+  const featuredProduct = bestSellersToDisplay[0];
+  const secondaryProducts = bestSellersToDisplay.slice(1);
+  const topRowProducts = secondaryProducts.slice(0, 2);
+  const bottomProduct = secondaryProducts[2];
+  const hasSecondaryProducts = secondaryProducts.length > 0;
+
+  const renderMenuCard = (product: Product, variant: 'featured' | 'small' | 'medium') => (
+    <article key={product.id} className={`ui-card menu-card best-seller-card best-seller-card--${variant}`}>
+      <img src={product.image} alt={product.nom_produit} className="menu-card__media" />
+      <div className="menu-card__body">
+        <h3 className="menu-card__title" style={menuTextStyle}>
+          {product.nom_produit}
+        </h3>
+        <p className="menu-card__description" style={menuBodyTextStyle}>
+          {product.description}
+        </p>
+        <p className="menu-card__price" style={menuBodyTextStyle}>
+          {formatCurrencyCOP(product.prix_vente)}
+        </p>
+      </div>
+    </article>
+  );
   const pinIsComplete = pin.length === PIN_LENGTH;
   const describedByIds = undefined;
 
@@ -807,23 +808,18 @@ const Login: React.FC = () => {
                 menuContent.loadingLabel,
               )
             ) : bestSellersToDisplay.length > 0 ? (
-              <div className={menuGridClassName}>
-                {bestSellersToDisplay.map(product => (
-                  <article key={product.id} className={menuCardClassName}>
-                    <img src={product.image} alt={product.nom_produit} className="menu-card__media" />
-                    <div className="menu-card__body">
-                      <h3 className="menu-card__title" style={menuTextStyle}>
-                        {product.nom_produit}
-                      </h3>
-                      <p className="menu-card__description" style={menuBodyTextStyle}>
-                        {product.description}
-                      </p>
-                      <p className="menu-card__price" style={menuBodyTextStyle}>
-                        {formatCurrencyCOP(product.prix_vente)}
-                      </p>
+              <div
+                className={`menu-grid ${hasSecondaryProducts ? 'menu-grid--best-sellers' : 'menu-grid--best-sellers-single'}`}
+              >
+                {featuredProduct && renderMenuCard(featuredProduct, 'featured')}
+                {hasSecondaryProducts && (
+                  <div className="best-seller-rail">
+                    <div className="best-seller-top">
+                      {topRowProducts.map(product => renderMenuCard(product, 'small'))}
                     </div>
-                  </article>
-                ))}
+                    {bottomProduct && renderMenuCard(bottomProduct, 'medium')}
+                  </div>
+                )}
               </div>
             ) : (
               <p className="section-text section-text--muted" style={menuBodyTextStyle}>
