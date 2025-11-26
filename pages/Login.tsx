@@ -441,18 +441,37 @@ const Login: React.FC = () => {
 
   const renderMenuCard = (product: Product, variant: 'featured' | 'small' | 'medium') => (
     <article key={product.id} className={`ui-card menu-card best-seller-card best-seller-card--${variant}`}>
-      <img src={product.image} alt={product.nom_produit} className="menu-card__media" />
-      <div className="menu-card__body">
-        <h3 className="menu-card__title" style={menuTextStyle}>
-          {product.nom_produit}
-        </h3>
-        <p className="menu-card__description" style={menuBodyTextStyle}>
-          {product.description}
-        </p>
-        <p className="menu-card__price" style={menuBodyTextStyle}>
-          {formatCurrencyCOP(product.prix_vente)}
-        </p>
-      </div>
+      {variant === 'featured' ? (
+        <>
+          <img src={product.image} alt={product.nom_produit} className="menu-card__media menu-card__media--featured" />
+          <div className="menu-card__body">
+            <h3 className="menu-card__title" style={menuTextStyle}>
+              {product.nom_produit}
+            </h3>
+            <p className="menu-card__description" style={menuBodyTextStyle}>
+              {product.description}
+            </p>
+            <p className="menu-card__price" style={menuBodyTextStyle}>
+              {formatCurrencyCOP(product.prix_vente)}
+            </p>
+          </div>
+        </>
+      ) : (
+        <div className="menu-card__overlay">
+          <img src={product.image} alt={product.nom_produit} className="menu-card__media menu-card__media--overlay" />
+          <div className="menu-card__overlay-content">
+            <h3 className="menu-card__title" style={menuTextStyle}>
+              {product.nom_produit}
+            </h3>
+            <p className="menu-card__description" style={menuBodyTextStyle}>
+              {product.description}
+            </p>
+            <p className="menu-card__price" style={menuBodyTextStyle}>
+              {formatCurrencyCOP(product.prix_vente)}
+            </p>
+          </div>
+        </div>
+      )}
     </article>
   );
   const pinIsComplete = pin.length === PIN_LENGTH;
