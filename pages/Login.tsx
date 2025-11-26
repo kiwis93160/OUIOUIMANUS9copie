@@ -456,6 +456,23 @@ const Login: React.FC = () => {
             </p>
           </div>
         </>
+      ) : variant === 'medium' ? (
+        <div className="menu-card__horizontal">
+          <div className="menu-card__media-pane">
+            <img src={product.image} alt={product.nom_produit} className="menu-card__media menu-card__media--side" />
+          </div>
+          <div className="menu-card__body menu-card__body--side" style={menuBodyTextStyle}>
+            <h3 className="menu-card__title" style={menuTextStyle}>
+              {product.nom_produit}
+            </h3>
+            <p className="menu-card__description" style={menuBodyTextStyle}>
+              {product.description}
+            </p>
+            <p className="menu-card__price" style={menuBodyTextStyle}>
+              {formatCurrencyCOP(product.prix_vente)}
+            </p>
+          </div>
+        </div>
       ) : (
         <div className="menu-card__overlay">
           <img src={product.image} alt={product.nom_produit} className="menu-card__media menu-card__media--overlay" />
