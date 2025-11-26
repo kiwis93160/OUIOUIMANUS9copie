@@ -867,10 +867,14 @@ body {
   min-height: 0;
   width: var(--best-seller-featured-width);
   height: var(--best-seller-featured-height);
+  min-height: var(--best-seller-featured-height);
+  max-height: var(--best-seller-featured-height);
 }
 
 .best-seller-card--medium {
   width: var(--best-seller-wide-width);
+  height: var(--best-seller-square-size);
+  min-height: var(--best-seller-square-size);
 }
 
 .best-seller-card--featured .menu-card__media {
@@ -892,8 +896,8 @@ body {
 
 
 .best-seller-card--medium .menu-card__horizontal {
-  min-height: var(--best-seller-square-size);
-  height: var(--best-seller-square-size);
+  min-height: 0;
+  height: 100%;
   width: var(--best-seller-wide-width);
 }
 
