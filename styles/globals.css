@@ -839,7 +839,7 @@ body {
 
 .best-seller-card {
   height: 100%;
-  --best-seller-square-size: clamp(220px, 32vw, 280px);
+  --best-seller-square-size: clamp(154px, 22.4vw, 196px);
 }
 
 .best-seller-card--small {
@@ -850,16 +850,6 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 0;
-}
-
-.best-seller-card--small {
-  min-height: 240px;
-}
-
-.best-seller-card--featured {
-  display: flex;
-  flex-direction: column;
-  min-height: 448px;
 }
 
 .best-seller-card--featured .menu-card__media {
