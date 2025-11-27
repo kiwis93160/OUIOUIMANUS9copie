@@ -441,18 +441,48 @@ const Login: React.FC = () => {
 
   const renderMenuCard = (product: Product, variant: 'featured' | 'small' | 'medium') => (
     <article key={product.id} className={`ui-card menu-card best-seller-card best-seller-card--${variant}`}>
-      <img src={product.image} alt={product.nom_produit} className="menu-card__media" />
-      <div className="menu-card__body">
-        <h3 className="menu-card__title" style={menuTextStyle}>
-          {product.nom_produit}
-        </h3>
-        <p className="menu-card__description" style={menuBodyTextStyle}>
-          {product.description}
-        </p>
-        <p className="menu-card__price" style={menuBodyTextStyle}>
-          {formatCurrencyCOP(product.prix_vente)}
-        </p>
-      </div>
+      {variant === 'featured' ? (
+        <>
+          <img src={product.image} alt={product.nom_produit} className="menu-card__media menu-card__media--featured" />
+          <div className="menu-card__body">
+            <h3 className="menu-card__title" style={{ ...menuTextStyle, color: '#ffffff' }}>
+              {product.nom_produit}
+            </h3>
+            <p className="menu-card__description" style={{ ...menuBodyTextStyle, color: '#ffffff' }}>
+              {product.description}
+            </p>
+            <p className="menu-card__price" style={{ ...menuBodyTextStyle, color: '#ffffff' }}>
+              {formatCurrencyCOP(product.prix_vente)}
+            </p>
+          </div>
+        </>
+      ) : variant === 'medium' ? (
+        <div className="menu-card__horizontal">
+          <div className="menu-card__media-pane">
+            <img src={product.image} alt={product.nom_produit} className="menu-card__media menu-card__media--side" />
+          </div>
+          <div className="menu-card__body menu-card__body--side" style={{ ...menuBodyTextStyle, color: '#ffffff' }}>
+            <h3 className="menu-card__title" style={{ ...menuTextStyle, color: '#ffffff' }}>
+              {product.nom_produit}
+            </h3>
+            <p className="menu-card__description" style={{ ...menuBodyTextStyle, color: '#ffffff' }}>
+              {product.description}
+            </p>
+            <p className="menu-card__price" style={{ ...menuBodyTextStyle, color: '#ffffff' }}>
+              {formatCurrencyCOP(product.prix_vente)}
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="menu-card__overlay">
+          <img src={product.image} alt={product.nom_produit} className="menu-card__media menu-card__media--overlay" />
+          <div className="menu-card__overlay-content">
+            <h3 className="menu-card__title" style={{ ...menuTextStyle, color: '#ffffff' }}>
+              {product.nom_produit}
+            </h3>
+          </div>
+        </div>
+      )}
     </article>
   );
   const pinIsComplete = pin.length === PIN_LENGTH;
@@ -698,7 +728,7 @@ const Login: React.FC = () => {
                     'p',
                     {
                       className: 'hero-history__title',
-                      style: getElementBodyTextStyle('hero.historyTitle'),
+                      style: { ...getElementBodyTextStyle('hero.historyTitle'), color: '#ffffff' },
                     },
                     hero.historyTitle,
                   )}
@@ -706,10 +736,10 @@ const Login: React.FC = () => {
                     {orderHistory.slice(0, 3).map(order => (
                       <div key={order.id} className="hero-history__item">
                         <div className="hero-history__meta">
-                          <p className="hero-history__date" style={heroBodyTextStyle}>
+                          <p className="hero-history__date" style={{ ...heroBodyTextStyle, color: '#ffffff' }}>
                             Pedido del {new Date(order.date_creation).toLocaleDateString()}
                           </p>
-                          <p className="hero-history__details" style={heroBodyTextStyle}>
+                          <p className="hero-history__details" style={{ ...heroBodyTextStyle, color: '#ffffff' }}>
                             {order.items.length} article(s) • {formatCurrencyCOP(order.total)}
                           </p>
                         </div>
@@ -719,6 +749,7 @@ const Login: React.FC = () => {
                           className="hero-history__cta"
                           style={{
                             ...getElementBodyTextStyle('hero.reorderCtaLabel'),
+                            color: '#ffffff',
                             ...getElementBackgroundStyle('hero.reorderCtaLabel'),
                           }}
                         >
@@ -727,7 +758,7 @@ const Login: React.FC = () => {
                             'span',
                             {
                               className: 'inline-flex items-center justify-center',
-                              style: getElementBodyTextStyle('hero.reorderCtaLabel'),
+                              style: { ...getElementBodyTextStyle('hero.reorderCtaLabel'), color: '#ffffff' },
                             },
                             hero.reorderCtaLabel,
                           )}
