@@ -818,10 +818,10 @@ body {
   --best-seller-square-size: 320px;
   --best-seller-medium-height: 236px;
   --best-seller-square-size: 300px;
-  --best-seller-wide-width: 540px;
-  --best-seller-featured-width: 520px;
+  --best-seller-wide-width: 630px;
+  --best-seller-featured-width: 630px;
   --best-seller-featured-media-height: 420px;
-  --best-seller-rail-width: 540px;
+  --best-seller-rail-width: 630px;
   --best-seller-gap: 30px;
   --best-seller-column-width: var(--best-seller-rail-width);
   grid-template-columns: repeat(2, var(--best-seller-column-width, 1fr));
@@ -864,10 +864,10 @@ body {
   height: 100%;
   --best-seller-square-size: 300px;
   --best-seller-medium-height: 260px;
-  --best-seller-wide-width: 540px;
-  --best-seller-featured-width: 520px;
+  --best-seller-wide-width: 630px;
+  --best-seller-featured-width: 630px;
   --best-seller-featured-media-height: 420px;
-  --best-seller-rail-width: 540px;
+  --best-seller-rail-width: 630px;
   --best-seller-gap: 30px;
   --best-seller-column-width: var(--best-seller-rail-width);
   position: relative;
