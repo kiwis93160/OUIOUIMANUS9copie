@@ -817,15 +817,16 @@ body {
 .menu-grid--best-sellers {
   --best-seller-square-size: 320px;
   --best-seller-medium-height: 236px;
-  --best-seller-wide-width: 650px;
-  --best-seller-featured-width: 490px;
-  --best-seller-featured-media-height: 480px;
-  --best-seller-rail-width: 650px;
-  --best-seller-gap: 10px;
+  --best-seller-square-size: 300px;
+  --best-seller-wide-width: 540px;
+  --best-seller-featured-width: 520px;
+  --best-seller-featured-media-height: 420px;
+  --best-seller-rail-width: 540px;
+  --best-seller-gap: 30px;
   --best-seller-column-width: var(--best-seller-rail-width);
   grid-template-columns: repeat(2, var(--best-seller-column-width, 1fr));
-  gap: clamp(0.45rem, 0.9vw, 0.75rem);
-  column-gap: clamp(0.09rem, 0.18vw, 0.15rem);
+  gap: 30px;
+  column-gap: 30px;
   justify-content: center;
   justify-items: center;
   align-items: stretch;
@@ -847,7 +848,7 @@ body {
 .best-seller-rail {
   display: flex;
   flex-direction: column;
-  gap: clamp(1rem, 2vw, 1.5rem);
+  gap: var(--best-seller-gap, 30px);
   height: 100%;
   width: var(--best-seller-rail-width, var(--best-seller-wide-width, auto));
   align-items: center;
@@ -861,89 +862,175 @@ body {
 
 .best-seller-card {
   height: 100%;
-  --best-seller-square-size: 320px;
-  --best-seller-medium-height: 236px;
-  --best-seller-wide-width: 650px;
-  --best-seller-featured-width: 490px;
-  --best-seller-featured-media-height: 480px;
-  --best-seller-rail-width: 650px;
-  --best-seller-gap: 10px;
+  --best-seller-square-size: 300px;
+  --best-seller-medium-height: 260px;
+  --best-seller-wide-width: 540px;
+  --best-seller-featured-width: 520px;
+  --best-seller-featured-media-height: 420px;
+  --best-seller-rail-width: 540px;
+  --best-seller-gap: 30px;
   --best-seller-column-width: var(--best-seller-rail-width);
+  position: relative;
+  border-radius: 26px;
+  overflow: hidden;
+  background: radial-gradient(circle at 20% 25%, rgba(255, 140, 0, 0.14), transparent 35%),
+    linear-gradient(145deg, #0d0b10 0%, #0f0f16 48%, #191823 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 24px 60px rgba(5, 5, 10, 0.45);
 }
 
 .best-seller-card--small {
-  min-height: 0;
   width: var(--best-seller-square-size);
+  min-height: 240px;
 }
 
 .best-seller-card--featured {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
   width: var(--best-seller-featured-width);
+  min-height: 440px;
 }
 
 .best-seller-card--medium {
   width: var(--best-seller-wide-width);
-  height: var(--best-seller-medium-height);
   min-height: var(--best-seller-medium-height);
 }
 
-.best-seller-card--featured .menu-card__media {
-  height: var(--best-seller-featured-media-height);
-  min-height: var(--best-seller-featured-media-height);
-  width: 100%;
-  object-fit: cover;
-}
-
-.best-seller-card--featured .menu-card__body {
-  flex: 1;
-  min-height: 0;
+.menu-card__visual {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  background: rgba(56, 1, 29, 0.7);
+  border-radius: inherit;
+}
+
+.menu-card__visual--featured {
+  min-height: var(--best-seller-featured-media-height);
+}
+
+.menu-card__visual--medium {
+  min-height: var(--best-seller-medium-height);
+}
+
+.menu-card__visual--small {
+  min-height: 240px;
+}
+
+.menu-card__backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.82) saturate(1.05);
+  transform: scale(1.02);
+}
+
+.menu-card__backdrop-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 18% 22%, rgba(255, 145, 31, 0.25), rgba(0, 0, 0, 0) 42%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.92) 100%);
+  opacity: 0.3;
+}
+
+.menu-card__content {
+  position: relative;
+  z-index: 1;
   color: #ffffff;
+  width: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  align-content: stretch;
+  align-items: start;
+  gap: clamp(0.85rem, 2vw, 1.15rem);
+  padding: clamp(1.35rem, 2vw, 1.85rem) clamp(1.35rem, 2.5vw, 2rem);
 }
 
-
-.best-seller-card--medium .menu-card__horizontal {
-  min-height: 0;
-  height: 100%;
-  width: var(--best-seller-wide-width);
+.menu-card__meta {
+  display: flex;
+  align-items: center;
+  align-self: flex-start;
 }
 
-.best-seller-card--medium .menu-card__media-pane {
-  flex: 0 0 var(--best-seller-square-size);
-  max-width: var(--best-seller-square-size);
+.menu-card__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #2f1700;
+  background: linear-gradient(120deg, #ffb347 0%, #ff9100 90%);
+  border-radius: 999px;
+  box-shadow: 0 12px 35px rgba(255, 145, 0, 0.35);
 }
 
-.best-seller-card--medium .menu-card__media {
-  height: 100%;
-  aspect-ratio: 1 / 1;
-}
-
-.best-seller-card--small .menu-card__media {
-  height: 100%;
-}
-
-.best-seller-card--small .menu-card__overlay {
-  min-height: var(--best-seller-square-size);
-  height: var(--best-seller-square-size);
-  aspect-ratio: 1 / 1;
-}
-
-.best-seller-card--small .menu-card__overlay-content {
-  justify-content: flex-end;
-  align-items: flex-start;
+.menu-card__copy {
+  display: flex;
+  flex-direction: column;
   gap: 0.35rem;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.35));
-  text-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+  align-items: flex-start;
+  justify-content: flex-end;
+  max-width: 88%;
+  text-align: left;
 }
 
-.best-seller-card--small .menu-card__title {
+.best-seller-card .menu-card__title {
   color: #ffffff;
-  text-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+  font-size: clamp(1.35rem, 2.2vw, 1.75rem);
+  letter-spacing: 0.01em;
+}
+
+.best-seller-card .menu-card__description {
+  color: #e9e9ed;
+  max-width: 42ch;
+  line-height: 1.5;
+}
+
+.menu-card__body {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: clamp(0.85rem, 2vw, 1.35rem);
+  width: 100%;
+  align-self: end;
+}
+
+.best-seller-card .menu-card__price {
+  font-size: clamp(1.2rem, 2vw, 1.45rem);
+  font-weight: 800;
+  color: #ffae3d;
+}
+
+.menu-card__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #121212;
+  border: none;
+  box-shadow: 0 16px 35px rgba(0, 0, 0, 0.35);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.menu-card__action:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.42);
+}
+
+.menu-card__action:focus-visible {
+  outline: 2px solid #ffae3d;
+  outline-offset: 3px;
+}
+
+.menu-card__action-icon {
+  height: 22px;
+  width: 22px;
 }
 
 .menu-grid--single {
