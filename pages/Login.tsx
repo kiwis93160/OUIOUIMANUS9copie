@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
 import { api } from '../services/api';
 import { EditableElementKey, EditableZoneKey, Product, Order, SiteContent, SectionStyle } from '../types';
-import { Check, Clock, Mail, MapPin, Menu, MessageCircle, X } from 'lucide-react';
+import { Check, Clock, Mail, MapPin, Menu, MessageCircle, Plus, X } from 'lucide-react';
 import CustomerOrderTracker from '../components/CustomerOrderTracker';
 import { clearActiveCustomerOrder, getActiveCustomerOrder } from '../services/customerOrderStorage';
 import { formatCurrencyCOP } from '../utils/formatIntegerAmount';
@@ -439,52 +439,41 @@ const Login: React.FC = () => {
   const bottomProduct = secondaryProducts[2];
   const hasSecondaryProducts = secondaryProducts.length > 0;
 
-  const renderMenuCard = (product: Product, variant: 'featured' | 'small' | 'medium') => (
-    <article key={product.id} className={`ui-card menu-card best-seller-card best-seller-card--${variant}`}>
-      {variant === 'featured' ? (
-        <>
-          <img src={product.image} alt={product.nom_produit} className="menu-card__media menu-card__media--featured" />
-          <div className="menu-card__body">
-            <h3 className="menu-card__title" style={{ ...menuTextStyle, color: '#ffffff' }}>
-              {product.nom_produit}
-            </h3>
-            <p className="menu-card__description" style={{ ...menuBodyTextStyle, color: '#ffffff' }}>
-              {product.description}
-            </p>
-            <p className="menu-card__price" style={{ ...menuBodyTextStyle, color: '#ffffff' }}>
-              {formatCurrencyCOP(product.prix_vente)}
-            </p>
-          </div>
-        </>
-      ) : variant === 'medium' ? (
-        <div className="menu-card__horizontal">
-          <div className="menu-card__media-pane">
-            <img src={product.image} alt={product.nom_produit} className="menu-card__media menu-card__media--side" />
-          </div>
-          <div className="menu-card__body menu-card__body--side" style={{ ...menuBodyTextStyle, color: '#ffffff' }}>
-            <h3 className="menu-card__title" style={{ ...menuTextStyle, color: '#ffffff' }}>
-              {product.nom_produit}
-            </h3>
-            <p className="menu-card__description" style={{ ...menuBodyTextStyle, color: '#ffffff' }}>
-              {product.description}
-            </p>
-            <p className="menu-card__price" style={{ ...menuBodyTextStyle, color: '#ffffff' }}>
-              {formatCurrencyCOP(product.prix_vente)}
-            </p>
+  const renderMenuCard = (product: Product, variant: 'featured' | 'small' | 'medium') => {
+    const showDescription = variant !== 'small';
+
+    return (
+      <article key={product.id} className={`ui-card menu-card best-seller-card best-seller-card--${variant}`}>
+        <div className={`menu-card__visual menu-card__visual--${variant}`}>
+          <img src={product.image} alt={product.nom_produit} className="menu-card__backdrop" />
+          <div className="menu-card__backdrop-overlay" />
+          <div className="menu-card__content">
+            <div className="menu-card__meta">
+              <span className="menu-card__tag">Popular</span>
+            </div>
+            <div className="menu-card__copy">
+              <h3 className="menu-card__title" style={{ ...menuTextStyle, color: '#ffffff' }}>
+                {product.nom_produit}
+              </h3>
+              {showDescription && (
+                <p className="menu-card__description" style={{ ...menuBodyTextStyle, color: '#e7e7e7' }}>
+                  {product.description}
+                </p>
+              )}
+            </div>
+            <div className="menu-card__footer">
+              <span className="menu-card__price" style={{ ...menuBodyTextStyle, color: '#ffae3d' }}>
+                {formatCurrencyCOP(product.prix_vente)}
+              </span>
+              <button type="button" className="menu-card__action" aria-label={`Añadir ${product.nom_produit}`}>
+                <Plus className="menu-card__action-icon" aria-hidden />
+              </button>
+            </div>
           </div>
         </div>
-      ) : (
-        <div className="menu-card__overlay">
-          <img src={product.image} alt={product.nom_produit} className="menu-card__media menu-card__media--overlay" />
-          <div className="menu-card__overlay-content">
-            <h3 className="menu-card__title" style={{ ...menuTextStyle, color: '#ffffff' }}>
-              {product.nom_produit}
-            </h3>
-          </div>
-        </div>
-      )}
-    </article>
-  );
+      </article>
+    );
+  };
   const pinIsComplete = pin.length === PIN_LENGTH;
   const describedByIds = undefined;
 
