@@ -984,7 +984,10 @@ const Login: React.FC = () => {
                 </div>
 
                 <div className="flex h-full w-full flex-col gap-6 rounded-[36px] border border-white/70 bg-white/75 p-6 shadow-[0_28px_70px_-32px_rgba(15,23,42,0.55)] backdrop-blur">
-                  <div className="relative w-full overflow-hidden rounded-3xl bg-white" style={{ paddingBottom: '100%' }}>
+                  <div
+                    className="relative mx-auto overflow-hidden rounded-3xl bg-white"
+                    style={{ width: '400px', height: '400px' }}
+                  >
                     {hasMapLocation ? (
                       <iframe
                         title={`Mapa de Google Maps para ${findUsMapTitle}`}
