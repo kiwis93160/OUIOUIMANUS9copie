@@ -1208,6 +1208,10 @@ body {
   flex: 1;
 }
 
+.best-seller-card .menu-card__body {
+  padding: 0;
+}
+
 .best-seller-card--featured .menu-card__body {
   margin-top: auto;
   flex-direction: row;
