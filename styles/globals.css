@@ -899,7 +899,6 @@ body {
   height: 100%;
   overflow: hidden;
   display: flex;
-  flex-direction: column;
   border-radius: inherit;
 }
 
@@ -938,18 +937,17 @@ body {
   z-index: 1;
   color: #ffffff;
   width: 100%;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  align-content: stretch;
-  align-items: start;
-  gap: clamp(0.85rem, 2vw, 1.15rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
+  gap: 0.65rem;
   padding: clamp(1.35rem, 2vw, 1.85rem) clamp(1.35rem, 2.5vw, 2rem);
 }
 
 .menu-card__meta {
   display: flex;
   align-items: center;
-  align-self: flex-start;
 }
 
 .menu-card__tag {
@@ -995,7 +993,6 @@ body {
   justify-content: space-between;
   gap: clamp(0.85rem, 2vw, 1.35rem);
   width: 100%;
-  align-self: end;
 }
 
 .best-seller-card .menu-card__price {
