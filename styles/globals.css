@@ -1208,6 +1208,14 @@ body {
   flex: 1;
 }
 
+.best-seller-card--featured .menu-card__body {
+  margin-top: auto;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: clamp(0.85rem, 2vw, 1.35rem);
+}
+
 .best-seller-card--featured .menu-card__title,
 .best-seller-card--featured .menu-card__description,
 .best-seller-card--featured .menu-card__price,
