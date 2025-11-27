@@ -822,11 +822,11 @@ body {
   --best-seller-featured-width: 520px;
   --best-seller-featured-media-height: 420px;
   --best-seller-rail-width: 540px;
-  --best-seller-gap: 14px;
+  --best-seller-gap: 30px;
   --best-seller-column-width: var(--best-seller-rail-width);
   grid-template-columns: repeat(2, var(--best-seller-column-width, 1fr));
-  gap: clamp(0.75rem, 1.4vw, 1rem);
-  column-gap: clamp(0.35rem, 0.5vw, 0.75rem);
+  gap: 30px;
+  column-gap: 30px;
   justify-content: center;
   justify-items: center;
   align-items: stretch;
@@ -848,7 +848,7 @@ body {
 .best-seller-rail {
   display: flex;
   flex-direction: column;
-  gap: clamp(1rem, 2vw, 1.5rem);
+  gap: var(--best-seller-gap, 30px);
   height: 100%;
   width: var(--best-seller-rail-width, var(--best-seller-wide-width, auto));
   align-items: center;
@@ -868,7 +868,7 @@ body {
   --best-seller-featured-width: 520px;
   --best-seller-featured-media-height: 420px;
   --best-seller-rail-width: 540px;
-  --best-seller-gap: 14px;
+  --best-seller-gap: 30px;
   --best-seller-column-width: var(--best-seller-rail-width);
   position: relative;
   border-radius: 26px;
@@ -929,7 +929,7 @@ body {
   inset: 0;
   background: radial-gradient(circle at 18% 22%, rgba(255, 145, 31, 0.25), rgba(0, 0, 0, 0) 42%),
     linear-gradient(180deg, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.92) 100%);
-  opacity: 0.96;
+  opacity: 0.3;
 }
 
 .menu-card__content {
