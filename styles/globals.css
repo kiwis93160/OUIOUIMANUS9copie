@@ -831,6 +831,14 @@ body {
   align-items: stretch;
 }
 
+.menu-grid--best-sellers > .best-seller-card--featured {
+  justify-self: end;
+}
+
+.menu-grid--best-sellers > .best-seller-rail {
+  justify-self: start;
+}
+
 .menu-grid--best-sellers-single {
   grid-template-columns: minmax(260px, 1fr);
   justify-content: center;
