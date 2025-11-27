@@ -231,15 +231,15 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
           <div className="menu-card__media bg-gradient-to-br from-orange-200 via-amber-100 to-orange-50" />
         )}
         <div className="menu-card__body">
-          <h3 className="menu-card__title" style={menuTextStyle}>
+          <h3 className="menu-card__title" style={{ ...menuTextStyle, color: '#ffffff' }}>
             {product.nom_produit}
           </h3>
           {product.description && (
-            <p className="menu-card__description" style={menuBodyTextStyle}>
+            <p className="menu-card__description" style={{ ...menuBodyTextStyle, color: '#ffffff' }}>
               {product.description}
             </p>
           )}
-          <p className="menu-card__price" style={menuBodyTextStyle}>
+          <p className="menu-card__price" style={{ ...menuBodyTextStyle, color: '#ffffff' }}>
             {formatCurrencyCOP(product.prix_vente)}
           </p>
         </div>
@@ -540,7 +540,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
                     'p',
                     {
                       className: 'hero-history__title',
-                      style: getElementBodyTextStyle('hero.historyTitle'),
+                      style: { ...getElementBodyTextStyle('hero.historyTitle'), color: '#ffffff' },
                     },
                     content.hero.historyTitle,
                   )}
@@ -556,10 +556,10 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
                     {[0, 1, 2].map(index => (
                       <div key={index} className="hero-history__item">
                         <div className="hero-history__meta">
-                          <p className="hero-history__date" style={heroBodyTextStyle}>
+                          <p className="hero-history__date" style={{ ...heroBodyTextStyle, color: '#ffffff' }}>
                             Pedido del 12/03/2024
                           </p>
-                          <p className="hero-history__details" style={heroBodyTextStyle}>
+                          <p className="hero-history__details" style={{ ...heroBodyTextStyle, color: '#ffffff' }}>
                             2 article(s) • {formatCurrencyCOP(32000)}
                           </p>
                         </div>
@@ -568,6 +568,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
                           className="hero-history__cta"
                           style={{
                             ...getElementBodyTextStyle('hero.reorderCtaLabel'),
+                            color: '#ffffff',
                             ...getElementBackgroundStyle('hero.reorderCtaLabel'),
                           }}
                           disabled
@@ -577,7 +578,7 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
                             'span',
                             {
                               className: 'inline-flex items-center justify-center',
-                              style: getElementBodyTextStyle('hero.reorderCtaLabel'),
+                              style: { ...getElementBodyTextStyle('hero.reorderCtaLabel'), color: '#ffffff' },
                             },
                             content.hero.reorderCtaLabel,
                           )}
