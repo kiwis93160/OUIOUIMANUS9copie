@@ -892,7 +892,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background: rgba(83, 1, 42, 0.9);
+  background: rgba(56, 1, 29, 0.9);
   color: #ffffff;
 }
 
@@ -1093,7 +1093,7 @@ body {
   justify-content: center;
   gap: 0.65rem;
   padding: clamp(1.25rem, 3vw, 1.75rem);
-  background: rgba(83, 1, 42, 0.9);
+  background: rgba(56, 1, 29, 0.9);
   color: #ffffff;
 }
 
