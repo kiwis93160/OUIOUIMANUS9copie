@@ -825,6 +825,7 @@ body {
   --best-seller-column-width: var(--best-seller-rail-width);
   grid-template-columns: repeat(2, var(--best-seller-column-width, 1fr));
   gap: clamp(0.45rem, 0.9vw, 0.75rem);
+  column-gap: clamp(0.09rem, 0.18vw, 0.15rem);
   justify-content: center;
   justify-items: center;
   align-items: stretch;
