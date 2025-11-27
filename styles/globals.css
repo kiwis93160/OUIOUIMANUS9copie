@@ -875,7 +875,6 @@ body {
   overflow: hidden;
   background: radial-gradient(circle at 20% 25%, rgba(255, 140, 0, 0.14), transparent 35%),
     linear-gradient(145deg, #0d0b10 0%, #0f0f16 48%, #191823 100%);
-  border: 1px solid rgba(255, 255, 255, 0.06);
   box-shadow: 0 24px 60px rgba(5, 5, 10, 0.45);
 }
 
@@ -995,7 +994,7 @@ body {
 .best-seller-card .menu-card__price {
   font-size: clamp(1.2rem, 2vw, 1.45rem);
   font-weight: 800;
-  color: #ffae3d;
+  color: #ffffff;
 }
 
 .menu-card__action {

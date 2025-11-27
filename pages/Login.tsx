@@ -462,7 +462,7 @@ const Login: React.FC = () => {
                     {product.description}
                   </p>
                 )}
-                <span className="menu-card__price" style={{ ...menuBodyTextStyle, color: '#ffae3d' }}>
+                <span className="menu-card__price" style={{ ...menuBodyTextStyle, color: '#ffffff' }}>
                   {formatCurrencyCOP(product.prix_vente)}
                 </span>
               </div>
@@ -530,6 +530,9 @@ const Login: React.FC = () => {
     }
 
     navigate('/commande-client');
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
   };
 
   return (
