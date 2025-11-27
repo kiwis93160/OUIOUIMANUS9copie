@@ -872,10 +872,10 @@ body {
   --best-seller-column-width: var(--best-seller-rail-width);
   position: relative;
   border-radius: 26px;
+  border: none;
   overflow: hidden;
   background: radial-gradient(circle at 20% 25%, rgba(255, 140, 0, 0.14), transparent 35%),
     linear-gradient(145deg, #0d0b10 0%, #0f0f16 48%, #191823 100%);
-  border: 1px solid rgba(255, 255, 255, 0.06);
   box-shadow: 0 24px 60px rgba(5, 5, 10, 0.45);
 }
 
@@ -995,7 +995,7 @@ body {
 .best-seller-card .menu-card__price {
   font-size: clamp(1.2rem, 2vw, 1.45rem);
   font-weight: 800;
-  color: #ffae3d;
+  color: #ffffff;
 }
 
 .menu-card__action {
@@ -2802,6 +2802,12 @@ p {
   box-shadow: var(--shadow-card);
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   color: var(--color-text);
+}
+
+.ui-card.best-seller-card,
+.ui-card.best-seller-card:hover {
+  border: none;
+  box-shadow: 0 24px 60px rgba(5, 5, 10, 0.45);
 }
 
 .ui-card:hover {
