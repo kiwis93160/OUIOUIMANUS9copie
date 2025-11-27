@@ -181,6 +181,7 @@ const PinInput = React.forwardRef<HTMLInputElement, PinInputProps>(
 PinInput.displayName = 'PinInput';
 
 const PIN_LENGTH = 6;
+const PENDING_CART_ITEM_KEY = 'customer-cart-pending-item';
 
 
 const Login: React.FC = () => {
@@ -451,21 +452,26 @@ const Login: React.FC = () => {
             <div className="menu-card__meta">
               <span className="menu-card__tag">Popular</span>
             </div>
-            <div className="menu-card__copy">
-              <h3 className="menu-card__title" style={{ ...menuTextStyle, color: '#ffffff' }}>
-                {product.nom_produit}
-              </h3>
-              {showDescription && (
-                <p className="menu-card__description" style={{ ...menuBodyTextStyle, color: '#e7e7e7' }}>
-                  {product.description}
-                </p>
-              )}
-            </div>
-            <div className="menu-card__footer">
-              <span className="menu-card__price" style={{ ...menuBodyTextStyle, color: '#ffae3d' }}>
-                {formatCurrencyCOP(product.prix_vente)}
-              </span>
-              <button type="button" className="menu-card__action" aria-label={`Añadir ${product.nom_produit}`}>
+            <div className="menu-card__body">
+              <div className="menu-card__copy">
+                <h3 className="menu-card__title" style={{ ...menuTextStyle, color: '#ffffff' }}>
+                  {product.nom_produit}
+                </h3>
+                {showDescription && (
+                  <p className="menu-card__description" style={{ ...menuBodyTextStyle, color: '#e7e7e7' }}>
+                    {product.description}
+                  </p>
+                )}
+                <span className="menu-card__price" style={{ ...menuBodyTextStyle, color: '#ffae3d' }}>
+                  {formatCurrencyCOP(product.prix_vente)}
+                </span>
+              </div>
+              <button
+                type="button"
+                className="menu-card__action"
+                aria-label={`Añadir ${product.nom_produit}`}
+                onClick={() => handleAddBestSellerToCart(product)}
+              >
                 <Plus className="menu-card__action-icon" aria-hidden />
               </button>
             </div>
@@ -508,6 +514,21 @@ const Login: React.FC = () => {
     if (!isOrderingAvailable) {
       return;
     }
+    navigate('/commande-client');
+  };
+
+  const handleAddBestSellerToCart = (product: Product) => {
+    if (typeof window !== 'undefined') {
+      try {
+        window.localStorage.setItem(
+          PENDING_CART_ITEM_KEY,
+          JSON.stringify({ productId: product.id, quantity: 1 }),
+        );
+      } catch (error) {
+        console.error('Could not queue best seller for cart', error);
+      }
+    }
+
     navigate('/commande-client');
   };
 
