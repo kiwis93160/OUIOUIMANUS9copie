@@ -1216,6 +1216,15 @@ body {
   gap: clamp(0.85rem, 2vw, 1.35rem);
 }
 
+.best-seller-card--featured .menu-card__copy {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.best-seller-card--featured .menu-card__description {
+  text-align: left;
+}
+
 .best-seller-card--featured .menu-card__title,
 .best-seller-card--featured .menu-card__description,
 .best-seller-card--featured .menu-card__price,
