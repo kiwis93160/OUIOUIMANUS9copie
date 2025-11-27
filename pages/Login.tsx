@@ -983,26 +983,26 @@ const Login: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex h-full w-full flex-col justify-between rounded-[36px] border border-white/70 bg-white/75 p-6 shadow-[0_28px_70px_-32px_rgba(15,23,42,0.55)] backdrop-blur">
-                  <div className="relative aspect-[13/8] w-full overflow-hidden rounded-3xl bg-white">
+                <div className="flex h-full w-full flex-col gap-6 rounded-[36px] border border-white/70 bg-white/75 p-6 shadow-[0_28px_70px_-32px_rgba(15,23,42,0.55)] backdrop-blur">
+                  <div className="relative w-full overflow-hidden rounded-3xl bg-white" style={{ paddingBottom: '100%' }}>
                     {hasMapLocation ? (
                       <iframe
                         title={`Mapa de Google Maps para ${findUsMapTitle}`}
                         src={findUsMapEmbedUrl}
                         loading="lazy"
                         referrerPolicy="no-referrer-when-downgrade"
-                        className="h-full w-full border-0"
+                        className="absolute inset-0 h-full w-full border-0"
                         allowFullScreen
                       />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-gray-100 px-8 text-center">
+                      <div className="absolute inset-0 flex h-full w-full items-center justify-center bg-gray-100 px-8 text-center">
                         <p className="text-lg text-gray-500" style={findUsBodyTextStyle}>
                           La ubicación de nuestro restaurante estará disponible muy pronto.
                         </p>
                       </div>
                     )}
                   </div>
-                  <div className="mt-6 flex justify-center">
+                  <div className="flex justify-center">
                     {hasMapLocation ? (
                       <a
                         href={findUsMapUrl}
