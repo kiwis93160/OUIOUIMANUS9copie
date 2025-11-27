@@ -29,6 +29,7 @@ import { createIngredientNameMap, mapIngredientIdsToNames } from '../utils/ingre
 
 const DOMICILIO_FEE = 8000;
 const DOMICILIO_ITEM_NAME = 'Domicilio';
+const PENDING_CART_ITEM_KEY = 'customer-cart-pending-item';
 
 const isDeliveryFeeItem = (item: OrderItem) => item.nom_produit === DOMICILIO_ITEM_NAME;
 
@@ -491,7 +492,68 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
         
         fetchData();
     }, []);
-    
+
+    useEffect(() => {
+        if (typeof window === 'undefined' || loading) {
+            return;
+        }
+
+        const pendingItemRaw = window.localStorage.getItem(PENDING_CART_ITEM_KEY);
+        if (!pendingItemRaw) {
+            return;
+        }
+
+        try {
+            const pendingItem = JSON.parse(pendingItemRaw) as { productId: string; quantity?: number };
+            const targetProduct = products.find(product => product.id === pendingItem.productId);
+
+            if (!targetProduct) {
+                return;
+            }
+
+            const quantity = pendingItem.quantity && pendingItem.quantity > 0 ? pendingItem.quantity : 1;
+
+            setCart(prevCart => {
+                const existingIndex = prevCart.findIndex(item =>
+                    item.produitRef === targetProduct.id
+                    && (!item.commentaire || item.commentaire.trim().length === 0)
+                    && (!item.excluded_ingredients || item.excluded_ingredients.length === 0)
+                    && (!item.selected_extras || item.selected_extras.length === 0)
+                );
+
+                if (existingIndex !== -1) {
+                    const updatedCart = [...prevCart];
+                    const existingItem = updatedCart[existingIndex];
+                    updatedCart[existingIndex] = {
+                        ...existingItem,
+                        quantite: existingItem.quantite + quantity,
+                    };
+                    return updatedCart;
+                }
+
+                return [
+                    ...prevCart,
+                    {
+                        id: `oi${Date.now()}`,
+                        produitRef: targetProduct.id,
+                        nom_produit: targetProduct.nom_produit,
+                        prix_unitaire: targetProduct.prix_vente,
+                        quantite: quantity,
+                        excluded_ingredients: [],
+                        commentaire: '',
+                        selected_extras: [],
+                        addedAt: Date.now(),
+                        estado: 'en_attente',
+                    },
+                ];
+            });
+        } catch (error) {
+            console.error('Error applying pending cart item', error);
+        } finally {
+            window.localStorage.removeItem(PENDING_CART_ITEM_KEY);
+        }
+    }, [loading, products]);
+
     const filteredProducts = useMemo(() => {
         if (activeCategoryId === 'all') return products;
         return products.filter(p => p.categoria_id === activeCategoryId);
