@@ -218,6 +218,8 @@ const Login: React.FC = () => {
     [findUs.address, sanitizeLocationCopy],
   );
 
+  const mapDimension = 'clamp(260px, 32vw, 420px)';
+
   const brandLogo = navigation.brandLogo ?? DEFAULT_BRAND_LOGO;
   const staffTriggerLogo = navigation.brandLogo ?? DEFAULT_BRAND_LOGO;
   const navigationBackgroundStyle = createBackgroundStyle(navigation.style);
@@ -911,7 +913,10 @@ const Login: React.FC = () => {
             )}
 
               <div className="mx-auto mt-10 grid w-full max-w-6xl grid-cols-1 gap-8 lg:grid-cols-3 lg:items-start">
-                <div className="flex w-full flex-col gap-6 rounded-[28px] border border-white/70 bg-white/80 p-6 shadow-[0_24px_60px_-28px_rgba(15,23,42,0.5)] backdrop-blur">
+                <div
+                  className="flex w-full flex-col gap-6 rounded-[28px] border border-white/70 bg-white/80 p-6 shadow-[0_24px_60px_-28px_rgba(15,23,42,0.5)] backdrop-blur"
+                  style={{ maxWidth: mapDimension, minHeight: mapDimension, width: '100%' }}
+                >
                   <div className="space-y-4">
                     {renderRichTextElement(
                       'findUs.addressLabel',
@@ -983,10 +988,13 @@ const Login: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex h-full w-full flex-col gap-6 rounded-[36px] border border-white/70 bg-white/75 p-6 shadow-[0_28px_70px_-32px_rgba(15,23,42,0.55)] backdrop-blur">
+                <div
+                  className="flex h-full w-full flex-col gap-6 rounded-[36px] border border-white/70 bg-white/75 p-6 shadow-[0_28px_70px_-32px_rgba(15,23,42,0.55)] backdrop-blur"
+                  style={{ maxWidth: mapDimension, minHeight: mapDimension, width: '100%' }}
+                >
                   <div
                     className="relative mx-auto overflow-hidden rounded-3xl bg-white"
-                    style={{ width: '400px', height: '400px' }}
+                    style={{ maxWidth: mapDimension, width: '100%', aspectRatio: '1 / 1' }}
                   >
                     {hasMapLocation ? (
                       <iframe
@@ -1028,10 +1036,13 @@ const Login: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex h-full w-full items-stretch rounded-[36px] border border-white/70 bg-white/75 p-6 shadow-[0_28px_70px_-32px_rgba(15,23,42,0.55)] backdrop-blur">
+                <div
+                  className="flex h-full w-full items-stretch rounded-[36px] border border-white/70 bg-white/75 p-6 shadow-[0_28px_70px_-32px_rgba(15,23,42,0.55)] backdrop-blur"
+                  style={{ maxWidth: mapDimension, minHeight: mapDimension, width: '100%' }}
+                >
                   <div className="h-full w-full overflow-hidden rounded-3xl border border-white/70 bg-white/75 shadow-[0_20px_45px_-28px_rgba(15,23,42,0.55)]">
                     <ShapoWidget
-                      className="h-[380px] w-full border-0"
+                      className="h-full w-full border-0"
                       title="Widget de opiniones de clientes Shapo"
                     />
                   </div>
