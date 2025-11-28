@@ -218,6 +218,8 @@ const Login: React.FC = () => {
     [findUs.address, sanitizeLocationCopy],
   );
 
+  const mapDimension = 'clamp(260px, 32vw, 420px)';
+
   const brandLogo = navigation.brandLogo ?? DEFAULT_BRAND_LOGO;
   const staffTriggerLogo = navigation.brandLogo ?? DEFAULT_BRAND_LOGO;
   const navigationBackgroundStyle = createBackgroundStyle(navigation.style);
@@ -910,28 +912,108 @@ const Login: React.FC = () => {
               findUs.title,
             )}
 
-            <div className="mx-auto mt-10 flex w-full max-w-6xl flex-col gap-8">
-              <div className="flex w-full flex-col gap-8 lg:flex-row lg:items-stretch">
-                <div className="flex h-full w-full flex-col justify-between rounded-[36px] border border-white/70 bg-white/75 p-6 shadow-[0_28px_70px_-32px_rgba(15,23,42,0.55)] backdrop-blur lg:flex-[3]">
-                  <div className="relative aspect-[13/8] w-full overflow-hidden rounded-3xl bg-white">
+              <div className="mx-auto mt-10 grid w-full max-w-6xl grid-cols-1 gap-8 lg:grid-cols-3 lg:items-start">
+                <div
+                  className="flex w-full flex-col gap-6 rounded-[28px] border border-white/70 bg-white/80 p-6 shadow-[0_24px_60px_-28px_rgba(15,23,42,0.5)] backdrop-blur"
+                  style={{ maxWidth: mapDimension, minHeight: mapDimension, width: '100%' }}
+                >
+                  <div className="space-y-4">
+                    {renderRichTextElement(
+                      'findUs.addressLabel',
+                      'h3',
+                      {
+                        className: 'text-xl font-semibold text-gray-900',
+                        style: getElementTextStyle('findUs.addressLabel'),
+                      },
+                      findUs.addressLabel,
+                    )}
+                    {renderRichTextElement(
+                      'findUs.address',
+                      'p',
+                      {
+                        className: 'whitespace-pre-line text-base font-medium text-gray-700',
+                        style: getElementBodyTextStyle('findUs.address'),
+                      },
+                      sanitizedAddress,
+                    )}
+                  </div>
+
+                  <div className="space-y-4">
+                    {renderRichTextElement(
+                      'findUs.hoursLabel',
+                      'h3',
+                      {
+                        className: 'text-xl font-semibold text-gray-900',
+                        style: getElementTextStyle('findUs.hoursLabel'),
+                      },
+                      findUs.hoursLabel,
+                    )}
+                    {renderRichTextElement(
+                      'findUs.hours',
+                      'p',
+                      {
+                        className: 'whitespace-pre-line text-base font-medium text-gray-700',
+                        style: getElementBodyTextStyle('findUs.hours'),
+                      },
+                      findUs.hours,
+                    )}
+                  </div>
+
+                  <div className="space-y-4">
+                    {renderRichTextElement(
+                      'findUs.cityLabel',
+                      'h3',
+                      {
+                        className: 'text-xl font-semibold text-gray-900',
+                        style: getElementTextStyle('findUs.cityLabel'),
+                      },
+                      findUs.cityLabel,
+                    )}
+                    <div className="flex flex-col items-center gap-3 text-base font-medium text-gray-700 text-center" style={findUsBodyTextStyle}>
+                      <div className="flex items-center gap-3">
+                        <span className="inline-flex items-center gap-2 text-base font-semibold text-gray-900">
+                          {whatsappTestNumber}
+                        </span>
+                        <a
+                          href={whatsappUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-green-500 text-white transition hover:bg-green-600"
+                          aria-label="Escríbenos por WhatsApp"
+                        >
+                          <MessageCircle className="h-4 w-4" />
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  className="flex h-full w-full flex-col gap-6 rounded-[36px] border border-white/70 bg-white/75 p-6 shadow-[0_28px_70px_-32px_rgba(15,23,42,0.55)] backdrop-blur"
+                  style={{ maxWidth: mapDimension, minHeight: mapDimension, width: '100%' }}
+                >
+                  <div
+                    className="relative mx-auto overflow-hidden rounded-3xl bg-white"
+                    style={{ maxWidth: mapDimension, width: '100%', aspectRatio: '1 / 1' }}
+                  >
                     {hasMapLocation ? (
                       <iframe
                         title={`Mapa de Google Maps para ${findUsMapTitle}`}
                         src={findUsMapEmbedUrl}
                         loading="lazy"
                         referrerPolicy="no-referrer-when-downgrade"
-                        className="h-full w-full border-0"
+                        className="absolute inset-0 h-full w-full border-0"
                         allowFullScreen
                       />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-gray-100 px-8 text-center">
+                      <div className="absolute inset-0 flex h-full w-full items-center justify-center bg-gray-100 px-8 text-center">
                         <p className="text-lg text-gray-500" style={findUsBodyTextStyle}>
                           La ubicación de nuestro restaurante estará disponible muy pronto.
                         </p>
                       </div>
                     )}
                   </div>
-                  <div className="mt-6 flex justify-center">
+                  <div className="flex justify-center">
                     {hasMapLocation ? (
                       <a
                         href={findUsMapUrl}
@@ -953,97 +1035,22 @@ const Login: React.FC = () => {
                     ) : null}
                   </div>
                 </div>
-                <div className="flex w-full items-stretch rounded-[36px] border border-white/70 bg-white/75 p-6 shadow-[0_28px_70px_-32px_rgba(15,23,42,0.55)] backdrop-blur lg:flex-[2]">
+
+                <div
+                  className="flex h-full w-full items-stretch rounded-[36px] border border-white/70 bg-white/75 p-6 shadow-[0_28px_70px_-32px_rgba(15,23,42,0.55)] backdrop-blur"
+                  style={{ maxWidth: mapDimension, minHeight: mapDimension, width: '100%' }}
+                >
                   <div className="h-full w-full overflow-hidden rounded-3xl border border-white/70 bg-white/75 shadow-[0_20px_45px_-28px_rgba(15,23,42,0.55)]">
                     <ShapoWidget
-                      className="h-[380px] w-full border-0"
+                      className="h-full w-full border-0"
                       title="Widget de opiniones de clientes Shapo"
                     />
                   </div>
                 </div>
-              </div>
-
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <div className="h-full text-left">
-                  <div className="space-y-2">
-                    {renderRichTextElement(
-                      'findUs.addressLabel',
-                      'h3',
-                      {
-                        className: 'text-xl font-semibold text-gray-900',
-                        style: getElementTextStyle('findUs.addressLabel'),
-                      },
-                      findUs.addressLabel,
-                    )}
-                    {renderRichTextElement(
-                      'findUs.address',
-                      'p',
-                      {
-                        className: 'whitespace-pre-line text-base font-medium text-gray-700',
-                        style: getElementBodyTextStyle('findUs.address'),
-                      },
-                      sanitizedAddress,
-                    )}
-                  </div>
-                </div>
-
-                <div className="h-full text-left">
-                  <div className="space-y-2">
-                    {renderRichTextElement(
-                      'findUs.hoursLabel',
-                      'h3',
-                      {
-                        className: 'text-xl font-semibold text-gray-900',
-                        style: getElementTextStyle('findUs.hoursLabel'),
-                      },
-                      findUs.hoursLabel,
-                    )}
-                    {renderRichTextElement(
-                      'findUs.hours',
-                      'p',
-                      {
-                        className: 'whitespace-pre-line text-base font-medium text-gray-700',
-                        style: getElementBodyTextStyle('findUs.hours'),
-                      },
-                      findUs.hours,
-                    )}
-                  </div>
-                </div>
-
-                <div className="h-full text-left">
-                  <div className="space-y-3 text-left">
-                    {renderRichTextElement(
-                      'findUs.cityLabel',
-                      'h3',
-                      {
-                        className: 'text-xl font-semibold text-gray-900',
-                        style: getElementTextStyle('findUs.cityLabel'),
-                      },
-                      findUs.cityLabel,
-                    )}
-                    <div className="flex flex-col gap-3 text-base font-medium text-gray-700" style={findUsBodyTextStyle}>
-                      <div className="flex items-center gap-2">
-                        <span className="inline-flex items-center gap-2 text-base font-semibold text-gray-900">
-                          {whatsappTestNumber}
-                        </span>
-                        <a
-                          href={whatsappUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-green-500 text-white transition hover:bg-green-600"
-                          aria-label="Escríbenos por WhatsApp"
-                        >
-                          <MessageCircle className="h-4 w-4" />
-                        </a>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </section>
-</main>
+            </section>
+          </main>
       
       <footer className="site-footer" style={{ ...footerBackgroundStyle, ...footerTextStyle }}>
         <div className="layout-container site-footer__inner" style={footerTextStyle}>
