@@ -916,7 +916,7 @@ const Login: React.FC = () => {
                 className="mx-auto mt-10 grid w-full max-w-6xl grid-cols-1 gap-8 lg:grid-cols-3 lg:items-start lg:[grid-template-columns:1fr_1.25fr_1fr]"
               >
                 <div
-                  className="flex w-full flex-col gap-6 rounded-[28px] border border-white/70 bg-white/80 p-6 shadow-[0_24px_60px_-28px_rgba(15,23,42,0.5)] backdrop-blur"
+                  className="flex w-full flex-col gap-6"
                   style={{ maxWidth: mapDimension, minHeight: mapDimension, width: '100%' }}
                 >
                   <div className="space-y-4">
@@ -991,11 +991,11 @@ const Login: React.FC = () => {
                 </div>
 
                 <div
-                  className="flex h-full w-full flex-col gap-6 rounded-[36px] border border-white/70 bg-white/75 p-6 shadow-[0_28px_70px_-32px_rgba(15,23,42,0.55)] backdrop-blur"
+                  className="flex h-full w-full flex-col gap-6"
                   style={{ minHeight: mapDimension, width: '100%' }}
                 >
                   <div
-                    className="relative mx-auto h-[min(420px,65vw)] w-full overflow-hidden rounded-3xl bg-white"
+                    className="relative mx-auto h-[min(420px,65vw)] w-full overflow-hidden"
                     style={{ maxWidth: 'min(640px, 100%)' }}
                   >
                     {hasMapLocation ? (
@@ -1039,10 +1039,10 @@ const Login: React.FC = () => {
                 </div>
 
                 <div
-                  className="flex h-full w-full items-stretch rounded-[36px] border border-white/70 bg-white/75 p-6 shadow-[0_28px_70px_-32px_rgba(15,23,42,0.55)] backdrop-blur"
+                  className="flex h-full w-full items-stretch"
                   style={{ maxWidth: mapDimension, minHeight: mapDimension, width: '100%' }}
                 >
-                  <div className="h-full w-full overflow-hidden rounded-3xl border border-white/70 bg-white/75 shadow-[0_20px_45px_-28px_rgba(15,23,42,0.55)]">
+                  <div className="h-full w-full overflow-hidden">
                     <ShapoWidget
                       className="h-full w-full border-0"
                       title="Widget de opiniones de clientes Shapo"
