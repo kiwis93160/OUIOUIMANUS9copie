@@ -219,7 +219,6 @@ const Login: React.FC = () => {
   );
 
   const mapDimension = 'clamp(260px, 32vw, 420px)';
-  const reviewWidgetHeight = 'clamp(520px, 75vw, 680px)';
 
   const brandLogo = navigation.brandLogo ?? DEFAULT_BRAND_LOGO;
   const staffTriggerLogo = navigation.brandLogo ?? DEFAULT_BRAND_LOGO;
@@ -1041,7 +1040,7 @@ const Login: React.FC = () => {
 
                 <div
                   className="flex h-full w-full items-stretch"
-                  style={{ maxWidth: mapDimension, minHeight: reviewWidgetHeight, width: '100%' }}
+                  style={{ maxWidth: mapDimension, minHeight: mapDimension, width: '100%' }}
                 >
                   <div className="h-full w-full overflow-hidden">
                     <ShapoWidget
