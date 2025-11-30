@@ -663,15 +663,15 @@ body {
 .hero-history {
   width: 100%;
   max-width: 680px;
-  margin-top: clamp(1rem, 2.5vw, 1.75rem);
-  padding: clamp(1rem, 3vw, 1.75rem);
+  margin-top: clamp(0.75rem, 2vw, 1.25rem);
+  padding: clamp(0.75rem, 2.5vw, 1.35rem);
   border-radius: 1.25rem;
   border: 1px solid rgba(148, 163, 184, 0.35);
   background: rgba(83, 1, 42, 0.7);
   box-shadow: 0 24px 55px rgba(2, 6, 23, 0.42);
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: 0.65rem;
 }
 
 .hero-history__title {
@@ -684,45 +684,47 @@ body {
 .hero-history__list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.55rem;
 }
 
 .hero-history__item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 0.75rem;
   flex-wrap: wrap;
 }
 
 .hero-history__meta {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.12rem;
 }
 
 .hero-history__date {
   color: #ffffff;
   font-weight: 600;
   margin: 0;
+  line-height: 1.2;
 }
 
 .hero-history__details {
   color: #ffffff;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   margin: 0;
+  line-height: 1.25;
 }
 
 .hero-history__cta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.45rem 1.25rem;
+  padding: 0.35rem 1.05rem;
   border-radius: 999px;
   border: 1px solid rgba(253, 224, 71, 0.55);
   background: rgba(253, 224, 71, 0.18);
   color: #ffffff;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
   transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
