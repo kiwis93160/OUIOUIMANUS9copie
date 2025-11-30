@@ -44,7 +44,7 @@
   --line-height-relaxed: 1.75;
   /* Couleurs pour la section Encuentranos */
   --color-encuentranos-bg: #FF6B35; /* Orange */
-  --color-encuentranos-title: #39FF14; /* Vert Néon */
+  --color-encuentranos-title: #861629; /* Rouge profond pour les titres et textes Encuéntranos */
   --color-encuentranos-icon-bg: #2563eb; /* Bleu Primaire */
   --color-encuentranos-icon-fg: #ffffff; /* Blanc */
 }
@@ -1364,6 +1364,7 @@ body {
 .section-encuentranos {
   background-color: var(--color-encuentranos-bg);
   padding-block: clamp(3rem, 8vw, 6rem);
+  color: #861629;
 }
 
 .encuentranos-title {
@@ -1445,13 +1446,13 @@ body {
   margin: 0;
   font-size: var(--font-size-lg);
   font-weight: 700;
-  color: var(--color-heading);
+  color: #861629;
 }
 
 .encuentranos-detail__text {
   margin: 0;
   font-size: var(--font-size-md);
-  color: var(--color-text);
+  color: #861629;
   line-height: 1.4;
   white-space: pre-line;
 }
