@@ -992,12 +992,11 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
             {/* Order Summary / Cart */}
             <div className="lg:w-96 flex flex-col">
                 <div className="order-cart rounded-3xl p-4 lg:p-6 shadow-xl flex flex-col">
-                    <h2 className="text-3xl font-bold text-gray-900 drop-shadow-md mb-4">Mon panier</h2>
                     {/* Tus ultimos pedidos - Compact version in cart */}
                     {orderHistory.length > 0 && (
-                        <div className="mb-3 p-2.5 bg-gray-50 rounded-lg border border-gray-200">
-                            <h3 className="text-sm font-bold text-gray-700 mb-1.5">Tus últimos pedidos</h3>
-                            <div className="space-y-1">
+                        <div className="mb-2 p-2 bg-gray-50 rounded-lg border border-gray-200">
+                            <h3 className="text-sm font-bold text-gray-700 mb-1">Tus últimos pedidos</h3>
+                            <div className="space-y-0.5">
                                 {orderHistory.map(order => {
                                     // Try to get date from multiple possible fields
                                     let orderDate = 'Fecha no disponible';
@@ -1035,7 +1034,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                                         : 0;
 
                                     return (
-                                        <div key={order.id} className="flex justify-between items-center bg-white px-2.5 py-1.5 rounded border border-gray-200 hover:border-yellow-500 transition-all">
+                                        <div key={order.id} className="flex justify-between items-center bg-white px-2 py-1 rounded border border-gray-200 hover:border-yellow-500 transition-all">
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-xs font-bold text-gray-800 truncate">Pedido del {orderDate}</p>
                                                 <p className="text-xs text-gray-600">
@@ -1054,6 +1053,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                             </div>
                         </div>
                     )}
+                    <h2 className="text-3xl font-bold text-gray-900 drop-shadow-md mb-4">Mi carrito</h2>
 
                 {cart.length === 0 ? (
                     <div className="flex-1 flex flex-col items-center justify-center text-gray-500">
