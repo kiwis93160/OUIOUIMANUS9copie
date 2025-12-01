@@ -995,9 +995,9 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                     <h2 className="text-3xl font-bold text-gray-900 drop-shadow-md mb-4">Mon panier</h2>
                     {/* Tus ultimos pedidos - Compact version in cart */}
                     {orderHistory.length > 0 && (
-                        <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                            <h3 className="text-sm font-bold text-gray-700 mb-2">Tus últimos pedidos</h3>
-                            <div className="space-y-2">
+                        <div className="mb-3 p-2.5 bg-gray-50 rounded-lg border border-gray-200">
+                            <h3 className="text-sm font-bold text-gray-700 mb-1.5">Tus últimos pedidos</h3>
+                            <div className="space-y-1">
                                 {orderHistory.map(order => {
                                     // Try to get date from multiple possible fields
                                     let orderDate = 'Fecha no disponible';
@@ -1035,7 +1035,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                                         : 0;
 
                                     return (
-                                        <div key={order.id} className="flex justify-between items-center bg-white p-2 rounded border border-gray-200 hover:border-yellow-500 transition-all">
+                                        <div key={order.id} className="flex justify-between items-center bg-white px-2.5 py-1.5 rounded border border-gray-200 hover:border-yellow-500 transition-all">
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-xs font-bold text-gray-800 truncate">Pedido del {orderDate}</p>
                                                 <p className="text-xs text-gray-600">
@@ -1044,7 +1044,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                                             </div>
                                             <button
                                                 onClick={() => handleReorder(order)}
-                                                className="ml-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold px-3 py-1 rounded text-xs whitespace-nowrap transition-all"
+                                                className="ml-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold px-2.5 py-1 rounded text-xs whitespace-nowrap transition-all"
                                             >
                                                 Pedir de nuevo
                                             </button>
@@ -1061,25 +1061,25 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                         <p>Tu carrito está vacío.</p>
                     </div>
                 ) : (
-                    <div className="flex-1 overflow-y-auto pr-2 -mr-2 space-y-6">
+                    <div className="flex-1 overflow-y-auto pr-2 -mr-2 space-y-4">
                         {groupedCartItems.map((group, groupIndex) => (
                             <div
                                 key={`${group.name}-${groupIndex}`}
-                                className={`space-y-3 border-t border-orange-100 ${groupIndex === 0 ? 'border-t-0 pt-0' : 'pt-4'}`}
+                                className={`space-y-2.5 border-t border-orange-100 ${groupIndex === 0 ? 'border-t-0 pt-0' : 'pt-3'}`}
                             >
                                 {group.items.map(item => {
                                     const excludedIngredientLabels = mapIngredientIdsToNames(item.excluded_ingredients, ingredientNameMap);
                                     return (
                                         <div
                                             key={item.id}
-                                            className="group relative rounded-2xl border border-orange-300/70 bg-gradient-to-br from-orange-500 via-orange-600 to-red-600 px-4 py-4 text-white shadow-xl shadow-orange-200/80"
+                                            className="group relative rounded-2xl border border-orange-300/70 bg-gradient-to-br from-orange-500 via-orange-600 to-red-600 px-3 py-3 text-white shadow-xl shadow-orange-200/80"
                                         >
                                             <div className="flex flex-col">
                                                 <div className="flex items-start justify-between gap-3">
-                                                    <p className="flex-1 text-[clamp(1rem,2vw,1.3rem)] font-semibold leading-snug text-white break-words text-balance whitespace-normal [hyphens:auto] drop-shadow-sm">
+                                                    <p className="flex-1 text-[clamp(0.95rem,1.9vw,1.2rem)] font-semibold leading-tight text-white break-words text-balance whitespace-normal [hyphens:auto] drop-shadow-sm">
                                                         {item?.nom_produit || 'Artículo'}
                                                     </p>
-                                                    <div className="flex items-center gap-2 rounded-full border border-orange-200 bg-white/80 px-3 py-1 text-sm font-semibold text-gray-900 shadow-sm">
+                                                    <div className="flex items-center gap-1.5 rounded-full border border-orange-200 bg-white/80 px-2.5 py-1 text-sm font-semibold text-gray-900 shadow-sm">
                                                         <button
                                                             onClick={() => handleCartItemQuantityChange(item.id, -1)}
                                                             className="rounded-full p-1 text-orange-600 transition hover:bg-orange-100"
@@ -1099,12 +1099,12 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                                                 </div>
 
                                                 {item.commentaire && (
-                                                    <p className="mt-3 text-sm text-gray-800 bg-white/90 border-l-2 border-orange-200 p-2 rounded shadow-sm">
+                                                    <p className="mt-2.5 text-sm text-gray-800 bg-white/90 border-l-2 border-orange-200 p-2 rounded shadow-sm">
                                                         💬 {item.commentaire}
                                                     </p>
                                                 )}
                                                 {item.selected_extras && item.selected_extras.length > 0 && (
-                                                    <div className="mt-3 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800 shadow-inner space-y-1">
+                                                    <div className="mt-2.5 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-sm text-emerald-800 shadow-inner space-y-1">
                                                         {item.selected_extras.map((extra, extraIndex) => (
                                                             <div key={`${item.id}-cart-extra-${extraIndex}`} className="flex items-center gap-2">
                                                                 <span className="inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600">
@@ -1118,12 +1118,12 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                                                     </div>
                                                 )}
                                                 {excludedIngredientLabels.length > 0 && (
-                                                    <p className="mt-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 shadow-inner">
+                                                    <p className="mt-2 rounded-md border border-red-200 bg-red-50 px-3 py-1.5 text-sm font-semibold text-red-700 shadow-inner">
                                                         🚫 Sin: {excludedIngredientLabels.join(', ')}
                                                     </p>
                                                 )}
 
-                                                <div className="mt-4 flex justify-end">
+                                                <div className="mt-3 flex justify-end">
                                                     <span className="text-lg font-bold text-white drop-shadow-sm">
                                                         {formatCurrencyCOP(item.prix_unitaire)}
                                                     </span>
