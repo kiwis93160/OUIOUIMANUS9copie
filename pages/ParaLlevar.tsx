@@ -577,12 +577,12 @@ const ParaLlevar: React.FC = () => {
     if (loading) return <div className="text-gray-700">Cargando pedidos para llevar...</div>;
 
     return (
-        <div className="space-y-6">
-            <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-10">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-blue-600">
-                            <Clock size={22} />
+        <div className="space-y-5">
+            <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-6 sm:p-7">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center gap-2.5">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                            <Clock size={20} />
                         </div>
                         <div>
                             <h2 className="text-base font-semibold text-gray-900">Disponibilidad de pedidos en línea</h2>
@@ -591,7 +591,7 @@ const ParaLlevar: React.FC = () => {
                             </p>
                         </div>
                     </div>
-                    <div className="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:items-end">
+                    <div className="flex w-full flex-col items-stretch gap-1.5 sm:w-auto sm:items-end">
                         {scheduleFeedback && (
                             <div
                                 className={`rounded-lg border px-3 py-2 text-xs font-medium ${
@@ -627,18 +627,18 @@ const ParaLlevar: React.FC = () => {
 
             </div>
 
-            <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-10">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
-                            <Phone size={22} />
+            <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-6 sm:p-7">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center gap-2.5">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                            <Phone size={20} />
                         </div>
                         <div>
                             <h2 className="text-base font-semibold text-gray-900">Configuración de contactos</h2>
                             <p className="text-sm text-gray-500">Gestiona los números que usan tus clientes y tu equipo.</p>
                         </div>
                     </div>
-                    <div className="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:items-end">
+                    <div className="flex w-full flex-col items-stretch gap-1.5 sm:w-auto sm:items-end">
                         {contactFeedback && (
                             <div
                                 className={`rounded-lg border px-3 py-2 text-xs font-medium ${
