@@ -1036,8 +1036,8 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                                     return (
                                         <div key={order.id} className="flex justify-between items-center bg-white px-2 py-1 rounded border border-gray-200 hover:border-yellow-500 transition-all">
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-xs font-bold text-gray-800 truncate">Pedido del {orderDate}</p>
-                                                <p className="text-xs text-gray-600">
+                                                <p className="text-xs font-bold text-gray-800 truncate mb-5">Pedido del {orderDate}</p>
+                                                <p className="text-xs text-gray-600 mb-5">
                                                     {itemCount} article{itemCount > 1 ? 's' : ''} • {formatCurrencyCOP(order.total)}
                                                 </p>
                                             </div>
