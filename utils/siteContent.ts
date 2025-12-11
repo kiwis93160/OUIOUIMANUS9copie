@@ -465,9 +465,9 @@ const DEFAULT_NAVIGATION_STYLE: SectionStyle = {
 
 const DEFAULT_HERO_STYLE: SectionStyle = {
   background: {
-    type: 'image',
-    color: '#0f172a',
-    image: 'https://picsum.photos/seed/tacosbg/1920/1080',
+    type: 'color',
+    color: '#640032',
+    image: null,
   },
   fontFamily: 'Inter',
   fontSize: '18px',
@@ -592,7 +592,7 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     subtitle:
       "Des tacos préparés avec passion, des ingrédients frais et une touche de tradition pour un voyage gustatif inoubliable.",
     ctaLabel: 'Commander en ligne',
-    backgroundImage: 'https://picsum.photos/seed/tacosbg/1920/1080',
+    backgroundImage: null,
     historyTitle: 'Vos dernières commandes',
     reorderCtaLabel: 'Commander à nouveau',
     style: DEFAULT_HERO_STYLE,
