@@ -534,7 +534,7 @@ body {
 
 .hero-content {
   position: relative;
-  left: -200px;
+  left: 50px;
   z-index: 1;
   width: 100%;
   max-width: 1200px;
