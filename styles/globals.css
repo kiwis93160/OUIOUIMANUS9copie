@@ -2506,8 +2506,11 @@ body.customization-mode .site-customization {
 
 .app-content__inner {
   margin: 0 auto;
-  width: min(1120px, 100%);
+  width: min(1180px, 100%);
   min-height: calc(100dvh - clamp(4.75rem, 6vw + 3rem, 7rem));
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1rem, 2vw, 1.75rem);
   background: rgba(15, 23, 42, 0.55);
   border-radius: 1.25rem;
   border: 1px solid rgba(148, 163, 184, 0.18);
@@ -2515,6 +2518,24 @@ body.customization-mode .site-customization {
   backdrop-filter: blur(12px);
   padding: clamp(1.25rem, 3vw + 0.75rem, 2.75rem);
   color: color-mix(in srgb, var(--color-surface) 88%, transparent);
+}
+
+img,
+svg,
+canvas,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+.responsive-table {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.responsive-table table {
+  min-width: 640px;
 }
 
 .promotions-page {
@@ -2720,6 +2741,40 @@ body.customization-mode .site-customization {
 
 .app-sidebar__action--logout svg {
   color: inherit;
+}
+
+@media (max-width: 767px) {
+  .app-shell {
+    flex-direction: column;
+  }
+
+  .app-header {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-radius: 0 0 1rem 1rem;
+  }
+
+  .app-header__title {
+    width: 100%;
+    font-size: clamp(1.15rem, 4vw, 1.4rem);
+  }
+
+  .app-content {
+    padding: 1rem;
+  }
+
+  .app-content__inner {
+    min-height: auto;
+    padding: 1rem;
+    gap: 1rem;
+    box-shadow: 0 16px 40px rgba(2, 6, 23, 0.35);
+  }
+
+  .responsive-table table {
+    min-width: 520px;
+  }
 }
 
 @media (min-width: 768px) {

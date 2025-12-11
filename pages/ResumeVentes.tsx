@@ -651,7 +651,7 @@ const ResumeVentes: React.FC = () => {
                         <h3 className="text-lg font-semibold text-gray-800">Distribución por método de pago</h3>
                         <BarChart3 size={18} className="text-brand-primary" />
                     </div>
-                    <div className="mt-4 overflow-x-auto">
+                    <div className="mt-4 responsive-table">
                         <table className="w-full text-left">
                             <thead className="border-b text-xs uppercase text-gray-500">
                                 <tr>
@@ -686,7 +686,7 @@ const ResumeVentes: React.FC = () => {
                         <h3 className="text-lg font-semibold text-gray-800">Distribución por categoría</h3>
                         <Layers size={18} className="text-brand-primary" />
                     </div>
-                    <div className="mt-4 overflow-x-auto">
+                    <div className="mt-4 responsive-table">
                         <table className="w-full text-left">
                             <thead className="border-b text-xs uppercase text-gray-500">
                                 <tr>
@@ -722,7 +722,7 @@ const ResumeVentes: React.FC = () => {
                     <h3 className="text-lg font-semibold text-gray-800">Productos con mejor desempeño</h3>
                     <Package size={18} className="text-brand-primary" />
                 </div>
-                <div className="mt-4 overflow-x-auto">
+                <div className="mt-4 responsive-table">
                     <table className="w-full text-left">
                         <thead className="border-b text-xs uppercase text-gray-500">
                             <tr>
@@ -756,7 +756,7 @@ const ResumeVentes: React.FC = () => {
 
             <section className="rounded-xl bg-white p-4 shadow-md">
                 <h3 className="text-lg font-semibold text-gray-800">Detalles de los pedidos</h3>
-                <div className="mt-4 overflow-x-auto">
+                <div className="mt-4 responsive-table">
                     <table className="w-full text-left">
                         <thead className="border-b text-xs uppercase text-gray-500">
                             <tr>
@@ -824,7 +824,7 @@ const ResumeVentes: React.FC = () => {
                                                     <td colSpan={8} className="p-4">
                                                         <div className="rounded-lg border border-gray-200 bg-white p-4">
                                                             <h4 className="text-sm font-semibold text-gray-800">Artículos incluidos ({aggregate.items.length})</h4>
-                                                            <div className="mt-3 overflow-x-auto">
+                                                            <div className="mt-3 responsive-table">
                                                                 <table className="w-full text-left">
                                                                     <thead className="border-b text-xs uppercase text-gray-500">
                                                                         <tr>

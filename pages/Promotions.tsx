@@ -269,7 +269,7 @@ const Promotions: React.FC = () => {
 
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
 
-        <div className="overflow-x-auto">
+        <div className="responsive-table">
           <table className="w-full">
             <thead>
               <tr className="bg-gray-50 border-b">

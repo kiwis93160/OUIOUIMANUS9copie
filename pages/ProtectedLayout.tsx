@@ -80,7 +80,9 @@ const ProtectedLayout: React.FC = () => {
             {/* Add other header elements like user menu here */}
           </header>
           <main className="app-content">
-            <Outlet />
+            <div className="app-content__inner">
+              <Outlet />
+            </div>
           </main>
         </div>
       </div>
