@@ -526,7 +526,7 @@ body {
   position: absolute;
   inset: 0;
   background: linear-gradient(145deg, rgba(15, 23, 42, 0.78) 0%, rgba(15, 23, 42, 0.42) 52%, rgba(37, 99, 235, 0.35) 100%);
-  backdrop-filter: saturate(140%) blur(4px);
+  backdrop-filter: saturate(140%);
 }
 
 /* Section-hero__inner supprimée - styles fusionnés dans hero-content */
