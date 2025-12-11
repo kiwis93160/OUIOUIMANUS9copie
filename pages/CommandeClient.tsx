@@ -17,7 +17,6 @@ import { formatScheduleWindow, isWithinSchedule, minutesUntilNextChange } from '
 import { isWithinWeeklySchedule, formatWeeklySchedule } from '../utils/weeklyScheduleUtils';
 import useOnlineOrderingSchedules from '../hooks/useOnlineOrderingSchedules';
 import { DEFAULT_SITE_CONTENT } from '../utils/siteContent';
-import { createHeroBackgroundStyle } from '../utils/siteStyleHelpers';
 import OrderConfirmationModal from '../components/OrderConfirmationModal';
 import CustomerOrderTracker from '../components/CustomerOrderTracker';
 import {
@@ -401,9 +400,9 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
     const { content: siteContent } = useSiteContent();
     const { schedule: weeklySchedule } = useOnlineOrderingSchedules();
     const safeContent = siteContent ?? DEFAULT_SITE_CONTENT;
-    const heroBackgroundStyle = useMemo(
-        () => createHeroBackgroundStyle(safeContent.hero.style, safeContent.hero.backgroundImage),
-        [safeContent.hero.backgroundImage, safeContent.hero.style]
+    const orderBackgroundStyle = useMemo(
+        () => ({ backgroundColor: '#640032' }),
+        [],
     );
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
@@ -938,7 +937,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
     }
 
     return (
-        <div className="order-online-page min-h-screen flex flex-col lg:flex-row" style={heroBackgroundStyle}>
+        <div className="order-online-page min-h-screen flex flex-col lg:flex-row" style={orderBackgroundStyle}>
             {/* Main Content */}
             <div className="flex-1 p-4 lg:p-8 space-y-6">
                 {/* Active Promotions Display */}
