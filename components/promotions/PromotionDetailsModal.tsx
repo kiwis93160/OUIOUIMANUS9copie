@@ -311,42 +311,44 @@ const PromotionDetailsModal: React.FC<PromotionDetailsModalProps> = ({ isOpen, o
                   No hay usos registrados para esta promoción
                 </div>
               ) : (
-                <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                  <table className="w-full divide-y divide-slate-200 text-sm text-black">
-                    <thead className="bg-slate-50/90 text-xs font-semibold uppercase tracking-wide text-slate-700">
-                      <tr>
-                        <th className="px-4 py-3 text-left">Fecha</th>
-                        <th className="px-4 py-3 text-left">Pedido</th>
-                        <th className="px-4 py-3 text-left">Cliente</th>
-                        <th className="px-4 py-3 text-right">Descuento</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {usages.map((usage) => (
-                        <tr key={usage.id} className="bg-white/80 transition hover:bg-brand-accent-soft">
-                          <td className="px-4 py-3 font-medium text-black">{formatDate(usage.applied_at)}</td>
-                          <td className="px-4 py-3">
-                            <a
-                              href="#"
-                              className="inline-flex items-center gap-2 text-black transition hover:underline"
-                              onClick={(e) => {
-                                e.preventDefault();
-                              }}
-                            >
-                              {usage.order_id.substring(0, 8)}...
-                              <ExternalLink size={14} />
-                            </a>
-                          </td>
-                          <td className="px-4 py-3">
-                            {usage.customer_phone || '—'}
-                          </td>
-                          <td className="px-4 py-3 text-right font-semibold text-black">
-                            {usage.discount_amount.toFixed(2)}€
-                          </td>
+                <div className="responsive-table">
+                  <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                    <table className="w-full divide-y divide-slate-200 text-sm text-black">
+                      <thead className="bg-slate-50/90 text-xs font-semibold uppercase tracking-wide text-slate-700">
+                        <tr>
+                          <th className="px-4 py-3 text-left">Fecha</th>
+                          <th className="px-4 py-3 text-left">Pedido</th>
+                          <th className="px-4 py-3 text-left">Cliente</th>
+                          <th className="px-4 py-3 text-right">Descuento</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {usages.map((usage) => (
+                          <tr key={usage.id} className="bg-white/80 transition hover:bg-brand-accent-soft">
+                            <td className="px-4 py-3 font-medium text-black">{formatDate(usage.applied_at)}</td>
+                            <td className="px-4 py-3">
+                              <a
+                                href="#"
+                                className="inline-flex items-center gap-2 text-black transition hover:underline"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                }}
+                              >
+                                {usage.order_id.substring(0, 8)}...
+                                <ExternalLink size={14} />
+                              </a>
+                            </td>
+                            <td className="px-4 py-3">
+                              {usage.customer_phone || '—'}
+                            </td>
+                            <td className="px-4 py-3 text-right font-semibold text-black">
+                              {usage.discount_amount.toFixed(2)}€
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               )}
             </div>

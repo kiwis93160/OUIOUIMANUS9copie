@@ -88,7 +88,7 @@ const Ingredients: React.FC = () => {
             </div>
 
             {loading ? <p className="text-gray-800">Cargando...</p> : error ? <p className="text-red-500">{error}</p> : (
-                <div className="ui-card p-4 overflow-x-auto">
+                <div className="ui-card p-4 responsive-table">
                     <table className="w-full text-left">
                         <thead className="border-b">
                             <tr>
