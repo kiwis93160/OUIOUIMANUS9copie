@@ -59,7 +59,7 @@ html {
 
 body {
   margin: 0;
-  background: linear-gradient(160deg, var(--color-bg) 0%, var(--color-bg-muted) 100%);
+  background: #640032;
   color: var(--color-text);
   font-size: var(--font-size-md);
   line-height: var(--line-height-base);
