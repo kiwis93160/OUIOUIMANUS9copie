@@ -547,6 +547,24 @@ body {
   margin-left: clamp(0.25rem, 1vw, 0.75rem);
 }
 
+.hero-header {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: clamp(1rem, 2vw, 1.5rem);
+}
+
+.hero-header__cta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.hero-header__cta .hero-cta {
+  margin: 0;
+}
+
 .hero-title {
   font-size: clamp(3rem, 7vw, 5rem) !important;
   line-height: 1 !important;
@@ -663,8 +681,8 @@ body {
 }
 
 .hero-history {
-  width: 100%;
-  max-width: 680px;
+  width: 60%;
+  max-width: 410px;
   margin-top: clamp(0.75rem, 2vw, 1.25rem);
   padding: clamp(0.75rem, 2.5vw, 1.35rem);
   border-radius: 1.25rem;
@@ -735,6 +753,23 @@ body {
   background: rgba(253, 224, 71, 0.32);
   transform: translateY(-1px);
   box-shadow: 0 12px 22px rgba(253, 224, 71, 0.28);
+}
+
+@media (max-width: 768px) {
+  .hero-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hero-header__cta {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .hero-history {
+    width: 100%;
+    max-width: 680px;
+  }
 }
 
 /* Header ultra-compact - 50% plus petit + NON FIXE */

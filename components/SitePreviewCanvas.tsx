@@ -466,67 +466,52 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
           <section className="section section-hero" style={{ ...heroBackgroundStyle, ...heroTextStyle }}>
             <div className="section-hero__inner">
               <div className="hero-content" style={heroTextStyle}>
-                <EditableElement
-                  id="hero.title"
-                  label="Editar el título del hero"
-                  onEdit={onEdit}
-                  className="block"
-                  buttonClassName="right-0 -top-3"
-                >
-                  {renderRichTextElement(
-                    'hero.title',
-                    'h2',
-                    {
-                      className: 'hero-title',
-                      style: getElementTextStyle('hero.title'),
-                    },
-                    content.hero.title,
-                  )}
-                </EditableElement>
-                <EditableElement
-                  id="hero.subtitle"
-                  label="Editar el subtítulo del hero"
-                  onEdit={onEdit}
-                  className="mt-4 block"
-                  buttonClassName="right-0 -top-3"
-                >
-                  {renderRichTextElement(
-                    'hero.subtitle',
-                    'p',
-                    {
-                      className: 'hero-subtitle',
-                      style: getElementBodyTextStyle('hero.subtitle'),
-                    },
-                    content.hero.subtitle,
-                  )}
-                </EditableElement>
-                <EditableElement
-                  id="hero.ctaLabel"
-                  label="Editar el texto del botón principal"
-                  onEdit={onEdit}
-                  className="mt-6 inline-flex"
-                  buttonClassName="-right-3 -top-3"
-                >
-                  <button
-                    type="button"
-                    className="ui-btn ui-btn-accent hero-cta"
-                    style={{
-                      ...getElementBodyTextStyle('hero.ctaLabel'),
-                      ...getElementBackgroundStyle('hero.ctaLabel'),
-                    }}
-                    disabled
+                <div className="hero-header">
+                  <EditableElement
+                    id="hero.title"
+                    label="Editar el título del hero"
+                    onEdit={onEdit}
+                    className="block"
+                    buttonClassName="right-0 -top-3"
                   >
                     {renderRichTextElement(
-                      'hero.ctaLabel',
-                      'span',
+                      'hero.title',
+                      'h2',
                       {
-                        className: 'inline-flex items-center justify-center',
-                        style: getElementBodyTextStyle('hero.ctaLabel'),
+                        className: 'hero-title',
+                        style: getElementTextStyle('hero.title'),
                       },
-                      content.hero.ctaLabel,
+                      content.hero.title,
                     )}
-                  </button>
-                </EditableElement>
+                  </EditableElement>
+                  <EditableElement
+                    id="hero.ctaLabel"
+                    label="Editar el texto del botón principal"
+                    onEdit={onEdit}
+                    className="hero-header__cta"
+                    buttonClassName="-right-3 -top-3"
+                  >
+                    <button
+                      type="button"
+                      className="ui-btn ui-btn-accent hero-cta"
+                      style={{
+                        ...getElementBodyTextStyle('hero.ctaLabel'),
+                        ...getElementBackgroundStyle('hero.ctaLabel'),
+                      }}
+                      disabled
+                    >
+                      {renderRichTextElement(
+                        'hero.ctaLabel',
+                        'span',
+                        {
+                          className: 'inline-flex items-center justify-center',
+                          style: getElementBodyTextStyle('hero.ctaLabel'),
+                        },
+                        content.hero.ctaLabel,
+                      )}
+                    </button>
+                  </EditableElement>
+                </div>
                 <div className="hero-history mt-6">
                 <EditableElement
                   id="hero.historyTitle"
@@ -588,6 +573,23 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
                   </>
                 </EditableElement>
                 </div>
+                <EditableElement
+                  id="hero.subtitle"
+                  label="Editar el subtítulo del hero"
+                  onEdit={onEdit}
+                  className="mt-4 block"
+                  buttonClassName="right-0 -top-3"
+                >
+                  {renderRichTextElement(
+                    'hero.subtitle',
+                    'p',
+                    {
+                      className: 'hero-subtitle',
+                      style: getElementBodyTextStyle('hero.subtitle'),
+                    },
+                    content.hero.subtitle,
+                  )}
+                </EditableElement>
               </div>
             </div>
           </section>
