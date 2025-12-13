@@ -674,68 +674,39 @@ const Login: React.FC = () => {
             />
           ) : (
             <div className="hero-content" style={heroTextStyle}>
-              {renderRichTextElement(
-                'hero.title',
-                'h2',
-                {
-                  className: 'hero-title',
-                  style: getElementTextStyle('hero.title'),
-                },
-                hero.title,
-              )}
-              {renderRichTextElement(
-                'hero.subtitle',
-                'p',
-                {
-                  className: 'hero-subtitle',
-                  style: getElementBodyTextStyle('hero.subtitle'),
-                },
-                hero.subtitle,
-              )}
-              <button
-                onClick={handleHeroCtaClick}
-                className={`ui-btn hero-cta ${isOrderingAvailable ? 'ui-btn-accent' : 'hero-cta--disabled'}`.trim()}
-                style={{
-                  ...getElementBodyTextStyle('hero.ctaLabel'),
-                  ...getElementBackgroundStyle('hero.ctaLabel'),
-                }}
-                disabled={!isOrderingAvailable}
-                aria-disabled={!isOrderingAvailable}
-              >
+              <div className="hero-header">
                 {renderRichTextElement(
-                  'hero.ctaLabel',
-                  'span',
+                  'hero.title',
+                  'h2',
                   {
-                    className: 'inline-flex items-center justify-center',
-                    style: getElementBodyTextStyle('hero.ctaLabel'),
+                    className: 'hero-title',
+                    style: getElementTextStyle('hero.title'),
                   },
-                  hero.ctaLabel,
+                  hero.title,
                 )}
-              </button>
-              {!isOrderingAvailable && (
-                <div className="hero-availability">
-                  <div className="hero-availability__icon">
-                    <Clock size={28} />
-                  </div>
-                  <div className="hero-availability__content">
-                    <p className="hero-availability__title">{onlineOrdering.closedTitle}</p>
-                    <p className="hero-availability__subtitle">
-                      {onlineOrdering.closedSubtitle || 'Veuillez consulter nos horaires ci-dessous.'}
-                    </p>
-                    <div className="mt-4 space-y-2">
-                      <p className="text-sm font-semibold uppercase tracking-wide text-white/90">Horaires d'ouverture :</p>
-                      <div className="space-y-1">
-                        {weeklyScheduleFormatted.map(({ day, label, schedule }) => (
-                          <div key={day} className="flex items-center text-sm">
-                            <span className="font-medium text-white/80 w-24">{label}</span>
-                            <span className="font-semibold text-white">{schedule}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+                <div className="hero-header__cta">
+                  <button
+                    onClick={handleHeroCtaClick}
+                    className={`ui-btn hero-cta ${isOrderingAvailable ? 'ui-btn-accent' : 'hero-cta--disabled'}`.trim()}
+                    style={{
+                      ...getElementBodyTextStyle('hero.ctaLabel'),
+                      ...getElementBackgroundStyle('hero.ctaLabel'),
+                    }}
+                    disabled={!isOrderingAvailable}
+                    aria-disabled={!isOrderingAvailable}
+                  >
+                    {renderRichTextElement(
+                      'hero.ctaLabel',
+                      'span',
+                      {
+                        className: 'inline-flex items-center justify-center',
+                        style: getElementBodyTextStyle('hero.ctaLabel'),
+                      },
+                      hero.ctaLabel,
+                    )}
+                  </button>
                 </div>
-              )}
+              </div>
               {orderHistory.length > 0 && (
                 <div className="hero-history">
                   {renderRichTextElement(
@@ -782,6 +753,39 @@ const Login: React.FC = () => {
                     ))}
                   </div>
                 </div>
+              )}
+              {!isOrderingAvailable && (
+                <div className="hero-availability">
+                  <div className="hero-availability__icon">
+                    <Clock size={28} />
+                  </div>
+                  <div className="hero-availability__content">
+                    <p className="hero-availability__title">{onlineOrdering.closedTitle}</p>
+                    <p className="hero-availability__subtitle">
+                      {onlineOrdering.closedSubtitle || 'Veuillez consulter nos horaires ci-dessous.'}
+                    </p>
+                    <div className="mt-4 space-y-2">
+                      <p className="text-sm font-semibold uppercase tracking-wide text-white/90">Horaires d'ouverture :</p>
+                      <div className="space-y-1">
+                        {weeklyScheduleFormatted.map(({ day, label, schedule }) => (
+                          <div key={day} className="flex items-center text-sm">
+                            <span className="font-medium text-white/80 w-24">{label}</span>
+                            <span className="font-semibold text-white">{schedule}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {renderRichTextElement(
+                'hero.subtitle',
+                'p',
+                {
+                  className: 'hero-subtitle',
+                  style: getElementBodyTextStyle('hero.subtitle'),
+                },
+                hero.subtitle,
               )}
             </div>
           )}
