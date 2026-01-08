@@ -674,7 +674,7 @@ const Login: React.FC = () => {
             />
           ) : (
             <div className="hero-content" style={heroTextStyle}>
-              <div className="hero-header">
+              <div className="hero-header flex flex-col md:flex-row">
                 {renderRichTextElement(
                   'hero.title',
                   'h2',
@@ -859,7 +859,7 @@ const Login: React.FC = () => {
               )
             ) : bestSellersToDisplay.length > 0 ? (
               <div
-                className={`menu-grid ${hasSecondaryProducts ? 'menu-grid--best-sellers' : 'menu-grid--best-sellers-single'}`}
+                className={`menu-grid ${hasSecondaryProducts ? 'grid grid-cols-1 lg:grid-cols-2' : 'menu-grid--best-sellers-single'}`}
               >
                 {featuredProduct && renderMenuCard(featuredProduct, 'featured')}
                 {hasSecondaryProducts && (
@@ -917,7 +917,7 @@ const Login: React.FC = () => {
             )}
 
               <div
-                className="mx-auto mt-10 grid w-full max-w-6xl grid-cols-1 gap-8 lg:grid-cols-3 lg:items-start lg:[grid-template-columns:1fr_1.25fr_1fr]"
+                className="mx-auto mt-10 grid w-full max-w-6xl grid-cols-1 gap-8 lg:grid-cols-3 lg:items-start"
               >
                 <div
                   className="flex w-full flex-col gap-6"
