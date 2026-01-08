@@ -3663,3 +3663,12 @@ p {
   font-size: 1.2rem;
   font-weight: 600;
 }
+
+@media (max-width: 768px) {
+  .login-page .hero-title {
+    font-size: 2.5rem;
+  }
+  .login-page .section-title {
+    font-size: 1.75rem;
+  }
+}
