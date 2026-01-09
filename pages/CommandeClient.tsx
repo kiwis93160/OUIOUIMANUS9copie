@@ -937,9 +937,9 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
     }
 
     return (
-        <div className="order-online-page min-h-screen flex flex-col lg:flex-row" style={orderBackgroundStyle}>
+        <div className="order-online-page min-h-screen flex flex-col lg:flex-row lg:items-start gap-6 lg:gap-10 px-4 pb-10 pt-4 lg:px-8 lg:pt-8" style={orderBackgroundStyle}>
             {/* Main Content */}
-            <div className="flex-1 p-4 lg:p-8 space-y-6">
+            <div className="flex-1 min-w-0 space-y-6">
                 {/* Active Promotions Display */}
                 <div className="px-4 pt-0 pb-4">
                     <div className="flex items-start justify-between gap-4">
@@ -989,7 +989,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
             </div>
 
             {/* Order Summary / Cart */}
-            <div className="lg:w-96 flex flex-col">
+            <div className="w-full lg:w-96 flex flex-col lg:sticky lg:top-6 self-start">
                 <div className="order-cart rounded-3xl p-4 lg:p-6 shadow-xl flex flex-col">
                     {/* Tus ultimos pedidos - Compact version in cart */}
                     {orderHistory.length > 0 && (
