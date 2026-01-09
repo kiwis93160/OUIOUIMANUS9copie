@@ -41,21 +41,22 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({ pro
       
       {/* Nom du produit */}
       <div className="flex w-full flex-1 flex-col items-center">
-        <p
-          className="font-extrabold text-gray-900 leading-snug text-[clamp(1rem,2.2vw,1.2rem)] break-words text-balance whitespace-normal [hyphens:auto] tracking-tight"
-        >
-          {product.nom_produit}
-        </p>
+        <div className="flex w-full items-start justify-between gap-2">
+          <p
+            className="flex-1 text-left font-extrabold text-gray-900 leading-snug text-[clamp(1rem,2.2vw,1.2rem)] break-words text-balance whitespace-normal [hyphens:auto] tracking-tight"
+          >
+            {product.nom_produit}
+          </p>
+          <p className="text-right font-bold text-lg text-gray-800">
+            {formatCurrencyCOP(product.prix_vente)}
+          </p>
+        </div>
 
         {/* Description */}
-        <p className="text-sm text-gray-600 mt-1 px-1 max-h-10 overflow-hidden line-clamp-2">
+        <p className="text-sm text-left text-gray-600 mt-1 px-1 max-h-10 overflow-hidden line-clamp-2">
           {product.description}
         </p>
 
-        {/* Prix */}
-        <p className="font-bold text-lg text-gray-800 mt-1">
-          {formatCurrencyCOP(product.prix_vente)}
-        </p>
         <div className="mt-auto w-full pt-2">
           {/* Statut */}
           {product.estado !== 'disponible' && (
