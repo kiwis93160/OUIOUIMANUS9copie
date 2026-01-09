@@ -19,7 +19,7 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({ pro
   return (
     <div
       onClick={() => product.estado === 'disponible' && onClick()}
-      className={`relative rounded-2xl border border-white/60 bg-white/70 backdrop-blur-md p-6 flex h-full flex-col items-center text-center transition-shadow shadow-lg ${
+      className={`relative rounded-2xl border border-white/60 bg-white/70 backdrop-blur-md p-4 flex h-full flex-col items-center text-center transition-shadow shadow-lg ${
         product.estado === 'disponible' ? 'cursor-pointer hover:shadow-xl' : 'opacity-60'
       }`}
     >
@@ -36,7 +36,7 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({ pro
       <img 
         src={product.image} 
         alt={product.nom_produit} 
-        className="w-full h-36 object-cover rounded-xl mb-4 aspect-4/3" 
+        className="w-full h-44 object-cover rounded-xl mb-2 aspect-4/3" 
       />
       
       {/* Nom du produit */}
@@ -48,15 +48,15 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({ pro
         </p>
 
         {/* Description */}
-        <p className="text-sm text-gray-600 mt-2 px-1 max-h-10 overflow-hidden line-clamp-2">
+        <p className="text-sm text-gray-600 mt-1 px-1 max-h-10 overflow-hidden line-clamp-2">
           {product.description}
         </p>
 
         {/* Prix */}
-        <p className="font-bold text-lg text-gray-800 mt-2">
+        <p className="font-bold text-lg text-gray-800 mt-1">
           {formatCurrencyCOP(product.prix_vente)}
         </p>
-        <div className="mt-auto w-full pt-3">
+        <div className="mt-auto w-full pt-2">
           {/* Statut */}
           {product.estado !== 'disponible' && (
             <span className="text-xs text-red-500 font-bold">Agotado</span>
