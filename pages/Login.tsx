@@ -1000,8 +1000,8 @@ const Login: React.FC = () => {
                   style={{ minHeight: mapDimension, width: '100%' }}
                 >
                   <div
-                    className="relative mx-auto h-[min(420px,65vw)] w-full overflow-hidden"
-                    style={{ maxWidth: 'min(640px, 100%)' }}
+                    className="relative mx-auto w-full overflow-hidden"
+                    style={{ height: mapDimension, maxWidth: 'min(640px, 100%)' }}
                   >
                     {hasMapLocation ? (
                       <iframe
@@ -1045,7 +1045,7 @@ const Login: React.FC = () => {
 
                 <div
                   className="flex w-full items-stretch"
-                  style={{ maxWidth: mapDimension, minHeight: mapDimension, width: '100%' }}
+                  style={{ height: mapDimension, maxWidth: mapDimension, width: '100%' }}
                 >
                   <div className="h-full w-full overflow-hidden bg-white">
                     <ShapoWidget
