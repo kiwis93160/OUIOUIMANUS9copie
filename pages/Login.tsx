@@ -1043,12 +1043,12 @@ const Login: React.FC = () => {
                 </div>
 
                 <div
-                  className="flex h-full w-full items-stretch"
+                  className="flex w-full items-stretch"
                   style={{ maxWidth: mapDimension, minHeight: mapDimension, width: '100%' }}
                 >
-                  <div className="h-full w-full overflow-hidden">
+                  <div className="h-full w-full overflow-hidden bg-white">
                     <ShapoWidget
-                      className="h-full w-full border-0"
+                      className="h-full w-full border-0 bg-white"
                       title="Widget de opiniones de clientes Shapo"
                     />
                   </div>
