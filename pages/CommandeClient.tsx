@@ -937,12 +937,12 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
     }
 
     return (
-        <div className="order-online-page min-h-screen flex flex-col lg:flex-row" style={orderBackgroundStyle}>
+        <div className="order-online-page min-h-screen flex flex-col lg:flex-row lg:items-start gap-6 lg:gap-10 px-4 pb-10 pt-4 lg:px-8 lg:pt-8" style={orderBackgroundStyle}>
             {/* Main Content */}
-            <div className="flex-1 p-4 lg:p-8 space-y-6">
+            <div className="flex-1 min-w-0 space-y-6">
                 {/* Active Promotions Display */}
                 <div className="px-4 pt-0 pb-4">
-                    <div className="flex items-start justify-between gap-4">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         <div className="flex-1">
                             <ActivePromotionsDisplay />
                         </div>
@@ -958,7 +958,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                 </div>
 
                 {/* Category Filters */}
-                <div className="flex space-x-3 mb-6 overflow-x-auto pb-2">
+                <div className="flex flex-wrap gap-3 mb-6 sm:flex-nowrap sm:overflow-x-auto sm:pb-2">
                     <button
                         onClick={() => setActiveCategoryId('all')}
                         className={`px-5 py-2 rounded-full text-sm font-bold transition-all ${activeCategoryId === 'all' ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg scale-105 border-2 border-orange-600' : 'bg-white text-gray-800 shadow-md hover:bg-gray-100 border-2 border-gray-300'}`}
@@ -977,19 +977,36 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                 </div>
 
                 {/* Product Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {filteredProducts.map(product => product && (
-                        <ProductCardWithPromotion
-                            key={product.id}
-                            product={product}
-                            onClick={() => handleProductClick(product)}
-                        />
-                    ))}
-                </div>
+                {loading ? (
+                    <div className="rounded-3xl border border-white/20 bg-white/15 p-6 text-center text-white shadow-lg backdrop-blur-sm">
+                        <p className="text-sm uppercase tracking-[0.25em] text-white/70">Cargando menú</p>
+                        <p className="mt-2 text-lg font-semibold text-white">Estamos preparando los productos.</p>
+                    </div>
+                ) : error ? (
+                    <div className="rounded-3xl border border-red-200/60 bg-red-50/90 p-6 text-center text-red-700 shadow-lg">
+                        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-red-500">Ups</p>
+                        <p className="mt-2 text-base font-semibold">{error}</p>
+                    </div>
+                ) : filteredProducts.length === 0 ? (
+                    <div className="rounded-3xl border border-white/20 bg-white/15 p-6 text-center text-white shadow-lg backdrop-blur-sm">
+                        <p className="text-sm uppercase tracking-[0.25em] text-white/70">Menú vacío</p>
+                        <p className="mt-2 text-lg font-semibold text-white">No hay productos disponibles en este momento.</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {filteredProducts.map(product => product && (
+                            <ProductCardWithPromotion
+                                key={product.id}
+                                product={product}
+                                onClick={() => handleProductClick(product)}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
 
             {/* Order Summary / Cart */}
-            <div className="lg:w-96 flex flex-col">
+            <div className="w-full lg:w-96 flex flex-col lg:sticky lg:top-6 self-start mt-4 lg:mt-0">
                 <div className="order-cart rounded-3xl p-4 lg:p-6 shadow-xl flex flex-col">
                     {/* Tus ultimos pedidos - Compact version in cart */}
                     {orderHistory.length > 0 && (

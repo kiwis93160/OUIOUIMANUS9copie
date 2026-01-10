@@ -19,7 +19,7 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({ pro
   return (
     <div
       onClick={() => product.estado === 'disponible' && onClick()}
-      className={`relative rounded-2xl border border-white/60 bg-white/70 backdrop-blur-md p-6 flex h-full flex-col items-center text-center transition-shadow shadow-lg ${
+      className={`relative rounded-2xl border border-white/60 bg-white/70 backdrop-blur-md p-4 flex h-full flex-col items-center text-center transition-shadow shadow-lg ${
         product.estado === 'disponible' ? 'cursor-pointer hover:shadow-xl' : 'opacity-60'
       }`}
     >
@@ -36,27 +36,28 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({ pro
       <img 
         src={product.image} 
         alt={product.nom_produit} 
-        className="w-full h-36 object-cover rounded-xl mb-4 aspect-4/3" 
+        className="w-full aspect-square object-cover rounded-xl mb-2" 
       />
       
       {/* Nom du produit */}
       <div className="flex w-full flex-1 flex-col items-center">
-        <p
-          className="font-extrabold text-gray-900 leading-snug text-[clamp(1rem,2.2vw,1.2rem)] break-words text-balance whitespace-normal [hyphens:auto] tracking-tight"
-        >
-          {product.nom_produit}
-        </p>
+        <div className="flex w-full items-baseline justify-between gap-2">
+          <p
+            className="flex-1 text-left font-extrabold text-gray-900 leading-snug text-[clamp(1.12rem,2.48vw,1.36rem)] break-words text-balance whitespace-normal [hyphens:auto] tracking-tight"
+          >
+            {product.nom_produit}
+          </p>
+          <p className="shrink-0 whitespace-nowrap text-right font-bold text-[clamp(1.28rem,2.4vw,1.52rem)] text-gray-800">
+            {formatCurrencyCOP(product.prix_vente)}
+          </p>
+        </div>
 
         {/* Description */}
-        <p className="text-sm text-gray-600 mt-2 px-1 max-h-10 overflow-hidden line-clamp-2">
+        <p className="text-sm text-left text-gray-600 mt-1 px-1 max-h-10 overflow-hidden line-clamp-2">
           {product.description}
         </p>
 
-        {/* Prix */}
-        <p className="font-bold text-lg text-gray-800 mt-2">
-          {formatCurrencyCOP(product.prix_vente)}
-        </p>
-        <div className="mt-auto w-full pt-3">
+        <div className="mt-auto w-full pt-2">
           {/* Statut */}
           {product.estado !== 'disponible' && (
             <span className="text-xs text-red-500 font-bold">Agotado</span>
