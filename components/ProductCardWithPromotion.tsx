@@ -19,7 +19,7 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({ pro
   return (
     <div
       onClick={() => product.estado === 'disponible' && onClick()}
-      className={`relative rounded-2xl border border-white/60 bg-white/70 backdrop-blur-md p-4 flex h-full flex-col items-center text-center transition-shadow shadow-lg ${
+      className={`relative rounded-2xl border border-white/60 bg-white/70 backdrop-blur-md p-3 sm:p-4 flex h-full flex-col items-center text-center transition-shadow shadow-lg ${
         product.estado === 'disponible' ? 'cursor-pointer hover:shadow-xl' : 'opacity-60'
       }`}
     >
@@ -33,27 +33,27 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({ pro
       )}
       
       {/* Image du produit */}
-      <img 
-        src={product.image} 
-        alt={product.nom_produit} 
-        className="w-full aspect-square object-cover rounded-xl mb-2" 
+      <img
+        src={product.image}
+        alt={product.nom_produit}
+        className="w-full aspect-square object-cover rounded-xl mb-2"
       />
       
       {/* Nom du produit */}
       <div className="flex w-full flex-1 flex-col items-center">
         <div className="flex w-full items-baseline justify-between gap-2">
           <p
-            className="flex-1 text-left font-extrabold text-gray-900 leading-snug text-[clamp(1.12rem,2.48vw,1.36rem)] break-words text-balance whitespace-normal [hyphens:auto] tracking-tight"
+            className="flex-1 text-left font-extrabold text-gray-900 leading-snug text-[clamp(1rem,3.4vw,1.2rem)] sm:text-[clamp(1.12rem,2.48vw,1.36rem)] break-words text-balance whitespace-normal [hyphens:auto] tracking-tight"
           >
             {product.nom_produit}
           </p>
-          <p className="shrink-0 whitespace-nowrap text-right font-bold text-[clamp(1.28rem,2.4vw,1.52rem)] text-gray-800">
+          <p className="shrink-0 whitespace-nowrap text-right font-bold text-[clamp(1.05rem,3vw,1.3rem)] sm:text-[clamp(1.28rem,2.4vw,1.52rem)] text-gray-800">
             {formatCurrencyCOP(product.prix_vente)}
           </p>
         </div>
 
         {/* Description */}
-        <p className="text-sm text-left text-gray-600 mt-1 px-1 max-h-10 overflow-hidden line-clamp-2">
+        <p className="text-xs sm:text-sm text-left text-gray-600 mt-1 px-1 max-h-10 overflow-hidden line-clamp-2">
           {product.description}
         </p>
 
@@ -65,7 +65,7 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({ pro
           {product.estado === 'disponible' && (
             <button
               onClick={(e) => { e.stopPropagation(); onClick(); }}
-              className="w-full rounded-lg bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-2 font-bold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:from-orange-600 hover:via-orange-700 hover:to-red-700"
+              className="w-full rounded-lg bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-1.5 sm:py-2 text-sm sm:text-base font-bold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:from-orange-600 hover:via-orange-700 hover:to-red-700"
             >
               Agregar
             </button>
