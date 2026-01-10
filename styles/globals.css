@@ -1483,6 +1483,9 @@ body {
   display: grid;
   gap: clamp(1.5rem, 4vw, 3rem);
   align-items: stretch;
+  width: min(960px, 100%);
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 4vw, 3rem);
 }
 
 @media (min-width: 1024px) {
@@ -1556,6 +1559,23 @@ body {
   color: #861629;
   line-height: 1.4;
   white-space: pre-line;
+}
+
+@media (max-width: 1023px) {
+  .encuentranos-panel {
+    align-items: center;
+    text-align: center;
+  }
+
+  .encuentranos-detail {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .encuentranos-detail__content {
+    align-items: center;
+  }
 }
 
 .encuentranos-map {
