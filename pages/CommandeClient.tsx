@@ -977,15 +977,32 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                 </div>
 
                 {/* Product Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {filteredProducts.map(product => product && (
-                        <ProductCardWithPromotion
-                            key={product.id}
-                            product={product}
-                            onClick={() => handleProductClick(product)}
-                        />
-                    ))}
-                </div>
+                {loading ? (
+                    <div className="rounded-3xl border border-white/20 bg-white/15 p-6 text-center text-white shadow-lg backdrop-blur-sm">
+                        <p className="text-sm uppercase tracking-[0.25em] text-white/70">Cargando menú</p>
+                        <p className="mt-2 text-lg font-semibold text-white">Estamos preparando los productos.</p>
+                    </div>
+                ) : error ? (
+                    <div className="rounded-3xl border border-red-200/60 bg-red-50/90 p-6 text-center text-red-700 shadow-lg">
+                        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-red-500">Ups</p>
+                        <p className="mt-2 text-base font-semibold">{error}</p>
+                    </div>
+                ) : filteredProducts.length === 0 ? (
+                    <div className="rounded-3xl border border-white/20 bg-white/15 p-6 text-center text-white shadow-lg backdrop-blur-sm">
+                        <p className="text-sm uppercase tracking-[0.25em] text-white/70">Menú vacío</p>
+                        <p className="mt-2 text-lg font-semibold text-white">No hay productos disponibles en este momento.</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {filteredProducts.map(product => product && (
+                            <ProductCardWithPromotion
+                                key={product.id}
+                                product={product}
+                                onClick={() => handleProductClick(product)}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
 
             {/* Order Summary / Cart */}
