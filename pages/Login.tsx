@@ -219,6 +219,7 @@ const Login: React.FC = () => {
   );
 
   const mapDimension = 'clamp(260px, 32vw, 420px)';
+  const widgetDimension = 'clamp(360px, 40vw, 560px)';
 
   const brandLogo = navigation.brandLogo ?? DEFAULT_BRAND_LOGO;
   const staffTriggerLogo = navigation.brandLogo ?? DEFAULT_BRAND_LOGO;
