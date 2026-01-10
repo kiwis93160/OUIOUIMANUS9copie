@@ -2205,7 +2205,7 @@ export const api = {
 
   updateProduct: async (
     productId: string,
-    updates: Partial<Omit<Product, 'id' | 'image'>>,
+    updates: Partial<Omit<Product, 'id'>>,
     imageFile?: File,
   ): Promise<Product> => {
     let imageUrl: string | undefined | null = undefined;
@@ -2219,8 +2219,12 @@ export const api = {
           }
           return response.data?.path;
         });
-    } else if ('image' in updates && updates.image === null) {
-      imageUrl = null; // Explicitly remove image
+    } else if ('image' in updates) {
+      if (updates.image === null) {
+        imageUrl = null; // Explicitly remove image
+      } else if (typeof updates.image === 'string') {
+        imageUrl = normalizeCloudinaryImageUrl(updates.image);
+      }
     }
 
     let payload: Record<string, unknown> = {};
