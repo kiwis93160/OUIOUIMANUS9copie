@@ -801,11 +801,13 @@ body {
 /* Header ultra-compact - 50% plus petit + NON FIXE */
 .login-header {
   position: relative !important;
-  padding-block: clamp(0.4rem, 0.8vw, 0.56rem) !important;
+  margin-block: 0 !important;
+  padding-block: 0 !important;
 }
 
 .login-header__inner {
-  padding-block: clamp(0.32rem, 0.6vw, 0.48rem) !important;
+  margin-block: 0 !important;
+  padding-block: 0 !important;
   padding-inline: clamp(1rem, 3vw, 2rem);
 }
 
