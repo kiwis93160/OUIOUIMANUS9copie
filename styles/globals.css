@@ -801,7 +801,7 @@ body {
 /* Header ultra-compact - 50% plus petit + NON FIXE */
 .login-header {
   position: relative !important;
-  margin-block: 0 !important;
+  margin-block: 5px !important;
   padding-block: 0 !important;
 }
 
