@@ -799,11 +799,11 @@ body {
 /* Header ultra-compact - 50% plus petit + NON FIXE */
 .login-header {
   position: relative !important;
-  padding-block: clamp(0.5rem, 1vw, 0.7rem) !important;
+  padding-block: clamp(0.4rem, 0.8vw, 0.56rem) !important;
 }
 
 .login-header__inner {
-  padding-block: clamp(0.4rem, 0.75vw, 0.6rem) !important;
+  padding-block: clamp(0.32rem, 0.6vw, 0.48rem) !important;
   padding-inline: clamp(1rem, 3vw, 2rem);
 }
 
@@ -813,20 +813,20 @@ body {
 }
 
 .login-brand__logo {
-  height: clamp(2.5rem, 4vw, 3rem);
+  height: clamp(2rem, 3.2vw, 2.4rem);
   width: auto;
   margin: 0 !important;
 }
 
 .login-brand__name {
-  font-size: clamp(1.5rem, 2.8vw, 2rem);
+  font-size: clamp(1.2rem, 2.24vw, 1.6rem);
   line-height: 1;
   margin: 0 !important;
 }
 
 .login-nav__link {
-  font-size: clamp(0.9rem, 1.8vw, 1rem);
-  padding: clamp(0.3rem, 0.5vw, 0.4rem) clamp(0.6rem, 1vw, 0.8rem);
+  font-size: clamp(0.72rem, 1.44vw, 0.8rem);
+  padding: clamp(0.24rem, 0.4vw, 0.32rem) clamp(0.48rem, 0.8vw, 0.64rem);
 }
 
 .section-surface {
