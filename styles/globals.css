@@ -115,7 +115,7 @@ body {
 
 .section-hero {
   position: relative;
-  min-height: min(85vh, 700px);
+  min-height: min(72.25vh, 595px);
   display: flex;
   flex-direction: column;
   justify-content: center;
