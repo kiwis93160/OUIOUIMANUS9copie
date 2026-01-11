@@ -540,14 +540,14 @@ body {
   left: 0;
   z-index: 1;
   width: 100%;
-  max-width: 1200px;
-  padding: 0 clamp(1rem, 5vw, 2.5rem);
+  max-width: none;
+  padding-inline: 0;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: clamp(1rem, 2.5vw, 1.5rem);
-  margin-inline: auto;
+  margin-inline: 0;
 }
 
 .hero-header {
