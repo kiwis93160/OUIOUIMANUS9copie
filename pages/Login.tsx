@@ -676,15 +676,26 @@ const Login: React.FC = () => {
           ) : (
             <div className="hero-content" style={heroTextStyle}>
               <div className="hero-header">
-                {renderRichTextElement(
-                  'hero.title',
-                  'h2',
-                  {
-                    className: 'hero-title',
-                    style: getElementTextStyle('hero.title'),
-                  },
-                  hero.title,
-                )}
+                <div className="hero-header__text">
+                  {renderRichTextElement(
+                    'hero.title',
+                    'h2',
+                    {
+                      className: 'hero-title',
+                      style: getElementTextStyle('hero.title'),
+                    },
+                    hero.title,
+                  )}
+                  {renderRichTextElement(
+                    'hero.subtitle',
+                    'p',
+                    {
+                      className: 'hero-subtitle',
+                      style: getElementBodyTextStyle('hero.subtitle'),
+                    },
+                    hero.subtitle,
+                  )}
+                </div>
                 <div className="hero-header__cta">
                   <button
                     onClick={handleHeroCtaClick}
@@ -778,15 +789,6 @@ const Login: React.FC = () => {
                     </div>
                   </div>
                 </div>
-              )}
-              {renderRichTextElement(
-                'hero.subtitle',
-                'p',
-                {
-                  className: 'hero-subtitle',
-                  style: getElementBodyTextStyle('hero.subtitle'),
-                },
-                hero.subtitle,
               )}
             </div>
           )}
