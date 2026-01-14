@@ -604,6 +604,7 @@ body {
   line-height: 0.75;
   font-weight: 500;
   text-align: left;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
 .hero-subtitle strong:has(br:only-child) {
