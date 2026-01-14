@@ -688,7 +688,7 @@ body {
 .hero-history {
   width: 100%;
   max-width: 520px;
-  margin-top: clamp(0.75rem, 2vw, 1.25rem);
+  margin-top: 0;
   padding: clamp(0.75rem, 2.5vw, 1.35rem);
   border-radius: 1.25rem;
   border: 1px solid rgba(148, 163, 184, 0.35);
