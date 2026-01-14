@@ -548,7 +548,7 @@ body {
   grid-template-areas:
     'header header'
     'availability availability'
-    'history subtitle';
+    'history history';
   align-content: space-between;
   align-items: start;
   gap: clamp(1rem, 2.5vw, 1.5rem);
@@ -563,6 +563,13 @@ body {
   justify-content: space-between;
   gap: clamp(1rem, 2vw, 1.5rem);
   grid-area: header;
+}
+
+.hero-header__text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(0.5rem, 1.5vw, 1rem);
 }
 
 .hero-header__cta {
@@ -596,9 +603,7 @@ body {
   margin: 0;
   line-height: 1.5;
   font-weight: 500;
-  grid-area: subtitle;
-  justify-self: end;
-  text-align: right;
+  text-align: left;
 }
 
 .hero-cta {
