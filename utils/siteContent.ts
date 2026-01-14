@@ -534,7 +534,13 @@ const DEFAULT_SITE_ASSETS: SiteAssets = {
 };
 
 const DEFAULT_ELEMENT_STYLES: ElementStyles = {};
-const DEFAULT_ELEMENT_RICH_TEXT: ElementRichText = {};
+const DEFAULT_ELEMENT_RICH_TEXT: ElementRichText = {
+  'hero.subtitle': {
+    html: '<div><strong style="color: rgb(229,138,11)">Una comida muy famosa en Francia, preparada con elegancia para deleitar tu paladar. Ven a probar los deliciosos OUI y viaja a Paris con un solo bocado!</strong></div>',
+    plainText:
+      'Una comida muy famosa en Francia, preparada con elegancia para deleitar tu paladar. Ven a probar los deliciosos OUI y viaja a Paris con un solo bocado!',
+  },
+};
 
 const resolveSectionStyle = (style: Partial<SectionStyle> | undefined, fallback: SectionStyle): SectionStyle => {
   const backgroundType = style?.background?.type === 'image' ? 'image' : 'color';
@@ -590,7 +596,7 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
   hero: {
     title: 'Le Goût Authentique du Mexique',
     subtitle:
-      "Des tacos préparés avec passion, des ingrédients frais et une touche de tradition pour un voyage gustatif inoubliable.",
+      'Una comida muy famosa en Francia, preparada con elegancia para deleitar tu paladar. Ven a probar los deliciosos OUI y viaja a Paris con un solo bocado!',
     ctaLabel: 'Commander en ligne',
     backgroundImage: null,
     historyTitle: 'Vos dernières commandes',
