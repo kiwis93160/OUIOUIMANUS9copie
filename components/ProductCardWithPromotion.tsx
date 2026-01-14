@@ -43,11 +43,11 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({ pro
       <div className="flex w-full flex-1 flex-col items-center">
         <div className="flex w-full items-baseline justify-between gap-2">
           <p
-            className="flex-1 text-left font-extrabold text-gray-900 leading-snug text-[clamp(1.12rem,2.48vw,1.36rem)] break-words text-balance whitespace-normal [hyphens:auto] tracking-tight"
+            className="flex-1 text-left font-extrabold text-gray-900 leading-snug text-[clamp(0.92rem,2vw,1.12rem)] break-words text-balance whitespace-normal [hyphens:auto] tracking-tight"
           >
             {product.nom_produit}
           </p>
-          <p className="shrink-0 whitespace-nowrap text-right font-bold text-[clamp(1.28rem,2.4vw,1.52rem)] text-gray-800">
+          <p className="shrink-0 whitespace-nowrap text-right font-bold text-[clamp(1.03rem,1.9vw,1.22rem)] text-gray-800">
             {formatCurrencyCOP(product.prix_vente)}
           </p>
         </div>
