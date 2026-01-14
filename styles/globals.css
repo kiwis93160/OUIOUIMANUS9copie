@@ -542,20 +542,27 @@ body {
   width: 100%;
   max-width: none;
   padding: 30px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  text-align: left;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  grid-template-areas:
+    'header header'
+    'availability availability'
+    'history subtitle';
+  align-content: space-between;
+  align-items: start;
   gap: clamp(1rem, 2.5vw, 1.5rem);
   margin-inline: 30px;
+  min-height: 100%;
 }
 
 .hero-header {
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   gap: clamp(1rem, 2vw, 1.5rem);
+  grid-area: header;
 }
 
 .hero-header__cta {
@@ -589,6 +596,9 @@ body {
   margin: 0;
   line-height: 1.5;
   font-weight: 500;
+  grid-area: subtitle;
+  justify-self: end;
+  text-align: right;
 }
 
 .hero-cta {
@@ -636,6 +646,8 @@ body {
   align-items: center;
   box-shadow: 0 8px 25px rgba(2, 6, 23, 0.5);
   backdrop-filter: blur(12px);
+  grid-area: availability;
+  justify-self: center;
 }
 
 .hero-availability__icon {
@@ -697,6 +709,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
+  grid-area: history;
+  justify-self: start;
 }
 
 .hero-history__title {
@@ -783,6 +797,13 @@ body {
 }
 
 @media (max-width: 768px) {
+  .hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
   .hero-header {
     flex-direction: column;
     align-items: center;
@@ -796,6 +817,11 @@ body {
   .hero-history {
     width: 100%;
     max-width: 100%;
+  }
+
+  .hero-subtitle {
+    justify-self: center;
+    text-align: center;
   }
 }
 
