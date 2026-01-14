@@ -541,7 +541,7 @@ body {
   z-index: 1;
   width: 100%;
   max-width: none;
-  padding-inline: 0;
+  padding: 30px;
   text-align: center;
   display: flex;
   flex-direction: column;
