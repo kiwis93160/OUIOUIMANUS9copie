@@ -606,6 +606,11 @@ body {
   text-align: left;
 }
 
+.hero-subtitle strong:has(br:only-child) {
+  display: block;
+  line-height: 0.75;
+}
+
 .hero-cta {
   font-size: clamp(1.1rem, 2.5vw, 1.4rem);
   font-weight: 800;
