@@ -1729,6 +1729,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 1.25rem;
+  padding-inline: 0;
 }
 
 .login-brand {
