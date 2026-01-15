@@ -138,7 +138,14 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
   const handleWhatsAppClick = () => {
     const message = generateWhatsAppMessage();
     const whatsappUrl = buildWhatsAppUrl(whatsappNumber, message);
-    window.open(whatsappUrl, '_blank');
+    const landingUrl = `${window.location.origin}/`;
+    const whatsappWindow = window.open(whatsappUrl, '_blank', 'noopener');
+
+    if (whatsappWindow) {
+      setTimeout(() => {
+        whatsappWindow.location.href = landingUrl;
+      }, 1200);
+    }
 
     // Redirect customer to the public home page where the tracker is displayed
     navigate('/', { replace: true });
