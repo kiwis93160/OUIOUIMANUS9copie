@@ -264,10 +264,11 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
     fallback: string,
   ) => {
     const html = getRichTextHtml(key);
-    if (html) {
+    const normalizedHtml = key === 'hero.title' && html ? html.replace(/<br\s*\/?>/gi, ' ') : html;
+    if (normalizedHtml) {
       return React.createElement(Component, {
         ...props,
-        dangerouslySetInnerHTML: { __html: html },
+        dangerouslySetInnerHTML: { __html: normalizedHtml },
       });
     }
     return React.createElement(Component, props, fallback);
