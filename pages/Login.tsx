@@ -433,9 +433,9 @@ const Login: React.FC = () => {
       : 'about:blank';
   const hasMapLocation = hasCustomMapUrl || encodedFindUsQuery.length > 0;
   const findUsMapTitle = findUsMapQuery.length > 0 ? findUsMapQuery : findUs.title;
-  const whatsappTestNumber = '0681161642';
-  const whatsappInternationalNumber = `33${whatsappTestNumber.replace(/^0/, '')}`;
-  const whatsappUrl = `https://wa.me/${whatsappInternationalNumber}`;
+  const contactValue = findUs.city?.trim() ?? '';
+  const whatsappNumber = contactValue.replace(/\D/g, '');
+  const whatsappUrl = whatsappNumber.length >= 8 ? `https://wa.me/${whatsappNumber}` : '';
   const activeOrderId = activeOrder?.orderId ?? null;
   const bestSellersToDisplay = bestSellers.slice(0, 4);
   const featuredProduct = bestSellersToDisplay[0];
@@ -930,7 +930,7 @@ const Login: React.FC = () => {
                   className="flex w-full flex-col gap-6"
                   style={{ maxWidth: mapDimension, minHeight: mapDimension, width: '100%' }}
                 >
-                  <div className="space-y-4">
+                  <div className="space-y-4 text-center">
                     {renderRichTextElement(
                       'findUs.addressLabel',
                       'h3',
@@ -951,7 +951,7 @@ const Login: React.FC = () => {
                     )}
                   </div>
 
-                  <div className="space-y-4">
+                  <div className="space-y-4 text-center">
                     {renderRichTextElement(
                       'findUs.hoursLabel',
                       'h3',
@@ -972,7 +972,7 @@ const Login: React.FC = () => {
                     )}
                   </div>
 
-                  <div className="space-y-4">
+                  <div className="space-y-4 text-center">
                     {renderRichTextElement(
                       'findUs.cityLabel',
                       'h3',
@@ -984,18 +984,26 @@ const Login: React.FC = () => {
                     )}
                     <div className="flex flex-col items-center gap-3 text-base font-medium text-gray-700 text-center" style={findUsBodyTextStyle}>
                       <div className="flex items-center gap-3">
-                        <span className="inline-flex items-center gap-2 text-base font-semibold text-gray-900">
-                          {whatsappTestNumber}
-                        </span>
-                        <a
-                          href={whatsappUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-green-500 text-white transition hover:bg-green-600"
-                          aria-label="Escríbenos por WhatsApp"
-                        >
-                          <MessageCircle className="h-4 w-4" />
-                        </a>
+                        {renderRichTextElement(
+                          'findUs.city',
+                          'span',
+                          {
+                            className: 'inline-flex items-center gap-2 text-base font-semibold text-gray-900',
+                            style: getElementBodyTextStyle('findUs.city'),
+                          },
+                          contactValue,
+                        )}
+                        {whatsappUrl ? (
+                          <a
+                            href={whatsappUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-green-500 text-white transition hover:bg-green-600"
+                            aria-label="Escríbenos por WhatsApp"
+                          >
+                            <MessageCircle className="h-4 w-4" />
+                          </a>
+                        ) : null}
                       </div>
                     </div>
                   </div>
