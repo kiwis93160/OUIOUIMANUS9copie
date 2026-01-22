@@ -431,6 +431,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
     const [isFreeShipping, setIsFreeShipping] = useState<boolean>(false);
     const [now, setNow] = useState(() => new Date());
     const cartUpdateTimeouts = useRef<Map<string, NodeJS.Timeout>>(new Map());
+    const cartSectionRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
         if (typeof window === 'undefined') {
@@ -603,6 +604,10 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
         });
         return groups;
     }, [sortedCartItems, productCategoryMap]);
+    const cartItemCount = useMemo(
+        () => cart.reduce((acc, item) => acc + item.quantite, 0),
+        [cart],
+    );
 
     const [orderTotals, setOrderTotals] = useState({
         subtotal: 0,
@@ -812,6 +817,12 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
         setPromoCode('');
         setPromoCodeError('');
     };
+    const handleScrollToCart = useCallback(() => {
+        if (!cartSectionRef.current) {
+            return;
+        }
+        cartSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, []);
 
     const handleSubmitOrder = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -938,6 +949,22 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
 
     return (
         <div className="order-online-page min-h-screen flex flex-col lg:flex-row lg:items-start gap-6 lg:gap-10 px-4 pb-10 pt-4 lg:px-8 lg:pt-8" style={orderBackgroundStyle}>
+            <button
+                type="button"
+                onClick={handleScrollToCart}
+                className="fixed right-4 top-4 z-50 inline-flex items-center gap-2 rounded-full border border-orange-200/70 bg-white/95 px-4 py-2 text-sm font-semibold text-orange-700 shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
+                aria-label="Ir al carrito"
+            >
+                <span className="relative flex items-center">
+                    <ShoppingCart size={18} />
+                    {cartItemCount > 0 && (
+                        <span className="absolute -right-2.5 -top-2.5 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-red-500 px-1 text-xs font-bold text-white shadow">
+                            {cartItemCount}
+                        </span>
+                    )}
+                </span>
+                <span>Carrito</span>
+            </button>
             {/* Main Content */}
             <div className="flex-1 min-w-0 space-y-6">
                 {/* Active Promotions Display */}
@@ -1006,7 +1033,11 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
             </div>
 
             {/* Order Summary / Cart */}
-            <div className="w-full lg:w-96 flex flex-col lg:sticky lg:top-6 self-start mt-4 lg:mt-0">
+            <div
+                ref={cartSectionRef}
+                id="order-cart-section"
+                className="w-full lg:w-96 flex flex-col lg:sticky lg:top-6 self-start mt-4 lg:mt-0"
+            >
                 <div className="order-cart rounded-3xl p-4 lg:p-6 shadow-xl flex flex-col">
                     {/* Tus ultimos pedidos - Compact version in cart */}
                     {orderHistory.length > 0 && (
