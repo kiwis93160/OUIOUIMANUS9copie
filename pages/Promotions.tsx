@@ -326,8 +326,11 @@ const Promotions: React.FC = () => {
                   </td>
                 </tr>
               ) : (
-                filteredPromotions.map((promotion) => (
-                  <tr key={promotion.id} className="block md:table-row border border-gray-200 md:border-x-0 md:border-t-0 rounded-lg md:rounded-none mb-3 md:mb-0 p-3 md:p-0 hover:bg-gray-50 md:hover:bg-gray-50/80 transition-colors">
+                filteredPromotions.map((promotion, index) => (
+                  <tr
+                    key={promotion.id}
+                    className={`block md:table-row border border-gray-200 md:border-x-0 md:border-t-0 rounded-lg md:rounded-none mb-3 md:mb-0 p-3 md:p-0 transition-colors ${index % 2 === 1 ? 'bg-slate-50/60 md:bg-slate-50/40' : 'bg-white'} hover:bg-gray-50 md:hover:bg-gray-50/80`}
+                  >
                     <td className="px-0 md:px-4 py-2 md:py-4 align-top">
                       <div className="md:hidden text-xs uppercase tracking-wide text-gray-500 mb-1">Nombre</div>
                       <div className="font-semibold text-gray-900">{promotion.name}</div>
@@ -370,31 +373,31 @@ const Promotions: React.FC = () => {
                       <div className="flex justify-start md:justify-end gap-2">
                         <button
                           onClick={() => handleToggleStatus(promotion)}
-                          className="p-1.5 rounded-md hover:bg-gray-100 border border-transparent hover:border-gray-200"
+                          className={`h-9 min-w-[70px] px-3 rounded-full border text-xs font-semibold tracking-wide transition-colors ${promotion.status === 'active' ? 'bg-emerald-100 text-emerald-700 border-emerald-300 hover:bg-emerald-200' : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200'}`}
                           title={promotion.status === 'active' ? 'Desactivar' : 'Activar'}
                         >
-                          {promotion.status === 'active' ? <EyeOff size={18} /> : <Eye size={18} />}
+                          {promotion.status === 'active' ? 'ON' : 'OFF'}
                         </button>
                         <button
                           onClick={() => handleViewPromotion(promotion)}
-                          className="p-1.5 rounded-md hover:bg-gray-100 border border-transparent hover:border-gray-200"
+                          className="p-2.5 rounded-md hover:bg-gray-100 border border-transparent hover:border-gray-200"
                           title="Ver detalles"
                         >
-                          <Eye size={18} />
+                          <Eye size={20} />
                         </button>
                         <button
                           onClick={() => handleEditPromotion(promotion)}
-                          className="p-1.5 rounded-md hover:bg-gray-100 border border-transparent hover:border-gray-200"
+                          className="p-2.5 rounded-md hover:bg-gray-100 border border-transparent hover:border-gray-200"
                           title="Editar"
                         >
-                          <Edit size={18} />
+                          <Edit size={20} />
                         </button>
                         <button
                           onClick={() => handleDeletePromotion(promotion)}
-                          className="p-1.5 rounded-md hover:bg-red-50 border border-transparent hover:border-red-100 text-red-500"
+                          className="p-2.5 rounded-md hover:bg-red-50 border border-transparent hover:border-red-100 text-red-500"
                           title="Eliminar"
                         >
-                          <Trash2 size={18} />
+                          <Trash2 size={20} />
                         </button>
                       </div>
                     </td>
