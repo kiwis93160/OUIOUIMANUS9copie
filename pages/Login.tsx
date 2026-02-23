@@ -927,10 +927,10 @@ const Login: React.FC = () => {
                 className="mx-auto mt-10 grid w-full max-w-6xl grid-cols-1 gap-8 lg:grid-cols-3 lg:items-start lg:[grid-template-columns:1fr_1.25fr_1fr]"
               >
                 <div
-                  className="flex w-full flex-col gap-6"
+                  className="flex w-full flex-col gap-6 max-lg:items-center max-lg:text-center"
                   style={{ maxWidth: mapDimension, minHeight: mapDimension, width: '100%' }}
                 >
-                  <div className="space-y-4 text-center">
+                  <div className="space-y-4 text-center max-lg:mx-auto max-lg:flex max-lg:w-full max-lg:flex-col max-lg:items-center">
                     {renderRichTextElement(
                       'findUs.addressLabel',
                       'h3',
@@ -951,7 +951,7 @@ const Login: React.FC = () => {
                     )}
                   </div>
 
-                  <div className="space-y-4 text-center">
+                  <div className="space-y-4 text-center max-lg:mx-auto max-lg:flex max-lg:w-full max-lg:flex-col max-lg:items-center">
                     {renderRichTextElement(
                       'findUs.hoursLabel',
                       'h3',
@@ -972,7 +972,7 @@ const Login: React.FC = () => {
                     )}
                   </div>
 
-                  <div className="space-y-4 text-center">
+                  <div className="space-y-4 text-center max-lg:mx-auto max-lg:flex max-lg:w-full max-lg:flex-col max-lg:items-center">
                     {renderRichTextElement(
                       'findUs.cityLabel',
                       'h3',
@@ -983,7 +983,7 @@ const Login: React.FC = () => {
                       findUs.cityLabel,
                     )}
                     <div className="flex flex-col items-center gap-3 text-base font-medium text-gray-700 text-center" style={findUsBodyTextStyle}>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center gap-3 text-center max-lg:w-full">
                         {renderRichTextElement(
                           'findUs.city',
                           'span',
