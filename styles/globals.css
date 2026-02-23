@@ -1631,6 +1631,20 @@ body {
 }
 
 @media (max-width: 1023px) {
+  .section-encuentranos,
+  .section-encuentranos * {
+    text-align: center !important;
+  }
+
+  .section-encuentranos .encuentranos-grid,
+  .section-encuentranos .encuentranos-panel,
+  .section-encuentranos .encuentranos-details,
+  .section-encuentranos .encuentranos-detail,
+  .section-encuentranos .encuentranos-detail__content {
+    justify-items: center;
+    align-items: center !important;
+  }
+
   .encuentranos-panel {
     align-items: center;
     text-align: center;
