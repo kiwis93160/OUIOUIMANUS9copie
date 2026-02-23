@@ -924,10 +924,10 @@ const Login: React.FC = () => {
             )}
 
               <div
-                className="mx-auto mt-10 grid w-full max-w-6xl grid-cols-1 gap-8 lg:grid-cols-3 lg:items-start lg:[grid-template-columns:1fr_1.25fr_1fr]"
+                className="mx-auto mt-10 grid w-full max-w-6xl grid-cols-1 gap-8 max-lg:justify-items-center lg:grid-cols-3 lg:items-start lg:[grid-template-columns:1fr_1.25fr_1fr]"
               >
                 <div
-                  className="flex w-full flex-col gap-6 max-lg:items-center max-lg:text-center"
+                  className="mx-auto flex w-full flex-col gap-6 max-lg:items-center max-lg:text-center"
                   style={{ maxWidth: mapDimension, minHeight: mapDimension, width: '100%' }}
                 >
                   <div className="space-y-4 text-center max-lg:mx-auto max-lg:flex max-lg:w-full max-lg:flex-col max-lg:items-center">
