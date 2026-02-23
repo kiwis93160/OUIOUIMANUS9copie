@@ -267,13 +267,12 @@ const Promotions: React.FC = () => {
         </div>
       )}
 
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-
-        <div className="responsive-table">
-          <table className="w-full">
-            <thead>
+      <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 mb-6">
+        <div className="responsive-table promotions-table-wrapper">
+          <table className="w-full text-sm sm:text-base promotions-table">
+            <thead className="hidden md:table-header-group">
               <tr className="bg-gray-50 border-b">
-                <th className="px-4 py-3 text-left">
+                <th className="px-4 py-3 text-left text-xs uppercase tracking-wide text-gray-500">
                   <button 
                     className="flex items-center gap-1 font-semibold text-gray-700"
                     onClick={() => handleSort('name')}
@@ -281,9 +280,9 @@ const Promotions: React.FC = () => {
                     Nombre {renderSortIcon('name')}
                   </button>
                 </th>
-                <th className="px-4 py-3 text-left">Tipo</th>
-                <th className="px-4 py-3 text-left">Estado</th>
-                <th className="px-4 py-3 text-left">
+                <th className="px-4 py-3 text-left text-xs uppercase tracking-wide text-gray-500">Tipo</th>
+                <th className="px-4 py-3 text-left text-xs uppercase tracking-wide text-gray-500">Estado</th>
+                <th className="px-4 py-3 text-left text-xs uppercase tracking-wide text-gray-500">
                   <button
                     className="flex items-center gap-1 font-semibold text-gray-700"
                     onClick={() => handleSort('priority')}
@@ -291,7 +290,7 @@ const Promotions: React.FC = () => {
                     Prioridad {renderSortIcon('priority')}
                   </button>
                 </th>
-                <th className="px-4 py-3 text-left">
+                <th className="px-4 py-3 text-left text-xs uppercase tracking-wide text-gray-500">
                   <button
                     className="flex items-center gap-1 font-semibold text-gray-700"
                     onClick={() => handleSort('period')}
@@ -299,7 +298,7 @@ const Promotions: React.FC = () => {
                     Periodo {renderSortIcon('period')}
                   </button>
                 </th>
-                <th className="px-4 py-3 text-left">
+                <th className="px-4 py-3 text-left text-xs uppercase tracking-wide text-gray-500">
                   <button
                     className="flex items-center gap-1 font-semibold text-gray-700"
                     onClick={() => handleSort('usage_count')}
@@ -307,7 +306,7 @@ const Promotions: React.FC = () => {
                     Usos {renderSortIcon('usage_count')}
                   </button>
                 </th>
-                <th className="px-4 py-3 text-right">Acciones</th>
+                <th className="px-4 py-3 text-right text-xs uppercase tracking-wide text-gray-500">Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -328,60 +327,71 @@ const Promotions: React.FC = () => {
                 </tr>
               ) : (
                 filteredPromotions.map((promotion) => (
-                  <tr key={promotion.id} className="border-b hover:bg-gray-50">
-                    <td className="px-4 py-4">
-                      <div className="font-medium">{promotion.name}</div>
+                  <tr key={promotion.id} className="block md:table-row border border-gray-200 md:border-x-0 md:border-t-0 rounded-lg md:rounded-none mb-3 md:mb-0 p-3 md:p-0 hover:bg-gray-50 md:hover:bg-gray-50/80 transition-colors">
+                    <td className="px-0 md:px-4 py-2 md:py-4 align-top">
+                      <div className="md:hidden text-xs uppercase tracking-wide text-gray-500 mb-1">Nombre</div>
+                      <div className="font-semibold text-gray-900">{promotion.name}</div>
                       {promotion.type === 'promo_code' && promotion.conditions.promo_code && (
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-gray-500 mt-1">
                           Code: <span className="font-mono bg-gray-100 px-1 rounded">{promotion.conditions.promo_code}</span>
                         </div>
                       )}
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="px-0 md:px-4 py-2 md:py-4 align-top">
+                      <div className="md:hidden text-xs uppercase tracking-wide text-gray-500 mb-1">Tipo</div>
                       <div className="flex items-center gap-1.5">
                         {typeIcons[promotion.type]}
                         <span>{typeLabels[promotion.type]}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="px-0 md:px-4 py-2 md:py-4 align-top">
+                      <div className="md:hidden text-xs uppercase tracking-wide text-gray-500 mb-1">Estado</div>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[promotion.status]}`}>
                         {statusLabels[promotion.status]}
                       </span>
                     </td>
-                    <td className="px-4 py-4">{promotion.priority}</td>
-                    <td className="px-4 py-4">
+                    <td className="px-0 md:px-4 py-2 md:py-4 align-top">
+                      <div className="md:hidden text-xs uppercase tracking-wide text-gray-500 mb-1">Prioridad</div>
+                      <span className="font-medium text-gray-800">{promotion.priority}</span>
+                    </td>
+                    <td className="px-0 md:px-4 py-2 md:py-4 align-top">
+                      <div className="md:hidden text-xs uppercase tracking-wide text-gray-500 mb-1">Periodo</div>
                       <div className="text-sm text-gray-700">
                         <div className="font-medium">{formatPeriod(promotion)}</div>
                         <div className="text-xs text-gray-500">Creada el {formatDate(promotion.created_at)}</div>
                       </div>
                     </td>
-                    <td className="px-4 py-4">{promotion.usage_count}</td>
-                    <td className="px-4 py-4 text-right">
-                      <div className="flex justify-end gap-2">
+                    <td className="px-0 md:px-4 py-2 md:py-4 align-top">
+                      <div className="md:hidden text-xs uppercase tracking-wide text-gray-500 mb-1">Usos</div>
+                      <span className="font-medium">{promotion.usage_count}</span>
+                    </td>
+                    <td className="px-0 md:px-4 pt-3 pb-1 md:py-4 text-left md:text-right align-top">
+                      <div className="md:hidden text-xs uppercase tracking-wide text-gray-500 mb-2">Acciones</div>
+                      <div className="flex justify-start md:justify-end gap-2">
                         <button
                           onClick={() => handleToggleStatus(promotion)}
-                          className="p-1.5 rounded-md hover:bg-gray-100"
+                          className="p-1.5 rounded-md hover:bg-gray-100 border border-transparent hover:border-gray-200"
                           title={promotion.status === 'active' ? 'Desactivar' : 'Activar'}
                         >
                           {promotion.status === 'active' ? <EyeOff size={18} /> : <Eye size={18} />}
                         </button>
                         <button
                           onClick={() => handleViewPromotion(promotion)}
-                          className="p-1.5 rounded-md hover:bg-gray-100"
+                          className="p-1.5 rounded-md hover:bg-gray-100 border border-transparent hover:border-gray-200"
                           title="Ver detalles"
                         >
                           <Eye size={18} />
                         </button>
                         <button
                           onClick={() => handleEditPromotion(promotion)}
-                          className="p-1.5 rounded-md hover:bg-gray-100"
+                          className="p-1.5 rounded-md hover:bg-gray-100 border border-transparent hover:border-gray-200"
                           title="Editar"
                         >
                           <Edit size={18} />
                         </button>
                         <button
                           onClick={() => handleDeletePromotion(promotion)}
-                          className="p-1.5 rounded-md hover:bg-gray-100 text-red-500"
+                          className="p-1.5 rounded-md hover:bg-red-50 border border-transparent hover:border-red-100 text-red-500"
                           title="Eliminar"
                         >
                           <Trash2 size={18} />
