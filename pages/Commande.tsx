@@ -341,12 +341,47 @@ const Commande: React.FC = () => {
     }, [order]);
 
     const filteredProducts = useMemo(() => {
+        const normalizeCategoryName = (value: string) => value
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .trim();
+
+        const categoryPriorityKeywords: Array<{ priority: number; keywords: string[] }> = [
+            { priority: 0, keywords: ['entrada', 'entradas'] },
+            { priority: 1, keywords: ['plato principal', 'platos principales', 'main', 'principale', 'principal'] },
+            { priority: 2, keywords: ['postre', 'postres', 'dessert', 'desserts'] },
+            { priority: 3, keywords: ['bebida', 'bebidas', 'drink', 'boisson'] },
+        ];
+
+        const categoryPriorityById = new Map(
+            categories.map(category => {
+                const normalizedName = normalizeCategoryName(category.nom);
+                const match = categoryPriorityKeywords.find(({ keywords }) =>
+                    keywords.some(keyword => normalizedName.includes(keyword))
+                );
+
+                return [category.id, match?.priority ?? Number.MAX_SAFE_INTEGER] as const;
+            })
+        );
+
+        const sortedProducts = [...products].sort((productA, productB) => {
+            const priorityA = categoryPriorityById.get(productA.categoria_id) ?? Number.MAX_SAFE_INTEGER;
+            const priorityB = categoryPriorityById.get(productB.categoria_id) ?? Number.MAX_SAFE_INTEGER;
+
+            if (priorityA !== priorityB) {
+                return priorityA - priorityB;
+            }
+
+            return productA.nom_produit.localeCompare(productB.nom_produit, 'es', { sensitivity: 'base' });
+        });
+
         if (activeCategoryId === 'all') {
-            return products;
+            return sortedProducts;
         }
 
-        return products.filter(product => product.categoria_id === activeCategoryId);
-    }, [activeCategoryId, products]);
+        return sortedProducts.filter(product => product.categoria_id === activeCategoryId);
+    }, [activeCategoryId, categories, products]);
 
     const productStockStatuses = useMemo<ProductStockStatusMap>(() => {
         if (products.length === 0) {
