@@ -2808,6 +2808,39 @@ video {
   opacity: 1;
 }
 
+
+.promotions-table-wrapper {
+  border: 1px solid color-mix(in srgb, var(--color-border) 75%, #e2e8f0 25%);
+  border-radius: 0.9rem;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.promotions-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+@media (max-width: 767px) {
+  .promotions-table {
+    min-width: 100%;
+  }
+
+  .promotions-table tbody {
+    display: grid;
+    gap: 0.75rem;
+    padding: 0.5rem;
+  }
+
+  .promotions-table tbody tr {
+    display: block;
+  }
+
+  .promotions-table tbody td {
+    display: block;
+    width: 100%;
+  }
+}
+
 .app-sidebar {
   background: var(--color-surface);
   color: var(--color-text);
