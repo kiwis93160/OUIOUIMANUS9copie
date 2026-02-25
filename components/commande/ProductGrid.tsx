@@ -138,7 +138,7 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
                         <button
                             type="button"
                             onClick={onNavigateToPlan}
-                            className="inline-flex items-center gap-2 rounded-full border border-brand-primary bg-white px-4 py-2 text-sm font-semibold text-brand-primary shadow-sm transition hover:bg-brand-primary hover:text-brand-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+                            className="inline-flex items-center gap-2 rounded-full border border-brand-primary bg-white px-4 py-2 text-sm font-semibold text-black shadow-sm transition hover:bg-brand-primary hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
                             title="Plan de salle"
                         >
                             <LayoutDashboard size={16} />
