@@ -644,7 +644,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
         )
         : null;
 
-    const itemsCount = order.items?.length ?? 0;
+    const itemsCount = (order.items ?? []).reduce((total, item) => total + item.quantite, 0);
 
     if (variant === 'hero') {
         return (
