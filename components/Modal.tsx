@@ -1,5 +1,6 @@
 
 import React, { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 
 interface ModalProps {
@@ -73,19 +74,12 @@ const Modal: React.FC<ModalProps> = ({
       const viewportRight = viewportLeft + viewport.width;
       const viewportBottom = viewportTop + viewport.height;
 
-      const bounds = boundary
-        ? {
-            top: Math.max(boundary.top + VIEWPORT_MARGIN, viewportTop + VIEWPORT_MARGIN),
-            left: Math.max(boundary.left + VIEWPORT_MARGIN, viewportLeft + VIEWPORT_MARGIN),
-            right: Math.min(boundary.right - VIEWPORT_MARGIN, viewportRight - VIEWPORT_MARGIN),
-            bottom: Math.min(boundary.bottom - VIEWPORT_MARGIN, viewportBottom - VIEWPORT_MARGIN),
-          }
-        : {
-            top: viewportTop + VIEWPORT_MARGIN,
-            left: viewportLeft + VIEWPORT_MARGIN,
-            right: viewportRight - VIEWPORT_MARGIN,
-            bottom: viewportBottom - VIEWPORT_MARGIN,
-          };
+      const bounds = {
+        top: viewportTop + VIEWPORT_MARGIN,
+        left: viewportLeft + VIEWPORT_MARGIN,
+        right: viewportRight - VIEWPORT_MARGIN,
+        bottom: viewportBottom - VIEWPORT_MARGIN,
+      };
 
       const availableWidth = Math.max(bounds.right - bounds.left, 0);
       const availableHeight = Math.max(bounds.bottom - bounds.top, 0);
@@ -223,7 +217,7 @@ const Modal: React.FC<ModalProps> = ({
     ? { top: position.top, left: position.left }
     : { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
 
-  return (
+  const modalNode = (
     <div className="fixed inset-0 z-50">
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
       <div
@@ -262,6 +256,8 @@ const Modal: React.FC<ModalProps> = ({
       </div>
     </div>
   );
+
+  return createPortal(modalNode, document.body);
 };
 
 export default Modal;
