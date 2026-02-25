@@ -522,7 +522,11 @@ const Commande: React.FC = () => {
                 const currentOrderSnapshot = getCachedSnapshot(orderRef.current?.items, currentItemsSnapshotCacheRef);
 
                 if (!areOrderItemSnapshotsEqual(currentOrderSnapshot, requestSnapshot)) {
-                    pendingServerOrderRef.current = cloneOrder(updatedOrder);
+                    // Une réponse serveur peut arriver en retard pendant que l'utilisateur continue
+                    // d'ajouter/supprimer des articles. Dans ce cas, garder ce snapshot en "pending"
+                    // peut réinjecter un état obsolète (articles disparus/réapparus).
+                    // On met seulement à jour la référence serveur sans écraser l'état local courant.
+                    pendingServerOrderRef.current = null;
                     serverOrderRef.current = cloneOrder(updatedOrder);
                     return;
                 }
