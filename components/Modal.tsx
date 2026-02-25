@@ -42,32 +42,56 @@ const Modal: React.FC<ModalProps> = ({
       return;
     }
 
+    const getViewportBounds = () => {
+      const visualViewport = window.visualViewport;
+
+      if (visualViewport) {
+        return {
+          left: visualViewport.offsetLeft,
+          top: visualViewport.offsetTop,
+          width: visualViewport.width,
+          height: visualViewport.height,
+        };
+      }
+
+      return {
+        left: 0,
+        top: 0,
+        width: window.innerWidth,
+        height: window.innerHeight,
+      };
+    };
+
     const updatePosition = () => {
       if (!containerRef.current) {
         return;
       }
       const rect = containerRef.current.getBoundingClientRect();
-      const { innerWidth, innerHeight } = window;
+      const viewport = getViewportBounds();
+      const viewportLeft = viewport.left;
+      const viewportTop = viewport.top;
+      const viewportRight = viewportLeft + viewport.width;
+      const viewportBottom = viewportTop + viewport.height;
 
       const bounds = boundary
         ? {
-            top: Math.max(boundary.top + VIEWPORT_MARGIN, VIEWPORT_MARGIN),
-            left: Math.max(boundary.left + VIEWPORT_MARGIN, VIEWPORT_MARGIN),
-            right: Math.min(boundary.right - VIEWPORT_MARGIN, innerWidth - VIEWPORT_MARGIN),
-            bottom: Math.min(boundary.bottom - VIEWPORT_MARGIN, innerHeight - VIEWPORT_MARGIN),
+            top: Math.max(boundary.top + VIEWPORT_MARGIN, viewportTop + VIEWPORT_MARGIN),
+            left: Math.max(boundary.left + VIEWPORT_MARGIN, viewportLeft + VIEWPORT_MARGIN),
+            right: Math.min(boundary.right - VIEWPORT_MARGIN, viewportRight - VIEWPORT_MARGIN),
+            bottom: Math.min(boundary.bottom - VIEWPORT_MARGIN, viewportBottom - VIEWPORT_MARGIN),
           }
         : {
-            top: VIEWPORT_MARGIN,
-            left: VIEWPORT_MARGIN,
-            right: innerWidth - VIEWPORT_MARGIN,
-            bottom: innerHeight - VIEWPORT_MARGIN,
+            top: viewportTop + VIEWPORT_MARGIN,
+            left: viewportLeft + VIEWPORT_MARGIN,
+            right: viewportRight - VIEWPORT_MARGIN,
+            bottom: viewportBottom - VIEWPORT_MARGIN,
           };
 
       const availableWidth = Math.max(bounds.right - bounds.left, 0);
       const availableHeight = Math.max(bounds.bottom - bounds.top, 0);
 
-      const centerX = innerWidth / 2;
-      const centerY = innerHeight / 2;
+      const centerX = viewportLeft + viewport.width / 2;
+      const centerY = viewportTop + viewport.height / 2;
 
       let left = centerX - rect.width / 2;
 
@@ -93,13 +117,23 @@ const Modal: React.FC<ModalProps> = ({
       frame = window.requestAnimationFrame(updatePosition);
     };
 
+    const resizeObserver = new ResizeObserver(handleResize);
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
     window.addEventListener('resize', handleResize);
     window.addEventListener('scroll', handleResize, true);
+    window.visualViewport?.addEventListener('resize', handleResize);
+    window.visualViewport?.addEventListener('scroll', handleResize);
 
     return () => {
       window.cancelAnimationFrame(frame);
+      resizeObserver.disconnect();
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('scroll', handleResize, true);
+      window.visualViewport?.removeEventListener('resize', handleResize);
+      window.visualViewport?.removeEventListener('scroll', handleResize);
     };
   }, [anchor, boundary, isOpen]);
 
