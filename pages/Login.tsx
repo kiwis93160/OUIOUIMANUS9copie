@@ -676,27 +676,16 @@ const Login: React.FC = () => {
             />
           ) : (
             <div className="hero-content" style={heroTextStyle}>
-              <div className="hero-header">
-                <div className="hero-header__text">
-                  {renderRichTextElement(
-                    'hero.title',
-                    'h2',
-                    {
-                      className: 'hero-title',
-                      style: getElementTextStyle('hero.title'),
-                    },
-                    hero.title,
-                  )}
-                  {renderRichTextElement(
-                    'hero.subtitle',
-                    'p',
-                    {
-                      className: 'hero-subtitle',
-                      style: getElementBodyTextStyle('hero.subtitle'),
-                    },
-                    hero.subtitle,
-                  )}
-                </div>
+              <div className="hero-header flex flex-col md:flex-row">
+                {renderRichTextElement(
+                  'hero.title',
+                  'h2',
+                  {
+                    className: 'hero-title',
+                    style: getElementTextStyle('hero.title'),
+                  },
+                  hero.title,
+                )}
                 <div className="hero-header__cta">
                   {isOrderingAvailable ? (
                     <button
@@ -866,7 +855,7 @@ const Login: React.FC = () => {
               )
             ) : bestSellersToDisplay.length > 0 ? (
               <div
-                className={`menu-grid ${hasSecondaryProducts ? 'menu-grid--best-sellers' : 'menu-grid--best-sellers-single'}`}
+                className={`menu-grid ${hasSecondaryProducts ? 'grid grid-cols-1 lg:grid-cols-2' : 'menu-grid--best-sellers-single'}`}
               >
                 {featuredProduct && renderMenuCard(featuredProduct, 'featured')}
                 {hasSecondaryProducts && (
@@ -924,7 +913,7 @@ const Login: React.FC = () => {
             )}
 
               <div
-                className="mx-auto mt-10 grid w-full max-w-6xl grid-cols-1 gap-8 max-lg:justify-items-center lg:grid-cols-3 lg:items-start lg:[grid-template-columns:1fr_1.25fr_1fr]"
+                className="mx-auto mt-10 grid w-full max-w-6xl grid-cols-1 gap-8 lg:grid-cols-3 lg:items-start"
               >
                 <div
                   className="mx-auto flex w-full flex-col gap-6 max-lg:items-center max-lg:text-center"
