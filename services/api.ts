@@ -615,6 +615,58 @@ const areOrderItemsEquivalent = (a: OrderItem, b: OrderItem): boolean => {
   return areSelectedExtrasEqual(a.selected_extras, b.selected_extras);
 };
 
+const areOrderItemsSameLine = (a: OrderItem, b: OrderItem): boolean => {
+  if (
+    a.produitRef !== b.produitRef ||
+    a.nom_produit !== b.nom_produit ||
+    a.prix_unitaire !== b.prix_unitaire ||
+    (a.commentaire ?? '') !== (b.commentaire ?? '') ||
+    (a.estado ?? 'en_attente') !== (b.estado ?? 'en_attente')
+  ) {
+    return false;
+  }
+
+  const excludedIngredientsA = [...(a.excluded_ingredients ?? [])].sort();
+  const excludedIngredientsB = [...(b.excluded_ingredients ?? [])].sort();
+
+  if (!areArraysEqual(excludedIngredientsA, excludedIngredientsB)) {
+    return false;
+  }
+
+  return areSelectedExtrasEqual(a.selected_extras, b.selected_extras);
+};
+
+const resolveIncomingItemsWithPersistedIds = (
+  incomingItems: OrderItem[],
+  existingItems: OrderItem[],
+): OrderItem[] => {
+  const availableExistingItems = [...existingItems];
+
+  return incomingItems.map(incomingItem => {
+    if (isUuid(incomingItem.id)) {
+      const directMatchIndex = availableExistingItems.findIndex(item => item.id === incomingItem.id);
+      if (directMatchIndex !== -1) {
+        availableExistingItems.splice(directMatchIndex, 1);
+      }
+      return incomingItem;
+    }
+
+    const equivalentExistingIndex = availableExistingItems.findIndex(existingItem =>
+      areOrderItemsSameLine(existingItem, incomingItem),
+    );
+
+    if (equivalentExistingIndex === -1) {
+      return incomingItem;
+    }
+
+    const [equivalentExistingItem] = availableExistingItems.splice(equivalentExistingIndex, 1);
+    return {
+      ...incomingItem,
+      id: equivalentExistingItem.id,
+    };
+  });
+};
+
 const reorderOrderItems = (referenceItems: OrderItem[], itemsToReorder: OrderItem[]): OrderItem[] => {
   const remaining = [...itemsToReorder];
   const ordered: OrderItem[] = [];
@@ -2719,6 +2771,7 @@ export const api = {
     const { items: incomingItems, clientInfo, removedItemIds = [], ...rest } = updates;
 
     let existingItems: OrderItem[] = [];
+    let resolvedIncomingItems: OrderItem[] | undefined = incomingItems;
     let itemsForStockDeduction: OrderItem[] = [];
     if (incomingItems) {
       const existingOrder = await fetchOrderById(orderId);
@@ -2727,10 +2780,11 @@ export const api = {
       }
 
       existingItems = existingOrder.items;
+      resolvedIncomingItems = resolveIncomingItemsWithPersistedIds(incomingItems, existingItems);
 
       const existingItemIds = new Set(existingItems.map(item => item.id));
-      const itemsToInsert = incomingItems.filter(item => !isUuid(item.id) || !existingItemIds.has(item.id));
-      const itemsToUpdate = incomingItems.filter(
+      const itemsToInsert = resolvedIncomingItems.filter(item => !isUuid(item.id) || !existingItemIds.has(item.id));
+      const itemsToUpdate = resolvedIncomingItems.filter(
         item => isUuid(item.id) && existingItemIds.has(item.id),
       );
       itemsForStockDeduction = [];
@@ -2835,11 +2889,11 @@ export const api = {
     if (rest.date_listo_cuisine !== undefined) payload.date_listo_cuisine = toIsoString(rest.date_listo_cuisine);
     if (rest.date_servido !== undefined) payload.date_servido = toIsoString(rest.date_servido);
 
-    if (incomingItems) {
-      payload.total = incomingItems.reduce((sum, item) => sum + item.prix_unitaire * item.quantite, 0);
+    if (resolvedIncomingItems) {
+      payload.total = resolvedIncomingItems.reduce((sum, item) => sum + item.prix_unitaire * item.quantite, 0);
     }
 
-    const incomingItemIds = new Set((incomingItems ?? []).map(item => item.id));
+    const incomingItemIds = new Set((resolvedIncomingItems ?? []).map(item => item.id));
     const persistedIdsToDelete = new Set<string>();
 
     removedItemIds.filter(id => isUuid(id)).forEach(id => persistedIdsToDelete.add(id));
@@ -2865,7 +2919,7 @@ export const api = {
       await supabase.from('orders').update(payload).eq('id', orderId);
     }
 
-    if (incomingItems && itemsForStockDeduction.length > 0) {
+    if (resolvedIncomingItems && itemsForStockDeduction.length > 0) {
       try {
         await deductIngredientsStockForOrderItems(itemsForStockDeduction);
       } catch (error) {
@@ -2879,10 +2933,10 @@ export const api = {
       throw new Error('Order not found after update');
     }
 
-    if (incomingItems) {
+    if (resolvedIncomingItems) {
       return {
         ...updatedOrder,
-        items: reorderOrderItems(incomingItems, updatedOrder.items),
+        items: reorderOrderItems(resolvedIncomingItems, updatedOrder.items),
       };
     }
 
