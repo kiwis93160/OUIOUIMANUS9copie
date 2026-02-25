@@ -351,7 +351,7 @@ const Commande: React.FC = () => {
             { priority: 0, keywords: ['entrada', 'entradas'] },
             { priority: 1, keywords: ['plato principal', 'platos principales', 'main', 'principale', 'principal'] },
             { priority: 2, keywords: ['postre', 'postres', 'dessert', 'desserts'] },
-            { priority: 3, keywords: ['bebida', 'bebidas', 'drink', 'boisson'] },
+            { priority: 4, keywords: ['bebida', 'bebidas', 'drink', 'boisson'] },
         ];
 
         const categoryPriorityById = new Map(
@@ -361,13 +361,13 @@ const Commande: React.FC = () => {
                     keywords.some(keyword => normalizedName.includes(keyword))
                 );
 
-                return [category.id, match?.priority ?? Number.MAX_SAFE_INTEGER] as const;
+                return [category.id, match?.priority ?? 3] as const;
             })
         );
 
         const sortedProducts = [...products].sort((productA, productB) => {
-            const priorityA = categoryPriorityById.get(productA.categoria_id) ?? Number.MAX_SAFE_INTEGER;
-            const priorityB = categoryPriorityById.get(productB.categoria_id) ?? Number.MAX_SAFE_INTEGER;
+            const priorityA = categoryPriorityById.get(productA.categoria_id) ?? 3;
+            const priorityB = categoryPriorityById.get(productB.categoria_id) ?? 3;
 
             if (priorityA !== priorityB) {
                 return priorityA - priorityB;
