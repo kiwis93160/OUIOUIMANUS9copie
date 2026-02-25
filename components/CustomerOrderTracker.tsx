@@ -644,13 +644,13 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
         )
         : null;
 
-    const itemsCount = order.items?.length ?? 0;
+    const itemsCount = (order.items ?? []).reduce((total, item) => total + item.quantite, 0);
 
     if (variant === 'hero') {
         return (
             <div className={containerClasses}>
                 <div
-                    className="relative w-full max-w-4xl rounded-3xl border-[6px] bg-brand-primary p-6 text-white shadow-2xl sm:p-8"
+                    className="relative w-full max-w-4xl rounded-3xl border-[6px] bg-black/40 p-6 text-white shadow-2xl sm:p-8"
                     style={{ borderColor: QUANTITY_BADGE_BASE_COLOR }}
                 >
                     <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-3xl opacity-70">
@@ -926,7 +926,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                 {hasClientDetails && (
                                     <div
                                         ref={clientInfoRef}
-                                        className="rounded-2xl bg-gradient-to-br from-slate-900/40 via-slate-900/30 to-slate-900/25 p-5 backdrop-blur-2xl border border-white/15 flex flex-col"
+                                        className="rounded-2xl bg-white/20 p-5 backdrop-blur-2xl border border-white/35 flex flex-col"
                                     >
                                         <p className="text-xs font-bold uppercase tracking-wider text-white/50 mb-3">Informations client</p>
                                         <div className="space-y-2.5">
@@ -972,7 +972,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                 )}
                                 {order.receipt_url && (
                                     <div
-                                        className="rounded-2xl bg-gradient-to-br from-slate-900/40 via-slate-900/30 to-slate-900/25 p-5 backdrop-blur-2xl border border-white/15 flex flex-col"
+                                        className="rounded-2xl bg-white/20 p-5 backdrop-blur-2xl border border-white/35 flex flex-col"
                                         style={clientInfoHeight ? { height: clientInfoHeight } : undefined}
                                     >
                                             <p className="text-xs font-bold uppercase tracking-wider text-white/50 mb-3">Comprobante de pago</p>
@@ -1016,7 +1016,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                             </div>
                         )}
 
-                        <div className="rounded-2xl border border-white/25 bg-slate-900/35 p-6 backdrop-blur-2xl">
+                        <div className="rounded-2xl border border-white/35 bg-white/20 p-6 backdrop-blur-2xl">
                             <div className="flex items-center justify-between mb-5">
                                 <h3 className="text-base font-bold uppercase tracking-wider text-white">Tu pedido</h3>
                                 <span className="rounded-full bg-white/20 px-4 py-1.5 text-sm font-bold text-white shadow-sm">{itemsCount} {itemsCount > 1 ? 'artículos' : 'artículo'}</span>

@@ -138,6 +138,7 @@ const Ingredients: React.FC = () => {
                     onSuccess={fetchIngredients}
                     ingredient={selectedIngredient}
                     mode={modalMode}
+                    ingredients={ingredients}
                 />
             )}
             {isResupplyModalOpen && canEdit && selectedIngredient && (
@@ -162,7 +163,7 @@ const Ingredients: React.FC = () => {
 
 // --- Modal Components ---
 
-const AddEditIngredientModal: React.FC<{ isOpen: boolean; onClose: () => void; onSuccess: () => void; ingredient: Ingredient | null; mode: 'add' | 'edit' }> = ({ isOpen, onClose, onSuccess, ingredient, mode }) => {
+const AddEditIngredientModal: React.FC<{ isOpen: boolean; onClose: () => void; onSuccess: () => void; ingredient: Ingredient | null; mode: 'add' | 'edit'; ingredients: Ingredient[] }> = ({ isOpen, onClose, onSuccess, ingredient, mode, ingredients }) => {
     const [formData, setFormData] = useState({
         nom: ingredient?.nom || '',
         unite: ingredient?.unite || 'g',
@@ -182,6 +183,18 @@ const AddEditIngredientModal: React.FC<{ isOpen: boolean; onClose: () => void; o
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        const normalizedName = formData.nom.trim().toLowerCase();
+        const alreadyExists = ingredients.some(existingIngredient =>
+            existingIngredient.nom.trim().toLowerCase() === normalizedName
+            && (mode !== 'edit' || existingIngredient.id !== ingredient?.id)
+        );
+
+        if (alreadyExists) {
+            alert('Este ingrediente ya existe en la lista.');
+            return;
+        }
+
         setSubmitting(true);
         try {
             if (mode === 'edit' && ingredient) {

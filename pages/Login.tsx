@@ -219,6 +219,7 @@ const Login: React.FC = () => {
   );
 
   const mapDimension = 'clamp(260px, 32vw, 420px)';
+  const widgetDimension = 'clamp(360px, 40vw, 560px)';
 
   const brandLogo = navigation.brandLogo ?? DEFAULT_BRAND_LOGO;
   const staffTriggerLogo = navigation.brandLogo ?? DEFAULT_BRAND_LOGO;
@@ -301,10 +302,11 @@ const Login: React.FC = () => {
     fallback: string,
   ) => {
     const html = getRichTextHtml(key);
-    if (html) {
+    const normalizedHtml = key === 'hero.title' && html ? html.replace(/<br\s*\/?>/gi, ' ') : html;
+    if (normalizedHtml) {
       return React.createElement(Component, {
         ...props,
-        dangerouslySetInnerHTML: { __html: html },
+        dangerouslySetInnerHTML: { __html: normalizedHtml },
       });
     }
     return React.createElement(Component, props, fallback);
@@ -431,9 +433,9 @@ const Login: React.FC = () => {
       : 'about:blank';
   const hasMapLocation = hasCustomMapUrl || encodedFindUsQuery.length > 0;
   const findUsMapTitle = findUsMapQuery.length > 0 ? findUsMapQuery : findUs.title;
-  const whatsappTestNumber = '0681161642';
-  const whatsappInternationalNumber = `33${whatsappTestNumber.replace(/^0/, '')}`;
-  const whatsappUrl = `https://wa.me/${whatsappInternationalNumber}`;
+  const contactValue = findUs.city?.trim() ?? '';
+  const whatsappNumber = contactValue.replace(/\D/g, '');
+  const whatsappUrl = whatsappNumber.length >= 8 ? `https://wa.me/${whatsappNumber}` : '';
   const activeOrderId = activeOrder?.orderId ?? null;
   const bestSellersToDisplay = bestSellers.slice(0, 4);
   const featuredProduct = bestSellersToDisplay[0];
@@ -685,26 +687,53 @@ const Login: React.FC = () => {
                   hero.title,
                 )}
                 <div className="hero-header__cta">
-                  <button
-                    onClick={handleHeroCtaClick}
-                    className={`ui-btn hero-cta ${isOrderingAvailable ? 'ui-btn-accent' : 'hero-cta--disabled'}`.trim()}
-                    style={{
-                      ...getElementBodyTextStyle('hero.ctaLabel'),
-                      ...getElementBackgroundStyle('hero.ctaLabel'),
-                    }}
-                    disabled={!isOrderingAvailable}
-                    aria-disabled={!isOrderingAvailable}
-                  >
-                    {renderRichTextElement(
-                      'hero.ctaLabel',
-                      'span',
-                      {
-                        className: 'inline-flex items-center justify-center',
-                        style: getElementBodyTextStyle('hero.ctaLabel'),
-                      },
-                      hero.ctaLabel,
-                    )}
-                  </button>
+                  {isOrderingAvailable ? (
+                    <button
+                      onClick={handleHeroCtaClick}
+                      className={`ui-btn hero-cta ${isOrderingAvailable ? 'ui-btn-accent' : 'hero-cta--disabled'}`.trim()}
+                      style={{
+                        ...getElementBodyTextStyle('hero.ctaLabel'),
+                        ...getElementBackgroundStyle('hero.ctaLabel'),
+                      }}
+                      disabled={!isOrderingAvailable}
+                      aria-disabled={!isOrderingAvailable}
+                    >
+                      {renderRichTextElement(
+                        'hero.ctaLabel',
+                        'span',
+                        {
+                          className: 'inline-flex items-center justify-center',
+                          style: getElementBodyTextStyle('hero.ctaLabel'),
+                        },
+                        hero.ctaLabel,
+                      )}
+                    </button>
+                  ) : (
+                    <div className="hero-availability">
+                      <div className="hero-availability__icon">
+                        <Clock size={28} />
+                      </div>
+                      <div className="hero-availability__content">
+                        <p className="hero-availability__title">{onlineOrdering.closedTitle}</p>
+                        <p className="hero-availability__subtitle">
+                          {onlineOrdering.closedSubtitle || 'Veuillez consulter nos horaires ci-dessous.'}
+                        </p>
+                        <div className="mt-4 space-y-2">
+                          <p className="text-sm font-semibold uppercase tracking-wide text-white/90">
+                            Horaires d'ouverture :
+                          </p>
+                          <div className="space-y-1">
+                            {weeklyScheduleFormatted.map(({ day, label, schedule }) => (
+                              <div key={day} className="flex items-center text-sm">
+                                <span className="font-medium text-white/80 w-24">{label}</span>
+                                <span className="font-semibold text-white">{schedule}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
               {orderHistory.length > 0 && (
@@ -753,39 +782,6 @@ const Login: React.FC = () => {
                     ))}
                   </div>
                 </div>
-              )}
-              {!isOrderingAvailable && (
-                <div className="hero-availability">
-                  <div className="hero-availability__icon">
-                    <Clock size={28} />
-                  </div>
-                  <div className="hero-availability__content">
-                    <p className="hero-availability__title">{onlineOrdering.closedTitle}</p>
-                    <p className="hero-availability__subtitle">
-                      {onlineOrdering.closedSubtitle || 'Veuillez consulter nos horaires ci-dessous.'}
-                    </p>
-                    <div className="mt-4 space-y-2">
-                      <p className="text-sm font-semibold uppercase tracking-wide text-white/90">Horaires d'ouverture :</p>
-                      <div className="space-y-1">
-                        {weeklyScheduleFormatted.map(({ day, label, schedule }) => (
-                          <div key={day} className="flex items-center text-sm">
-                            <span className="font-medium text-white/80 w-24">{label}</span>
-                            <span className="font-semibold text-white">{schedule}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-              {renderRichTextElement(
-                'hero.subtitle',
-                'p',
-                {
-                  className: 'hero-subtitle',
-                  style: getElementBodyTextStyle('hero.subtitle'),
-                },
-                hero.subtitle,
               )}
             </div>
           )}
@@ -920,10 +916,10 @@ const Login: React.FC = () => {
                 className="mx-auto mt-10 grid w-full max-w-6xl grid-cols-1 gap-8 lg:grid-cols-3 lg:items-start"
               >
                 <div
-                  className="flex w-full flex-col gap-6"
+                  className="mx-auto flex w-full flex-col gap-6 max-lg:items-center max-lg:text-center"
                   style={{ maxWidth: mapDimension, minHeight: mapDimension, width: '100%' }}
                 >
-                  <div className="space-y-4">
+                  <div className="space-y-4 text-center max-lg:mx-auto max-lg:flex max-lg:w-full max-lg:flex-col max-lg:items-center">
                     {renderRichTextElement(
                       'findUs.addressLabel',
                       'h3',
@@ -944,7 +940,7 @@ const Login: React.FC = () => {
                     )}
                   </div>
 
-                  <div className="space-y-4">
+                  <div className="space-y-4 text-center max-lg:mx-auto max-lg:flex max-lg:w-full max-lg:flex-col max-lg:items-center">
                     {renderRichTextElement(
                       'findUs.hoursLabel',
                       'h3',
@@ -965,7 +961,7 @@ const Login: React.FC = () => {
                     )}
                   </div>
 
-                  <div className="space-y-4">
+                  <div className="space-y-4 text-center max-lg:mx-auto max-lg:flex max-lg:w-full max-lg:flex-col max-lg:items-center">
                     {renderRichTextElement(
                       'findUs.cityLabel',
                       'h3',
@@ -976,19 +972,27 @@ const Login: React.FC = () => {
                       findUs.cityLabel,
                     )}
                     <div className="flex flex-col items-center gap-3 text-base font-medium text-gray-700 text-center" style={findUsBodyTextStyle}>
-                      <div className="flex items-center gap-3">
-                        <span className="inline-flex items-center gap-2 text-base font-semibold text-gray-900">
-                          {whatsappTestNumber}
-                        </span>
-                        <a
-                          href={whatsappUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-green-500 text-white transition hover:bg-green-600"
-                          aria-label="Escríbenos por WhatsApp"
-                        >
-                          <MessageCircle className="h-4 w-4" />
-                        </a>
+                      <div className="flex items-center justify-center gap-3 text-center max-lg:w-full">
+                        {renderRichTextElement(
+                          'findUs.city',
+                          'span',
+                          {
+                            className: 'inline-flex items-center gap-2 text-base font-semibold text-gray-900',
+                            style: getElementBodyTextStyle('findUs.city'),
+                          },
+                          contactValue,
+                        )}
+                        {whatsappUrl ? (
+                          <a
+                            href={whatsappUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-green-500 text-white transition hover:bg-green-600"
+                            aria-label="Escríbenos por WhatsApp"
+                          >
+                            <MessageCircle className="h-4 w-4" />
+                          </a>
+                        ) : null}
                       </div>
                     </div>
                   </div>
@@ -999,8 +1003,8 @@ const Login: React.FC = () => {
                   style={{ minHeight: mapDimension, width: '100%' }}
                 >
                   <div
-                    className="relative mx-auto h-[min(420px,65vw)] w-full overflow-hidden"
-                    style={{ maxWidth: 'min(640px, 100%)' }}
+                    className="relative mx-auto w-full overflow-hidden"
+                    style={{ height: mapDimension, maxWidth: 'min(640px, 100%)' }}
                   >
                     {hasMapLocation ? (
                       <iframe
@@ -1043,12 +1047,12 @@ const Login: React.FC = () => {
                 </div>
 
                 <div
-                  className="flex h-full w-full items-stretch"
-                  style={{ maxWidth: mapDimension, minHeight: mapDimension, width: '100%' }}
+                  className="flex w-full items-stretch"
+                  style={{ height: mapDimension, maxWidth: mapDimension, width: '100%' }}
                 >
-                  <div className="h-full w-full overflow-hidden">
+                  <div className="h-full w-full overflow-hidden bg-white">
                     <ShapoWidget
-                      className="h-full w-full border-0"
+                      className="h-full w-full border-0 bg-white"
                       title="Widget de opiniones de clientes Shapo"
                     />
                   </div>
