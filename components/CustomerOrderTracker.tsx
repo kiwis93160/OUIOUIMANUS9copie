@@ -650,7 +650,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
         return (
             <div className={containerClasses}>
                 <div
-                    className="relative w-full max-w-4xl rounded-3xl border-[6px] bg-black/40 p-6 text-white shadow-2xl sm:p-8"
+                    className="relative w-full max-w-4xl rounded-3xl border-[6px] bg-black/20 p-6 text-white shadow-2xl sm:p-8"
                     style={{ borderColor: QUANTITY_BADGE_BASE_COLOR }}
                 >
                     <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-3xl opacity-70">
