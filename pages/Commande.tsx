@@ -158,6 +158,7 @@ const Commande: React.FC = () => {
     const pendingServerOrderRef = useRef<Order | null>(null);
     const itemsSyncTimeoutRef = useRef<number | null>(null);
     const syncQueueRef = useRef<Promise<void>>(Promise.resolve());
+    const ignoreRealtimeRefreshUntilRef = useRef<number>(0);
     const currentItemsSnapshotCacheRef = useRef<OrderItemsSnapshotCache | null>(null);
     const originalItemsSnapshotCacheRef = useRef<OrderItemsSnapshotCache | null>(null);
     const quantityUpdateTimeouts = useRef<Map<string, NodeJS.Timeout>>(new Map());
@@ -322,7 +323,13 @@ const Commande: React.FC = () => {
     }, [applyPendingServerSnapshot, isOrderSynced, order, originalOrder]);
 
     useEffect(() => {
-        const unsubscribe = api.notifications.subscribe('orders_updated', () => fetchOrderData(true));
+        const unsubscribe = api.notifications.subscribe('orders_updated', () => {
+            if (Date.now() < ignoreRealtimeRefreshUntilRef.current) {
+                return;
+            }
+
+            fetchOrderData(true);
+        });
         return () => unsubscribe();
     }, [fetchOrderData]);
     
@@ -502,6 +509,7 @@ const Commande: React.FC = () => {
                     .map(item => item.id);
 
                 const requestSnapshot = createOrderItemsSnapshot(finalItems);
+                ignoreRealtimeRefreshUntilRef.current = Date.now() + 2000;
                 const updatedOrder = await api.updateOrder(
                     currentOrder.id,
                     {
@@ -526,12 +534,6 @@ const Commande: React.FC = () => {
                 originalOrderRef.current = updatedOriginalSnapshot;
                 updateSnapshotCache(originalItemsSnapshotCacheRef, updatedOriginalSnapshot.items);
                 serverOrderRef.current = cloneOrder(updatedOrder);
-
-                void api.getIngredients()
-                    .then(setIngredients)
-                    .catch(error => {
-                        console.error("Failed to refresh ingredients", error);
-                    });
                 applyPendingServerSnapshot();
             } catch (error) {
                 console.error("Failed to update order:", error);
