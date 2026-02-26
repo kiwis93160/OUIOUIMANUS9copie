@@ -36,6 +36,20 @@ const FALLBACK_SUPPORT_PHONE_DISPLAY = '+57 323 809 0562';
 
 const sanitizePhoneDigits = (value: string): string => value.replace(/[^\d]/g, '');
 
+const getUniqueSortedProductIds = (order: Order | null): string[] => {
+    if (!order?.items?.length) {
+        return [];
+    }
+
+    return Array.from(
+        new Set(
+            order.items
+                .map(item => item.produitRef)
+                .filter((value): value is string => typeof value === 'string' && value.length > 0)
+        )
+    ).sort();
+};
+
 const QUANTITY_BADGE_GRADIENT_FROM = '#f59e0b';
 const QUANTITY_BADGE_GRADIENT_TO = '#f97316';
 const QUANTITY_BADGE_BASE_COLOR = '#f97316';
@@ -119,6 +133,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
     const [isReceiptPreviewError, setReceiptPreviewError] = useState(false);
     const [clientInfoHeight, setClientInfoHeight] = useState<number | null>(null);
     const [ingredientNameMap, setIngredientNameMap] = useState<IngredientNameMap>({});
+    const productDescriptionCacheRef = useRef<Record<string, string>>({});
 
     const receiptUrl = order?.receipt_url ?? '';
     const normalizedSupportPhone = (supportPhoneNumber ?? '').trim();
@@ -320,6 +335,9 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
         }
     }, [order]);
 
+    const trackedProductIds = useMemo(() => getUniqueSortedProductIds(order), [order]);
+    const trackedProductIdsKey = useMemo(() => trackedProductIds.join('|'), [trackedProductIds]);
+
     // Calcul réel de la position dans la file d'attente
     const [queuePosition, setQueuePosition] = useState<number | null>(null);
     
@@ -350,39 +368,59 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
         // Recalculer toutes les 30 secondes
         const interval = setInterval(calculateQueuePosition, 30000);
         return () => clearInterval(interval);
-    }, [order, currentStep]);
+    }, [order?.id, order?.type_commande, order?.statut, currentStep]);
 
     // Récupérer les descriptions des produits depuis la table products
     useEffect(() => {
         const fetchProductDescriptions = async () => {
-            if (!order || !order.items || order.items.length === 0) {
+            if (trackedProductIds.length === 0) {
+                setProductDescriptions({});
+                return;
+            }
+
+            const cachedDescriptions = productDescriptionCacheRef.current;
+            const missingProductIds = trackedProductIds.filter(productId => cachedDescriptions[productId] === undefined);
+
+            if (missingProductIds.length === 0) {
+                const nextDescriptions = trackedProductIds.reduce<Record<string, string>>((acc, productId) => {
+                    const description = cachedDescriptions[productId];
+                    if (description) {
+                        acc[productId] = description;
+                    }
+                    return acc;
+                }, {});
+                setProductDescriptions(nextDescriptions);
                 return;
             }
             
             try {
-                const productIds = order.items
-                    .map(item => item.produitRef)
-                    .filter(Boolean);
-                
-                if (productIds.length === 0) return;
-                
                 const products = await api.getProducts();
-                const descriptionsMap: Record<string, string> = {};
+                const nextCache = { ...cachedDescriptions };
                 
                 products.forEach((product: any) => {
-                    if (productIds.includes(product.id) && product.description) {
-                        descriptionsMap[product.id] = product.description;
+                    if (trackedProductIds.includes(product.id)) {
+                        nextCache[product.id] = product.description ?? '';
                     }
                 });
+
+                productDescriptionCacheRef.current = nextCache;
+
+                const nextDescriptions = trackedProductIds.reduce<Record<string, string>>((acc, productId) => {
+                    const description = nextCache[productId];
+                    if (description) {
+                        acc[productId] = description;
+                    }
+                    return acc;
+                }, {});
                 
-                setProductDescriptions(descriptionsMap);
+                setProductDescriptions(nextDescriptions);
             } catch (error) {
                 console.error('Erreur lors de la récupération des descriptions des produits:', error);
             }
         };
         
         fetchProductDescriptions();
-    }, [order]);
+    }, [orderId, trackedProductIds, trackedProductIdsKey]);
 
     const heroProgressRef = useRef<HTMLDivElement | null>(null);
     const clientInfoRef = useRef<HTMLDivElement | null>(null);
