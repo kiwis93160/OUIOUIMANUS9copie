@@ -646,26 +646,24 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
             return (
                 <div
                     key={`${promotion.promotion_id}-${promotion.name}`}
-                    className="flex items-center rounded-xl shadow-lg overflow-hidden py-2"
+                    className="grid grid-cols-[auto,minmax(0,1fr)] gap-y-1 rounded-xl shadow-lg overflow-hidden px-2 py-2 sm:grid-cols-[auto,minmax(0,1fr),auto] sm:items-center sm:gap-x-2 sm:gap-y-0"
                     style={{
                         backgroundImage: `linear-gradient(to bottom, ${QUANTITY_BADGE_GRADIENT_FROM}, ${QUANTITY_BADGE_GRADIENT_TO})`,
                     }}
                     aria-label={`Promotion ${promotion.name}`}
                 >
                     <div
-                        className="flex items-center justify-center w-11 flex-shrink-0"
+                        className="row-span-2 flex items-center justify-center w-11 flex-shrink-0 sm:row-span-1"
                         style={{ color: visuals?.badge_color || '#FFFFFF' }}
                     >
                         {getPromotionIcon(promotion)}
                     </div>
-                    <div className="flex-1 px-2.5 flex items-center justify-between min-w-0 gap-2 h-full">
-                        <p className="font-bold text-white text-sm sm:text-base leading-tight truncate mb-px">
-                            {promotion.name}
-                        </p>
-                        <span className="text-sm sm:text-base font-bold text-white whitespace-nowrap shrink-0">
-                            -{formatCurrencyCOP(discountAmount)}
-                        </span>
-                    </div>
+                    <p className="min-w-0 pr-2 font-bold text-white text-sm leading-tight break-words sm:text-base">
+                        {promotion.name}
+                    </p>
+                    <span className="pl-0.5 text-sm font-bold text-white whitespace-nowrap sm:justify-self-end sm:text-base">
+                        -{formatCurrencyCOP(discountAmount)}
+                    </span>
                 </div>
             );
         })
@@ -1661,8 +1659,8 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                         >
                                             {item.quantite}
                                         </div>
-                                        <div className="relative flex flex-1 items-stretch px-5 py-3 sm:py-4">
-                                            <div className="relative flex items-start justify-between gap-4 w-full">
+                                            <div className="relative flex flex-1 items-stretch px-5 py-3 sm:py-4">
+                                                <div className="relative flex w-full flex-col items-start gap-3 sm:flex-row sm:justify-between sm:gap-4">
                                                 <div className="flex flex-1 items-start gap-3">
                                                     <div className="min-w-0 space-y-2">
                                                         <div className="space-y-1">
@@ -1730,7 +1728,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                         )}
                                                     </div>
                                                 </div>
-                                                <div className="flex shrink-0 flex-col items-end gap-1 text-right">
+                                                <div className="flex w-full shrink-0 flex-col items-start gap-1 text-left sm:w-auto sm:items-end sm:text-right">
                                                     {isFreeShipping ? (
                                                         <>
                                                             <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-semibold ${
