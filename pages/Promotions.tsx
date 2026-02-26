@@ -370,34 +370,34 @@ const Promotions: React.FC = () => {
                     </td>
                     <td className="px-0 md:px-4 pt-3 pb-1 md:py-4 text-left md:text-right align-top">
                       <div className="md:hidden text-xs uppercase tracking-wide text-gray-500 mb-2">Acciones</div>
-                      <div className="flex justify-start md:justify-end gap-2">
+                      <div className="flex justify-start md:justify-end gap-2.5 md:gap-3 lg:gap-4">
                         <button
                           onClick={() => handleToggleStatus(promotion)}
-                          className={`h-9 min-w-[70px] px-3 rounded-full border text-xs font-semibold tracking-wide transition-colors ${promotion.status === 'active' ? 'bg-emerald-100 text-emerald-700 border-emerald-300 hover:bg-emerald-200' : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200'}`}
+                          className={`h-10 min-w-[76px] px-3.5 rounded-full border text-sm font-semibold tracking-wide transition-colors md:h-11 md:min-w-[92px] md:px-4 lg:h-12 lg:min-w-[104px] lg:px-5 lg:text-base ${promotion.status === 'active' ? 'bg-emerald-100 text-emerald-700 border-emerald-300 hover:bg-emerald-200' : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200'}`}
                           title={promotion.status === 'active' ? 'Desactivar' : 'Activar'}
                         >
                           {promotion.status === 'active' ? 'ON' : 'OFF'}
                         </button>
                         <button
                           onClick={() => handleViewPromotion(promotion)}
-                          className="p-2.5 rounded-md hover:bg-gray-100 border border-transparent hover:border-gray-200"
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-transparent transition-colors hover:bg-gray-100 hover:border-gray-200 md:h-11 md:w-11 lg:h-12 lg:w-12"
                           title="Ver detalles"
                         >
-                          <Eye size={20} />
+                          <Eye className="h-5 w-5 md:h-6 md:w-6 lg:h-7 lg:w-7" />
                         </button>
                         <button
                           onClick={() => handleEditPromotion(promotion)}
-                          className="p-2.5 rounded-md hover:bg-gray-100 border border-transparent hover:border-gray-200"
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-transparent transition-colors hover:bg-gray-100 hover:border-gray-200 md:h-11 md:w-11 lg:h-12 lg:w-12"
                           title="Editar"
                         >
-                          <Edit size={20} />
+                          <Edit className="h-5 w-5 md:h-6 md:w-6 lg:h-7 lg:w-7" />
                         </button>
                         <button
                           onClick={() => handleDeletePromotion(promotion)}
-                          className="p-2.5 rounded-md hover:bg-red-50 border border-transparent hover:border-red-100 text-red-500"
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-transparent text-red-500 transition-colors hover:bg-red-50 hover:border-red-100 md:h-11 md:w-11 lg:h-12 lg:w-12"
                           title="Eliminar"
                         >
-                          <Trash2 size={20} />
+                          <Trash2 className="h-5 w-5 md:h-6 md:w-6 lg:h-7 lg:w-7" />
                         </button>
                       </div>
                     </td>
