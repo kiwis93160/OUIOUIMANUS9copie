@@ -1038,7 +1038,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                                 className="group relative overflow-hidden rounded-2xl border border-white/40 bg-white/95 text-slate-900 shadow-xl flex"
                                             >
                                                 <div
-                                                    className="flex w-14 items-center justify-center bg-gradient-to-b from-orange-500 to-rose-500 text-2xl font-black leading-none text-white shadow-[0_10px_20px_rgba(249,115,22,0.35)] ring-2 ring-white/50 sm:w-16"
+                                                    className="flex w-14 shrink-0 items-center justify-center bg-gradient-to-b from-orange-500 to-rose-500 text-2xl font-black leading-none text-white shadow-[0_10px_20px_rgba(249,115,22,0.35)] ring-2 ring-white/50 sm:w-16"
                                                     style={{ backgroundImage: `linear-gradient(to bottom, ${QUANTITY_BADGE_GRADIENT_FROM}, ${QUANTITY_BADGE_GRADIENT_TO})` }}
                                                 >
                                                     {item.quantite}
@@ -1616,7 +1616,7 @@ const CustomerOrderTracker: React.FC<CustomerOrderTrackerProps> = ({
                                         }`}
                                     >
                                         <div
-                                            className={`flex w-14 items-center justify-center text-2xl font-black leading-none text-white shadow-[0_10px_20px_rgba(249,115,22,0.35)] ${
+                                            className={`flex w-14 shrink-0 items-center justify-center text-2xl font-black leading-none text-white shadow-[0_10px_20px_rgba(249,115,22,0.35)] ${
                                                 variant === 'hero' ? 'ring-2 ring-white/40' : 'ring-1 ring-white/50'
                                             } sm:w-16`}
                                             style={{ backgroundImage: `linear-gradient(to bottom, ${QUANTITY_BADGE_GRADIENT_FROM}, ${QUANTITY_BADGE_GRADIENT_TO})` }}
