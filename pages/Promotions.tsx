@@ -370,34 +370,34 @@ const Promotions: React.FC = () => {
                     </td>
                     <td className="px-0 md:px-4 pt-3 pb-1 md:py-4 text-left md:text-right align-top">
                       <div className="md:hidden text-xs uppercase tracking-wide text-gray-500 mb-2">Acciones</div>
-                      <div className="flex justify-start md:justify-end gap-2.5 lg:gap-3">
+                      <div className="flex justify-start md:justify-end gap-2.5 md:gap-3 lg:gap-4">
                         <button
                           onClick={() => handleToggleStatus(promotion)}
-                          className={`h-10 min-w-[76px] px-3.5 rounded-full border text-sm font-semibold tracking-wide transition-colors lg:h-11 lg:min-w-[88px] lg:px-4 ${promotion.status === 'active' ? 'bg-emerald-100 text-emerald-700 border-emerald-300 hover:bg-emerald-200' : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200'}`}
+                          className={`h-10 min-w-[76px] px-3.5 rounded-full border text-sm font-semibold tracking-wide transition-colors md:h-11 md:min-w-[92px] md:px-4 lg:h-12 lg:min-w-[104px] lg:px-5 lg:text-base ${promotion.status === 'active' ? 'bg-emerald-100 text-emerald-700 border-emerald-300 hover:bg-emerald-200' : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200'}`}
                           title={promotion.status === 'active' ? 'Desactivar' : 'Activar'}
                         >
                           {promotion.status === 'active' ? 'ON' : 'OFF'}
                         </button>
                         <button
                           onClick={() => handleViewPromotion(promotion)}
-                          className="p-3 rounded-md hover:bg-gray-100 border border-transparent hover:border-gray-200 lg:p-3.5"
+                          className="p-3 rounded-md hover:bg-gray-100 border border-transparent hover:border-gray-200 md:p-3.5 lg:p-4"
                           title="Ver detalles"
                         >
-                          <Eye className="h-5 w-5 lg:h-[22px] lg:w-[22px]" />
+                          <Eye className="h-5 w-5 md:h-[22px] md:w-[22px] lg:h-6 lg:w-6" />
                         </button>
                         <button
                           onClick={() => handleEditPromotion(promotion)}
-                          className="p-3 rounded-md hover:bg-gray-100 border border-transparent hover:border-gray-200 lg:p-3.5"
+                          className="p-3 rounded-md hover:bg-gray-100 border border-transparent hover:border-gray-200 md:p-3.5 lg:p-4"
                           title="Editar"
                         >
-                          <Edit className="h-5 w-5 lg:h-[22px] lg:w-[22px]" />
+                          <Edit className="h-5 w-5 md:h-[22px] md:w-[22px] lg:h-6 lg:w-6" />
                         </button>
                         <button
                           onClick={() => handleDeletePromotion(promotion)}
-                          className="p-3 rounded-md hover:bg-red-50 border border-transparent hover:border-red-100 text-red-500 lg:p-3.5"
+                          className="p-3 rounded-md hover:bg-red-50 border border-transparent hover:border-red-100 text-red-500 md:p-3.5 lg:p-4"
                           title="Eliminar"
                         >
-                          <Trash2 className="h-5 w-5 lg:h-[22px] lg:w-[22px]" />
+                          <Trash2 className="h-5 w-5 md:h-[22px] md:w-[22px] lg:h-6 lg:w-6" />
                         </button>
                       </div>
                     </td>
