@@ -1048,7 +1048,7 @@ const Login: React.FC = () => {
 
                 <div
                   className="flex w-full items-stretch"
-                  style={{ height: mapDimension, maxWidth: mapDimension, width: '100%' }}
+                  style={{ minHeight: widgetDimension, maxWidth: 'min(640px, 100%)', width: '100%' }}
                 >
                   <div className="h-full w-full overflow-hidden bg-white">
                     <ShapoWidget
