@@ -2810,9 +2810,13 @@ video {
 
 
 .promotions-table-wrapper {
+  width: 100%;
+  max-width: 100%;
   border: 1px solid color-mix(in srgb, var(--color-border) 75%, #e2e8f0 25%);
   border-radius: 0.9rem;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
   background: #ffffff;
 }
 
@@ -2821,7 +2825,8 @@ video {
 }
 
 @media (max-width: 767px) {
-  .promotions-table {
+  .promotions-table-wrapper .promotions-table {
+    width: 100%;
     min-width: 100%;
   }
 
