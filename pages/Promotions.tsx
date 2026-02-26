@@ -380,24 +380,24 @@ const Promotions: React.FC = () => {
                         </button>
                         <button
                           onClick={() => handleViewPromotion(promotion)}
-                          className="p-3 rounded-md hover:bg-gray-100 border border-transparent hover:border-gray-200 md:p-3.5 lg:p-4"
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-transparent transition-colors hover:bg-gray-100 hover:border-gray-200 md:h-11 md:w-11 lg:h-12 lg:w-12"
                           title="Ver detalles"
                         >
-                          <Eye className="h-5 w-5 md:h-[22px] md:w-[22px] lg:h-6 lg:w-6" />
+                          <Eye className="h-5 w-5 md:h-6 md:w-6 lg:h-7 lg:w-7" />
                         </button>
                         <button
                           onClick={() => handleEditPromotion(promotion)}
-                          className="p-3 rounded-md hover:bg-gray-100 border border-transparent hover:border-gray-200 md:p-3.5 lg:p-4"
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-transparent transition-colors hover:bg-gray-100 hover:border-gray-200 md:h-11 md:w-11 lg:h-12 lg:w-12"
                           title="Editar"
                         >
-                          <Edit className="h-5 w-5 md:h-[22px] md:w-[22px] lg:h-6 lg:w-6" />
+                          <Edit className="h-5 w-5 md:h-6 md:w-6 lg:h-7 lg:w-7" />
                         </button>
                         <button
                           onClick={() => handleDeletePromotion(promotion)}
-                          className="p-3 rounded-md hover:bg-red-50 border border-transparent hover:border-red-100 text-red-500 md:p-3.5 lg:p-4"
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-transparent text-red-500 transition-colors hover:bg-red-50 hover:border-red-100 md:h-11 md:w-11 lg:h-12 lg:w-12"
                           title="Eliminar"
                         >
-                          <Trash2 className="h-5 w-5 md:h-[22px] md:w-[22px] lg:h-6 lg:w-6" />
+                          <Trash2 className="h-5 w-5 md:h-6 md:w-6 lg:h-7 lg:w-7" />
                         </button>
                       </div>
                     </td>
