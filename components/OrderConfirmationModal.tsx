@@ -138,21 +138,20 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
   const handleWhatsAppClick = () => {
     const message = generateWhatsAppMessage();
     const whatsappUrl = buildWhatsAppUrl(whatsappNumber, message);
-    const landingUrl = `${window.location.origin}/`;
-    const whatsappWindow = window.open(whatsappUrl, '_blank', 'noopener');
 
-    if (whatsappWindow) {
-      setTimeout(() => {
-        whatsappWindow.location.href = landingUrl;
-      }, 1200);
-    }
-
-    // Redirect customer to the public home page where the tracker is displayed
+    // Redirect the current tab first so that returning from WhatsApp lands on the tracker page.
     navigate('/', { replace: true });
 
-    // Ensure the tracker is visible by scrolling to the top after navigation
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const whatsappWindow = window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+
+      // Mobile browsers can block popups or reuse the same tab.
+      // Falling back to same-tab navigation keeps the previous history entry on `/`.
+      if (!whatsappWindow) {
+        window.location.assign(whatsappUrl);
+      }
     }, 100);
   };
 
