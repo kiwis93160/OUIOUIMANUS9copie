@@ -1020,15 +1020,29 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                         <p className="mt-2 text-lg font-semibold text-white">No hay productos disponibles en este momento.</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {filteredProducts.map(product => product && (
-                            <ProductCardWithPromotion
-                                key={product.id}
-                                product={product}
-                                onClick={() => handleProductClick(product)}
-                            />
-                        ))}
-                    </div>
+                    <>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-lg:hidden">
+                            {filteredProducts.map(product => product && (
+                                <ProductCardWithPromotion
+                                    key={product.id}
+                                    product={product}
+                                    onClick={() => handleProductClick(product)}
+                                />
+                            ))}
+                        </div>
+
+                        <div className="lg:hidden h-[100dvh] overflow-y-auto snap-y snap-mandatory overscroll-y-contain">
+                            {filteredProducts.map(product => product && (
+                                <div key={product.id} className="h-[100dvh] snap-start snap-always py-3">
+                                    <ProductCardWithPromotion
+                                        product={product}
+                                        onClick={() => handleProductClick(product)}
+                                        className="h-full"
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </>
                 )}
             </div>
 
