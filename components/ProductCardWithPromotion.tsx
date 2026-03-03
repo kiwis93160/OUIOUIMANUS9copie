@@ -7,12 +7,13 @@ import useProductPromotions from '../hooks/useProductPromotions';
 interface ProductCardWithPromotionProps {
   product: Product;
   onClick: () => void;
+  className?: string;
 }
 
 /**
  * Composant de carte produit avec badge promotionnel
  */
-const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({ product, onClick }) => {
+const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({ product, onClick, className = '' }) => {
   // Récupérer toutes les promotions applicables au produit
   const { promotions, loading } = useProductPromotions(product);
 
@@ -21,7 +22,7 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({ pro
       onClick={() => product.estado === 'disponible' && onClick()}
       className={`relative rounded-2xl border border-white/60 bg-white/70 backdrop-blur-md p-4 flex h-full flex-col items-center text-center transition-shadow shadow-lg ${
         product.estado === 'disponible' ? 'cursor-pointer hover:shadow-xl' : 'opacity-60'
-      }`}
+      } ${className}`}
     >
       {/* Afficher tous les badges promotionnels si des promotions sont applicables */}
       {!loading && promotions.length > 0 && product.estado === 'disponible' && (

@@ -952,7 +952,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
             <button
                 type="button"
                 onClick={handleScrollToCart}
-                className="fixed right-4 top-4 z-50 inline-flex items-center gap-2 rounded-full border border-orange-200/70 bg-white/95 px-4 py-2 text-sm font-semibold text-orange-700 shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
+                className="fixed right-4 top-4 z-50 hidden lg:inline-flex items-center gap-2 rounded-full border border-orange-200/70 bg-white/95 px-4 py-2 text-sm font-semibold text-orange-700 shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
                 aria-label="Ir al carrito"
             >
                 <span className="relative flex items-center">
@@ -968,7 +968,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
             {/* Main Content */}
             <div className="flex-1 min-w-0 space-y-6">
                 {/* Active Promotions Display */}
-                <div className="px-4 pt-0 pb-4">
+                <div className="hidden px-4 pt-0 pb-4 lg:block">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         <div className="flex-1">
                             <ActivePromotionsDisplay />
@@ -985,7 +985,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                 </div>
 
                 {/* Category Filters */}
-                <div className="flex flex-wrap gap-3 mb-6 sm:flex-nowrap sm:overflow-x-auto sm:pb-2">
+                <div className="hidden flex-wrap gap-3 mb-6 sm:flex-nowrap sm:overflow-x-auto sm:pb-2 lg:flex">
                     <button
                         onClick={() => setActiveCategoryId('all')}
                         className={`px-5 py-2 rounded-full text-sm font-bold transition-all ${activeCategoryId === 'all' ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg scale-105 border-2 border-orange-600' : 'bg-white text-gray-800 shadow-md hover:bg-gray-100 border-2 border-gray-300'}`}
@@ -1020,15 +1020,53 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                         <p className="mt-2 text-lg font-semibold text-white">No hay productos disponibles en este momento.</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {filteredProducts.map(product => product && (
-                            <ProductCardWithPromotion
-                                key={product.id}
-                                product={product}
-                                onClick={() => handleProductClick(product)}
-                            />
-                        ))}
-                    </div>
+                    <>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-lg:hidden">
+                            {filteredProducts.map(product => product && (
+                                <ProductCardWithPromotion
+                                    key={product.id}
+                                    product={product}
+                                    onClick={() => handleProductClick(product)}
+                                />
+                            ))}
+                        </div>
+
+                        <div className="lg:hidden relative h-[100dvh] overflow-y-auto snap-y snap-mandatory overscroll-y-contain">
+                            <div className="pointer-events-none absolute inset-x-0 top-0 z-30 p-3">
+                                <div className="pointer-events-auto mb-3">
+                                    <ActivePromotionsDisplay />
+                                </div>
+                                <div className="pointer-events-auto flex justify-end gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={handleScrollToCart}
+                                        className="inline-flex items-center gap-2 rounded-full border border-orange-200/70 bg-white/95 px-4 py-2 text-sm font-semibold text-orange-700 shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
+                                        aria-label="Ir al carrito"
+                                    >
+                                        <span className="relative flex items-center">
+                                            <ShoppingCart size={18} />
+                                            {cartItemCount > 0 && (
+                                                <span className="absolute -right-2.5 -top-2.5 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-red-500 px-1 text-xs font-bold text-white shadow">
+                                                    {cartItemCount}
+                                                </span>
+                                            )}
+                                        </span>
+                                        <span>Carrito</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {filteredProducts.map(product => product && (
+                                <div key={product.id} className="h-[100dvh] snap-start snap-always">
+                                    <ProductCardWithPromotion
+                                        product={product}
+                                        onClick={() => handleProductClick(product)}
+                                        className="h-full rounded-none border-0"
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </>
                 )}
             </div>
 
