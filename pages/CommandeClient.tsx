@@ -1031,12 +1031,12 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                             ))}
                         </div>
 
-                        <div className="lg:hidden relative h-[100dvh] overflow-y-auto snap-y snap-mandatory overscroll-y-contain">
-                            <div className="pointer-events-none absolute inset-x-0 top-0 z-30 p-3">
-                                <div className="pointer-events-auto mb-3">
+                        <div className="lg:hidden relative h-[100dvh] overflow-y-auto overscroll-y-contain pb-4">
+                            <div className="sticky inset-x-0 top-0 z-30 px-3 pt-3 pb-2 backdrop-blur-md bg-gradient-to-b from-[#7d004a]/95 via-[#7d004a]/85 to-transparent">
+                                <div className="mb-3">
                                     <ActivePromotionsDisplay />
                                 </div>
-                                <div className="pointer-events-auto flex justify-end gap-2">
+                                <div className="flex justify-end gap-2">
                                     <button
                                         type="button"
                                         onClick={handleScrollToCart}
@@ -1056,15 +1056,16 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                                 </div>
                             </div>
 
-                            {filteredProducts.map(product => product && (
-                                <div key={product.id} className="h-[100dvh] snap-start snap-always">
+                            <div className="space-y-4 px-3 pb-4 pt-2">
+                                {filteredProducts.map(product => product && (
                                     <ProductCardWithPromotion
+                                        key={product.id}
                                         product={product}
                                         onClick={() => handleProductClick(product)}
-                                        className="h-full rounded-none border-0"
+                                        className="min-h-[calc(100dvh-13rem)]"
                                     />
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
                     </>
                 )}
