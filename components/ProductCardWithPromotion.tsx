@@ -16,17 +16,18 @@ interface ProductCardWithPromotionProps {
 const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({ product, onClick, className = '' }) => {
   // Récupérer toutes les promotions applicables au produit
   const { promotions, loading } = useProductPromotions(product);
+  const hasPromotionBadges = !loading && promotions.length > 0 && product.estado === 'disponible';
 
   return (
     <div
       onClick={() => product.estado === 'disponible' && onClick()}
       className={`relative rounded-2xl border border-white/60 bg-white/70 backdrop-blur-md p-4 flex h-full flex-col items-center text-center transition-shadow shadow-lg ${
         product.estado === 'disponible' ? 'cursor-pointer hover:shadow-xl' : 'opacity-60'
-      } ${className}`}
+      } ${hasPromotionBadges ? 'pt-16' : ''} ${className}`}
     >
       {/* Afficher tous les badges promotionnels si des promotions sont applicables */}
-      {!loading && promotions.length > 0 && product.estado === 'disponible' && (
-        <div className="absolute top-2 right-2 flex flex-wrap gap-1 max-w-[calc(100%-1rem)] justify-end z-10">
+      {hasPromotionBadges && (
+        <div className="absolute top-3 right-3 flex flex-wrap gap-1 max-w-[calc(100%-1.25rem)] justify-end z-10">
           {promotions.map((promotion, index) => (
             <PromotionBadge key={promotion.id || index} promotion={promotion} />
           ))}
@@ -37,7 +38,7 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({ pro
       <img 
         src={product.image} 
         alt={product.nom_produit} 
-        className="w-full aspect-square object-cover rounded-xl mb-2" 
+        className="w-full aspect-[4/3] sm:aspect-square object-cover rounded-xl mb-2" 
       />
       
       {/* Nom du produit */}
