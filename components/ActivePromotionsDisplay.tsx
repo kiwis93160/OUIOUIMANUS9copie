@@ -7,7 +7,11 @@ const PROMO_GRADIENT_FROM = '#f59e0b';
 const PROMO_GRADIENT_TO = '#f97316';
 const PROMO_LINEAR_GRADIENT = `linear-gradient(135deg, ${PROMO_GRADIENT_FROM}, ${PROMO_GRADIENT_TO})`;
 
-const ActivePromotionsDisplay: React.FC = () => {
+interface ActivePromotionsDisplayProps {
+  compact?: boolean;
+}
+
+const ActivePromotionsDisplay: React.FC<ActivePromotionsDisplayProps> = ({ compact = false }) => {
   const [promotions, setPromotions] = useState<Promotion[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -66,15 +70,15 @@ const ActivePromotionsDisplay: React.FC = () => {
   };
 
   return (
-    <div className="mb-3 space-y-2.5">
-      <div className="flex items-center gap-2 text-sm font-semibold text-white drop-shadow-sm">
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm">
-          <Gift size={16} className="text-black" />
+    <div className={compact ? 'mb-2 space-y-1.5' : 'mb-3 space-y-2.5'}>
+      <div className={compact ? 'flex items-center gap-2 text-xs font-semibold text-white drop-shadow-sm' : 'flex items-center gap-2 text-sm font-semibold text-white drop-shadow-sm'}>
+        <div className={compact ? 'flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-sm' : 'flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm'}>
+          <Gift size={compact ? 14 : 16} className="text-black" />
         </div>
-        <span className="text-base leading-tight">Promociones Activas</span>
+        <span className={compact ? 'text-sm leading-tight' : 'text-base leading-tight'}>Promociones Activas</span>
       </div>
 
-      <div className="space-y-2.5">
+      <div className={compact ? 'space-y-1.5' : 'space-y-2.5'}>
         {visiblePromotions.map((promo) => {
           const accentColor = promo.visuals?.badge_bg_color || PROMO_GRADIENT_TO;
           const bannerImage = promo.visuals?.banner_image;
@@ -90,21 +94,21 @@ const ActivePromotionsDisplay: React.FC = () => {
                 <img
                   src={bannerImage}
                   alt={promo.name}
-                  className="h-28 w-full object-cover"
+                  className={compact ? 'h-20 w-full object-cover' : 'h-28 w-full object-cover'}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/35 to-transparent" />
                 <div className="absolute inset-0 flex items-end">
-                  <div className="flex w-full items-stretch p-3.5 text-white">
+                  <div className={compact ? 'flex w-full items-stretch p-2.5 text-white' : 'flex w-full items-stretch p-3.5 text-white'}>
                     <div
-                      className="flex flex-shrink-0 items-center justify-center rounded-l-xl bg-white px-3 py-2.5 text-[length:16px] shadow-sm"
+                      className={compact ? 'flex flex-shrink-0 items-center justify-center rounded-l-xl bg-white px-2.5 py-2 text-[length:14px] shadow-sm' : 'flex flex-shrink-0 items-center justify-center rounded-l-xl bg-white px-3 py-2.5 text-[length:16px] shadow-sm'}
                       style={{ color: accentColor }}
                     >
                       {getPromotionIcon(promo)}
                     </div>
-                    <div className="space-y-0.5 rounded-r-xl bg-black/10 px-3.5 py-2.5 backdrop-blur-[1px]">
-                      <p className="text-base font-bold drop-shadow-sm leading-tight">{promo.name}</p>
+                    <div className={compact ? 'space-y-0.5 rounded-r-xl bg-black/10 px-2.5 py-2 backdrop-blur-[1px]' : 'space-y-0.5 rounded-r-xl bg-black/10 px-3.5 py-2.5 backdrop-blur-[1px]'}>
+                      <p className={compact ? 'text-sm font-bold drop-shadow-sm leading-tight' : 'text-base font-bold drop-shadow-sm leading-tight'}>{promo.name}</p>
                       {(bannerText || description) && (
-                        <p className="text-sm text-white/90 drop-shadow-sm line-clamp-2 leading-tight">
+                        <p className={compact ? 'text-xs text-white/90 drop-shadow-sm line-clamp-1 leading-tight' : 'text-sm text-white/90 drop-shadow-sm line-clamp-2 leading-tight'}>
                           {bannerText || description}
                         </p>
                       )}
@@ -123,18 +127,18 @@ const ActivePromotionsDisplay: React.FC = () => {
             >
               <div className="absolute inset-0 opacity-80" style={{ backgroundImage: PROMO_LINEAR_GRADIENT }} />
               <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.18),rgba(255,255,255,0))] opacity-60" />
-              <div className="relative flex items-stretch pr-5">
+              <div className={compact ? 'relative flex items-stretch pr-3' : 'relative flex items-stretch pr-5'}>
                 <div
-                  className="flex flex-shrink-0 items-center justify-center rounded-l-xl bg-white px-3 py-3 text-[length:16px] shadow-sm"
+                  className={compact ? 'flex flex-shrink-0 items-center justify-center rounded-l-xl bg-white px-2.5 py-2 text-[length:14px] shadow-sm' : 'flex flex-shrink-0 items-center justify-center rounded-l-xl bg-white px-3 py-3 text-[length:16px] shadow-sm'}
                   style={{ color: accentColor }}
                   aria-hidden
                 >
                   {getPromotionIcon(promo)}
                 </div>
-                <div className="flex flex-1 min-w-0 flex-col items-center gap-0.5 rounded-r-xl bg-white/0 pl-3 pr-0 pt-0 pb-0 sm:flex-row sm:items-center sm:justify-between">
-                  <p className="text-sm font-semibold leading-tight text-white sm:text-base truncate mb-0">{promo.name}</p>
+                <div className={compact ? 'flex min-w-0 flex-1 flex-col items-center gap-0 rounded-r-xl bg-white/0 pl-2.5 pr-0 pt-0 pb-0 sm:flex-row sm:items-center sm:justify-between' : 'flex min-w-0 flex-1 flex-col items-center gap-0.5 rounded-r-xl bg-white/0 pl-3 pr-0 pt-0 pb-0 sm:flex-row sm:items-center sm:justify-between'}>
+                  <p className={compact ? 'mb-0 truncate text-xs font-semibold leading-tight text-white sm:text-sm' : 'mb-0 truncate text-sm font-semibold leading-tight text-white sm:text-base'}>{promo.name}</p>
                   {description && (
-                    <p className="text-xs text-white/90 sm:text-sm truncate sm:text-right mb-0">{description}</p>
+                    <p className={compact ? 'mb-0 truncate text-[11px] text-white/90 sm:text-xs sm:text-right' : 'mb-0 truncate text-xs text-white/90 sm:text-sm sm:text-right'}>{description}</p>
                   )}
                 </div>
               </div>

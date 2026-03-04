@@ -8,64 +8,74 @@ interface ProductCardWithPromotionProps {
   product: Product;
   onClick: () => void;
   className?: string;
+  immersiveMobile?: boolean;
 }
 
 /**
  * Composant de carte produit avec badge promotionnel
  */
-const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({ product, onClick, className = '' }) => {
+const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
+  product,
+  onClick,
+  className = '',
+  immersiveMobile = false,
+}) => {
   // Récupérer toutes les promotions applicables au produit
   const { promotions, loading } = useProductPromotions(product);
+  const hasPromotionBadges = !loading && promotions.length > 0 && product.estado === 'disponible';
 
   return (
     <div
       onClick={() => product.estado === 'disponible' && onClick()}
-      className={`relative rounded-2xl border border-white/60 bg-white/70 backdrop-blur-md p-4 flex h-full flex-col items-center text-center transition-shadow shadow-lg ${
-        product.estado === 'disponible' ? 'cursor-pointer hover:shadow-xl' : 'opacity-60'
+      className={`relative flex h-full flex-col items-center text-center transition-shadow ${
+        immersiveMobile
+          ? 'rounded-none border-0 bg-transparent p-0 shadow-none backdrop-blur-none'
+          : 'rounded-2xl border border-white/60 bg-white/70 p-4 shadow-lg backdrop-blur-md'
+      } ${product.estado === 'disponible' ? 'cursor-pointer hover:shadow-xl' : 'opacity-60'} ${
+        hasPromotionBadges ? (immersiveMobile ? 'pt-12' : 'pt-16') : ''
       } ${className}`}
     >
       {/* Afficher tous les badges promotionnels si des promotions sont applicables */}
-      {!loading && promotions.length > 0 && product.estado === 'disponible' && (
-        <div className="absolute top-2 right-2 flex flex-wrap gap-1 max-w-[calc(100%-1rem)] justify-end z-10">
+      {hasPromotionBadges && (
+        <div className="absolute right-3 top-3 z-10 flex max-w-[calc(100%-1.25rem)] flex-wrap justify-end gap-1">
           {promotions.map((promotion, index) => (
             <PromotionBadge key={promotion.id || index} promotion={promotion} />
           ))}
         </div>
       )}
-      
+
       {/* Image du produit */}
-      <img 
-        src={product.image} 
-        alt={product.nom_produit} 
-        className="w-full aspect-square object-cover rounded-xl mb-2" 
+      <img
+        src={product.image}
+        alt={product.nom_produit}
+        className={`w-full object-cover ${immersiveMobile ? 'aspect-[1/1] rounded-none mb-0' : 'mb-2 aspect-[4/3] rounded-xl sm:aspect-square'}`}
       />
-      
+
       {/* Nom du produit */}
-      <div className="flex w-full flex-1 flex-col items-center">
+      <div className={`flex w-full flex-1 flex-col items-center ${immersiveMobile ? 'bg-[#d5bdd0] px-4 py-4' : ''}`}>
         <div className="flex w-full items-baseline justify-between gap-2">
-          <p
-            className="flex-1 text-left font-extrabold text-gray-900 leading-snug text-[clamp(0.78rem,1.7vw,0.95rem)] break-words text-balance whitespace-normal [hyphens:auto] tracking-tight"
-          >
+          <p className="flex-1 text-left text-[clamp(0.78rem,1.7vw,0.95rem)] font-extrabold leading-snug tracking-tight text-gray-900 break-words text-balance whitespace-normal [hyphens:auto]">
             {product.nom_produit}
           </p>
-          <p className="shrink-0 whitespace-nowrap text-right font-bold text-[clamp(0.88rem,1.6vw,1.04rem)] text-gray-800">
+          <p className="shrink-0 whitespace-nowrap text-right text-[clamp(0.88rem,1.6vw,1.04rem)] font-bold text-gray-800">
             {formatCurrencyCOP(product.prix_vente)}
           </p>
         </div>
 
         {/* Description */}
-        <p className="text-sm text-left text-gray-600 mt-1 px-1 max-h-10 overflow-hidden line-clamp-2">
+        <p className={`mt-1 px-1 text-left text-sm text-gray-600 ${immersiveMobile ? 'max-h-none line-clamp-3' : 'max-h-10 overflow-hidden line-clamp-2'}`}>
           {product.description}
         </p>
 
-        <div className="mt-auto w-full pt-2">
+        <div className={`mt-auto w-full ${immersiveMobile ? 'pt-4' : 'pt-2'}`}>
           {/* Statut */}
-          {product.estado !== 'disponible' && (
-            <span className="text-xs text-red-500 font-bold">Agotado</span>
-          )}
+          {product.estado !== 'disponible' && <span className="text-xs font-bold text-red-500">Agotado</span>}
           {product.estado === 'disponible' && (
             <button
-              onClick={(e) => { e.stopPropagation(); onClick(); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onClick();
+              }}
               className="w-full rounded-lg bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-2 font-bold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:from-orange-600 hover:via-orange-700 hover:to-red-700"
             >
               Agregar
@@ -73,7 +83,6 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({ pro
           )}
         </div>
       </div>
-
     </div>
   );
 };
