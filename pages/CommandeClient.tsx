@@ -1031,22 +1031,20 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                             ))}
                         </div>
 
-                        <div className="lg:hidden relative h-[100dvh] overflow-y-auto overscroll-y-contain pb-4">
-                            <div className="sticky inset-x-0 top-0 z-30 px-3 pt-3 pb-2 backdrop-blur-md bg-gradient-to-b from-[#7d004a]/95 via-[#7d004a]/85 to-transparent">
-                                <div className="mb-3">
-                                    <ActivePromotionsDisplay />
-                                </div>
-                                <div className="flex justify-end gap-2">
+                        <div className="lg:hidden relative h-[100dvh] overflow-hidden">
+                            <div className="sticky inset-x-0 top-0 z-30 bg-[#7d004a] px-2 pt-2 pb-1">
+                                <div className="relative">
+                                    <ActivePromotionsDisplay compact />
                                     <button
                                         type="button"
                                         onClick={handleScrollToCart}
-                                        className="inline-flex items-center gap-2 rounded-full border border-orange-200/70 bg-white/95 px-4 py-2 text-sm font-semibold text-orange-700 shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
+                                        className="absolute right-0 top-0 inline-flex items-center gap-1 rounded-full border border-orange-200/70 bg-white/95 px-3 py-1.5 text-xs font-semibold text-orange-700 shadow"
                                         aria-label="Ir al carrito"
                                     >
                                         <span className="relative flex items-center">
-                                            <ShoppingCart size={18} />
+                                            <ShoppingCart size={14} />
                                             {cartItemCount > 0 && (
-                                                <span className="absolute -right-2.5 -top-2.5 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-red-500 px-1 text-xs font-bold text-white shadow">
+                                                <span className="absolute -right-2 -top-2 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white shadow">
                                                     {cartItemCount}
                                                 </span>
                                             )}
@@ -1056,14 +1054,16 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                                 </div>
                             </div>
 
-                            <div className="space-y-4 px-3 pb-4 pt-2">
+                            <div className="h-[calc(100dvh-9.5rem)] overflow-y-auto snap-y snap-mandatory overscroll-y-contain">
                                 {filteredProducts.map(product => product && (
-                                    <ProductCardWithPromotion
-                                        key={product.id}
-                                        product={product}
-                                        onClick={() => handleProductClick(product)}
-                                        className="min-h-[calc(100dvh-13rem)]"
-                                    />
+                                    <div key={product.id} className="h-[calc(100dvh-9.5rem)] snap-start snap-always">
+                                        <ProductCardWithPromotion
+                                            product={product}
+                                            onClick={() => handleProductClick(product)}
+                                            immersiveMobile
+                                            className="h-full"
+                                        />
+                                    </div>
                                 ))}
                             </div>
                         </div>
