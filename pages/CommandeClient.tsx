@@ -850,6 +850,54 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
     }, [orderType]);
 
 
+    useEffect(() => {
+        if (typeof window === 'undefined') {
+            return;
+        }
+
+        const shouldLockUpScroll = isCartViewActive && orderType === 'pedir_en_linea' && window.innerWidth < 1024;
+        if (!shouldLockUpScroll) {
+            return;
+        }
+
+        let lastTouchY: number | null = null;
+
+        const onWheel = (event: WheelEvent) => {
+            if (event.deltaY < 0) {
+                event.preventDefault();
+            }
+        };
+
+        const onTouchStart = (event: TouchEvent) => {
+            lastTouchY = event.touches[0]?.clientY ?? null;
+        };
+
+        const onTouchMove = (event: TouchEvent) => {
+            if (lastTouchY === null) {
+                return;
+            }
+
+            const currentY = event.touches[0]?.clientY ?? lastTouchY;
+            const deltaY = currentY - lastTouchY;
+            lastTouchY = currentY;
+
+            if (deltaY > 0) {
+                event.preventDefault();
+            }
+        };
+
+        window.addEventListener('wheel', onWheel, { passive: false });
+        window.addEventListener('touchstart', onTouchStart, { passive: true });
+        window.addEventListener('touchmove', onTouchMove, { passive: false });
+
+        return () => {
+            window.removeEventListener('wheel', onWheel);
+            window.removeEventListener('touchstart', onTouchStart);
+            window.removeEventListener('touchmove', onTouchMove);
+        };
+    }, [isCartViewActive, orderType]);
+
+
     const handleSubmitOrder = async (e: React.FormEvent) => {
         e.preventDefault();
         setSubmitting(true);
@@ -1070,7 +1118,10 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                                     aria-label="Volver al menú"
                                     title="Volver al menú"
                                 >
-                                    <ArrowUp size={28} />
+                                    <span className="flex flex-col items-center leading-none">
+                                        <ArrowUp size={18} />
+                                        <span className="text-[10px] font-bold uppercase tracking-tight">Menu</span>
+                                    </span>
                                 </button>
                             ) : (
                                 <button
