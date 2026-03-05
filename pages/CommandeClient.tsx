@@ -948,7 +948,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
     }
 
     return (
-        <div className="order-online-page min-h-screen flex flex-col lg:flex-row lg:items-start gap-6 lg:gap-10 px-4 pb-10 pt-4 lg:px-8 lg:pt-8" style={orderBackgroundStyle}>
+        <div className="order-online-page min-h-screen flex flex-col px-0 pb-0 pt-0 lg:flex-row lg:items-start lg:gap-10 lg:px-8 lg:pb-10 lg:pt-8" style={orderBackgroundStyle}>
             <button
                 type="button"
                 onClick={handleScrollToCart}
@@ -966,7 +966,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                 <span>Carrito</span>
             </button>
             {/* Main Content */}
-            <div className="flex-1 min-w-0 space-y-6">
+            <div className="flex-1 min-w-0 lg:space-y-6">
                 {/* Active Promotions Display */}
                 <div className="hidden px-4 pt-0 pb-4 lg:block">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -1031,8 +1031,8 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                             ))}
                         </div>
 
-                        <div className="lg:hidden relative h-[100dvh] overflow-hidden">
-                            <div className="sticky inset-x-0 top-0 z-30 bg-[#7d004a] px-2 pt-2 pb-1">
+                        <div className="relative h-[100dvh] overflow-hidden lg:hidden">
+                            <div className="sticky inset-x-0 top-0 z-30 bg-[#7d004a] px-0 pt-0 pb-1">
                                 <div className="relative">
                                     <ActivePromotionsDisplay compact />
                                     <button

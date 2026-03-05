@@ -122,6 +122,12 @@ const TakeawayCard: React.FC<{
                             </p>
                         </div>
                         <div className="flex flex-col items-start gap-1 sm:items-end">
+                            {onlineOrderMode && (
+                                <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-1 text-[11px] font-semibold ${onlineOrderMode.classes}`}>
+                                    <onlineOrderMode.icon size={12} />
+                                    <span>{onlineOrderMode.label}</span>
+                                </span>
+                            )}
                             <div className="flex w-full justify-start sm:justify-end">
                                 <OrderTimer startTime={timerStart} className=" text-sm sm:text-base" />
                             </div>

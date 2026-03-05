@@ -21,20 +21,7 @@ import { fetchPromotions, updatePromotionStatus, deletePromotion } from '../serv
 import PromotionModal from '../components/promotions/PromotionModal';
 import PromotionDetailsModal from '../components/promotions/PromotionDetailsModal';
 import ConfirmationModal from '../components/ConfirmationModal';
-
-const statusLabels: Record<PromotionStatus, string> = {
-  active: 'Activa',
-  inactive: 'Inactiva',
-  scheduled: 'Programada',
-  expired: 'Expirada'
-};
-
-const statusColors: Record<PromotionStatus, string> = {
-  active: 'bg-green-100 text-green-800',
-  inactive: 'bg-gray-100 text-gray-800',
-  scheduled: 'bg-blue-100 text-blue-800',
-  expired: 'bg-red-100 text-red-800'
-};
+import { formatCurrencyCOP } from '../utils/formatIntegerAmount';
 
 const typeLabels: Record<PromotionType, string> = {
   percentage: 'Porcentaje',
@@ -281,15 +268,7 @@ const Promotions: React.FC = () => {
                   </button>
                 </th>
                 <th className="px-4 py-3 text-left text-xs uppercase tracking-wide text-gray-500">Tipo</th>
-                <th className="px-4 py-3 text-left text-xs uppercase tracking-wide text-gray-500">Estado</th>
-                <th className="px-4 py-3 text-left text-xs uppercase tracking-wide text-gray-500">
-                  <button
-                    className="flex items-center gap-1 font-semibold text-gray-700"
-                    onClick={() => handleSort('priority')}
-                  >
-                    Prioridad {renderSortIcon('priority')}
-                  </button>
-                </th>
+                <th className="px-4 py-3 text-left text-xs uppercase tracking-wide text-gray-500">Mínimo de compra</th>
                 <th className="px-4 py-3 text-left text-xs uppercase tracking-wide text-gray-500">
                   <button
                     className="flex items-center gap-1 font-semibold text-gray-700"
@@ -312,7 +291,7 @@ const Promotions: React.FC = () => {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center">
+                  <td colSpan={6} className="px-4 py-8 text-center">
                     <div className="flex justify-center items-center">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"></div>
                       <span className="ml-2">Cargando...</span>
@@ -321,7 +300,7 @@ const Promotions: React.FC = () => {
                 </tr>
               ) : filteredPromotions.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
                     No se encontraron promociones
                   </td>
                 </tr>
@@ -348,14 +327,12 @@ const Promotions: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-0 md:px-4 py-2 md:py-4 align-top">
-                      <div className="md:hidden text-xs uppercase tracking-wide text-gray-500 mb-1">Estado</div>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[promotion.status]}`}>
-                        {statusLabels[promotion.status]}
+                      <div className="md:hidden text-xs uppercase tracking-wide text-gray-500 mb-1">Mínimo de compra</div>
+                      <span className="font-medium text-gray-800">
+                        {typeof promotion.conditions.min_order_amount === 'number' && promotion.conditions.min_order_amount > 0
+                          ? formatCurrencyCOP(promotion.conditions.min_order_amount)
+                          : 'Sin mínimo'}
                       </span>
-                    </td>
-                    <td className="px-0 md:px-4 py-2 md:py-4 align-top">
-                      <div className="md:hidden text-xs uppercase tracking-wide text-gray-500 mb-1">Prioridad</div>
-                      <span className="font-medium text-gray-800">{promotion.priority}</span>
                     </td>
                     <td className="px-0 md:px-4 py-2 md:py-4 align-top">
                       <div className="md:hidden text-xs uppercase tracking-wide text-gray-500 mb-1">Periodo</div>
@@ -376,7 +353,7 @@ const Promotions: React.FC = () => {
                           className={`h-10 min-w-[76px] px-3.5 rounded-full border text-sm font-semibold tracking-wide transition-colors md:h-11 md:min-w-[92px] md:px-4 lg:h-12 lg:min-w-[104px] lg:px-5 lg:text-base ${promotion.status === 'active' ? 'bg-emerald-100 text-emerald-700 border-emerald-300 hover:bg-emerald-200' : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200'}`}
                           title={promotion.status === 'active' ? 'Desactivar' : 'Activar'}
                         >
-                          {promotion.status === 'active' ? 'ON' : 'OFF'}
+                          {promotion.status === 'active' ? 'Activada' : 'Inactivada'}
                         </button>
                         <button
                           onClick={() => handleViewPromotion(promotion)}
