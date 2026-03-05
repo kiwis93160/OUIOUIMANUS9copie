@@ -432,6 +432,8 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
     const [now, setNow] = useState(() => new Date());
     const cartUpdateTimeouts = useRef<Map<string, NodeJS.Timeout>>(new Map());
     const cartSectionRef = useRef<HTMLDivElement | null>(null);
+    const mobileMenuScrollRef = useRef<HTMLDivElement | null>(null);
+    const hasAutoReturnedToMenuRef = useRef(false);
 
     useEffect(() => {
         if (typeof window === 'undefined') {
@@ -824,6 +826,66 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
         cartSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, []);
 
+
+    useEffect(() => {
+        if (typeof window === 'undefined') {
+            return;
+        }
+
+        let lastTouchY: number | null = null;
+
+        const autoReturnToMenuTop = () => {
+            if (window.innerWidth >= 1024 || !cartSectionRef.current) {
+                return;
+            }
+
+            const cartTop = cartSectionRef.current.getBoundingClientRect().top + window.scrollY;
+            if (window.scrollY + 8 < cartTop) {
+                hasAutoReturnedToMenuRef.current = false;
+                return;
+            }
+
+            if (!hasAutoReturnedToMenuRef.current) {
+                hasAutoReturnedToMenuRef.current = true;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                mobileMenuScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        };
+
+        const onWheel = (event: WheelEvent) => {
+            if (event.deltaY < -6) {
+                autoReturnToMenuTop();
+            }
+        };
+
+        const onTouchStart = (event: TouchEvent) => {
+            lastTouchY = event.touches[0]?.clientY ?? null;
+        };
+
+        const onTouchMove = (event: TouchEvent) => {
+            if (lastTouchY === null) {
+                return;
+            }
+            const currentY = event.touches[0]?.clientY ?? lastTouchY;
+            const deltaY = currentY - lastTouchY;
+            lastTouchY = currentY;
+
+            if (deltaY > 6) {
+                autoReturnToMenuTop();
+            }
+        };
+
+        window.addEventListener('wheel', onWheel, { passive: true });
+        window.addEventListener('touchstart', onTouchStart, { passive: true });
+        window.addEventListener('touchmove', onTouchMove, { passive: true });
+
+        return () => {
+            window.removeEventListener('wheel', onWheel);
+            window.removeEventListener('touchstart', onTouchStart);
+            window.removeEventListener('touchmove', onTouchMove);
+        };
+    }, []);
+
     const handleSubmitOrder = async (e: React.FormEvent) => {
         e.preventDefault();
         setSubmitting(true);
@@ -1043,7 +1105,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                                 aria-label="Ir al carrito"
                             >
                                 <span className="relative flex items-center justify-center">
-                                    <ShoppingCart size={20} />
+                                    <ShoppingCart size={28} />
                                     {cartItemCount > 0 && (
                                         <span className="absolute -right-2 -top-2 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white shadow">
                                             {cartItemCount}
@@ -1052,7 +1114,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                                 </span>
                             </button>
 
-                            <div className="h-[100dvh] overflow-y-auto snap-y snap-mandatory overscroll-y-contain">
+                            <div ref={mobileMenuScrollRef} className="h-[100dvh] overflow-y-auto snap-y snap-mandatory overscroll-y-contain">
                                 {filteredProducts.map(product => product && (
                                     <div key={product.id} className="h-[100dvh] snap-start snap-always">
                                         <ProductCardWithPromotion
