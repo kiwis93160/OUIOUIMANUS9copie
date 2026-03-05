@@ -64,7 +64,7 @@ const TakeawayCard: React.FC<{
     const onlineOrderMode = useMemo(() => {
         if (order.type === 'pedir_en_linea') {
             return {
-                label: 'Para entregar',
+                label: 'Entregar',
                 icon: Truck,
                 classes: 'bg-emerald-50 text-emerald-700 border-emerald-200',
             };
@@ -72,7 +72,7 @@ const TakeawayCard: React.FC<{
 
         if (order.type === 'a_emporter') {
             return {
-                label: 'Para recoger',
+                label: 'Recoger',
                 icon: Store,
                 classes: 'bg-indigo-50 text-indigo-700 border-indigo-200',
             };
@@ -108,7 +108,15 @@ const TakeawayCard: React.FC<{
                 <header className="border-b border-gray-200 px-5 pt-3 pb-2">
                     <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
                         <div className="min-w-0 space-y-0.5">
-                            <h4 className="truncate text-base font-semibold leading-tight text-gray-900 sm:text-lg md:text-xl">{displayName}</h4>
+                            <div className="flex items-center justify-between gap-2">
+                                <h4 className="truncate text-base font-semibold leading-tight text-gray-900 sm:text-lg md:text-xl">{displayName}</h4>
+                                {onlineOrderMode && (
+                                    <span className={`inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-1 text-[11px] font-semibold ${onlineOrderMode.classes}`}>
+                                        <onlineOrderMode.icon size={12} />
+                                        <span>{onlineOrderMode.label}</span>
+                                    </span>
+                                )}
+                            </div>
                             <p className="text-xs text-gray-500">
                                 Pedido enviado {new Date(timerStart).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}
                             </p>
