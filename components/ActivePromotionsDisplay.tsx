@@ -9,9 +9,10 @@ const PROMO_LINEAR_GRADIENT = `linear-gradient(135deg, ${PROMO_GRADIENT_FROM}, $
 
 interface ActivePromotionsDisplayProps {
   compact?: boolean;
+  showTitle?: boolean;
 }
 
-const ActivePromotionsDisplay: React.FC<ActivePromotionsDisplayProps> = ({ compact = false }) => {
+const ActivePromotionsDisplay: React.FC<ActivePromotionsDisplayProps> = ({ compact = false, showTitle = true }) => {
   const [promotions, setPromotions] = useState<Promotion[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -71,12 +72,14 @@ const ActivePromotionsDisplay: React.FC<ActivePromotionsDisplayProps> = ({ compa
 
   return (
     <div className={compact ? 'mb-2 space-y-1.5' : 'mb-3 space-y-2.5'}>
-      <div className={compact ? 'flex items-center gap-2 text-xs font-semibold text-white drop-shadow-sm' : 'flex items-center gap-2 text-sm font-semibold text-white drop-shadow-sm'}>
-        <div className={compact ? 'flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-sm' : 'flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm'}>
-          <Gift size={compact ? 14 : 16} className="text-black" />
+      {showTitle && (
+        <div className={compact ? 'flex items-center gap-2 text-xs font-semibold text-white drop-shadow-sm' : 'flex items-center gap-2 text-sm font-semibold text-white drop-shadow-sm'}>
+          <div className={compact ? 'flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-sm' : 'flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm'}>
+            <Gift size={compact ? 14 : 16} className="text-black" />
+          </div>
+          <span className={compact ? 'text-sm leading-tight' : 'text-base leading-tight'}>Promociones Activas</span>
         </div>
-        <span className={compact ? 'text-sm leading-tight' : 'text-base leading-tight'}>Promociones Activas</span>
-      </div>
+      )}
 
       <div className={compact ? 'space-y-1.5' : 'space-y-2.5'}>
         {visiblePromotions.map((promo) => {
