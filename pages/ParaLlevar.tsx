@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useMemo, Dispatch, SetStateAction } from 'react';
 import { api } from '../services/api';
 import { Order, OrderItem, WeeklySchedule } from '../types';
-import { Clock, Eye, User, MapPin, Phone, PlusCircle } from 'lucide-react';
+import { Clock, Eye, User, MapPin, Phone, PlusCircle, Store, Truck } from 'lucide-react';
 import Modal from '../components/Modal';
 import OrderTimer from '../components/OrderTimer';
 import { getOrderUrgencyStyles, getOrderUrgencyToneClasses } from '../utils/orderUrgency';
@@ -61,6 +61,25 @@ const TakeawayCard: React.FC<{
     const showPromotionDetails = hasAppliedPromotions;
     const toneBorderStyle = useMemo<React.CSSProperties>(() => ({ borderColor: urgencyTone.toneHex }), [urgencyTone.toneHex]);
     const toneFillStyle = useMemo<React.CSSProperties>(() => ({ backgroundColor: urgencyTone.toneHex }), [urgencyTone.toneHex]);
+    const onlineOrderMode = useMemo(() => {
+        if (order.type === 'pedir_en_linea') {
+            return {
+                label: 'Para entregar',
+                icon: Truck,
+                classes: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+            };
+        }
+
+        if (order.type === 'a_emporter') {
+            return {
+                label: 'Para recoger',
+                icon: Store,
+                classes: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+            };
+        }
+
+        return null;
+    }, [order.type]);
 
     const { borderClasses, quantityBackgroundClass } = (() => {
         switch (urgencyStyles.level) {
@@ -95,6 +114,12 @@ const TakeawayCard: React.FC<{
                             </p>
                         </div>
                         <div className="flex flex-col items-start gap-1 sm:items-end">
+                            {onlineOrderMode && (
+                                <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-1 text-[11px] font-semibold ${onlineOrderMode.classes}`}>
+                                    <onlineOrderMode.icon size={12} />
+                                    <span>{onlineOrderMode.label}</span>
+                                </span>
+                            )}
                             <div className="flex w-full justify-start sm:justify-end">
                                 <OrderTimer startTime={timerStart} className=" text-sm sm:text-base" />
                             </div>
