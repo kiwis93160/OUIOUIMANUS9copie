@@ -48,11 +48,11 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
       <img
         src={product.image}
         alt={product.nom_produit}
-        className={`w-full object-cover ${immersiveMobile ? 'aspect-[1/1] rounded-none mb-0' : 'mb-2 aspect-[4/3] rounded-xl sm:aspect-square'}`}
+        className={`w-full object-cover ${immersiveMobile ? 'h-[58dvh] min-h-[45dvh] max-h-[62dvh] rounded-none mb-0' : 'mb-2 aspect-[4/3] rounded-xl sm:aspect-square'}`}
       />
 
       {/* Nom du produit */}
-      <div className={`flex w-full flex-1 flex-col items-center ${immersiveMobile ? 'bg-[#d5bdd0] px-4 py-4' : ''}`}>
+      <div className={`flex w-full flex-1 min-h-0 flex-col items-center ${immersiveMobile ? 'bg-[#d5bdd0] px-4 py-3' : ''}`}>
         <div className="flex w-full items-baseline justify-between gap-2">
           <p className="flex-1 text-left text-[clamp(0.78rem,1.7vw,0.95rem)] font-extrabold leading-snug tracking-tight text-gray-900 break-words text-balance whitespace-normal [hyphens:auto]">
             {product.nom_produit}
@@ -63,11 +63,11 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
         </div>
 
         {/* Description */}
-        <p className={`mt-1 px-1 text-left text-sm text-gray-600 ${immersiveMobile ? 'max-h-none line-clamp-3' : 'max-h-10 overflow-hidden line-clamp-2'}`}>
+        <p className={`mt-1 px-1 text-left text-sm text-gray-600 ${immersiveMobile ? 'line-clamp-4' : 'max-h-10 overflow-hidden line-clamp-2'}`}>
           {product.description}
         </p>
 
-        <div className={`mt-auto w-full ${immersiveMobile ? 'pt-4' : 'pt-2'}`}>
+        <div className={`mt-auto w-full ${immersiveMobile ? 'pt-3' : 'pt-2'}`}>
           {/* Statut */}
           {product.estado !== 'disponible' && <span className="text-xs font-bold text-red-500">Agotado</span>}
           {product.estado === 'disponible' && (

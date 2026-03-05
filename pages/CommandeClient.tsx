@@ -948,7 +948,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
     }
 
     return (
-        <div className="order-online-page min-h-screen flex flex-col lg:flex-row lg:items-start gap-6 lg:gap-10 px-4 pb-10 pt-4 lg:px-8 lg:pt-8" style={orderBackgroundStyle}>
+        <div className="order-online-page min-h-screen flex flex-col px-0 pb-0 pt-0 lg:flex-row lg:items-start lg:gap-10 lg:px-8 lg:pb-10 lg:pt-8" style={orderBackgroundStyle}>
             <button
                 type="button"
                 onClick={handleScrollToCart}
@@ -966,7 +966,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                 <span>Carrito</span>
             </button>
             {/* Main Content */}
-            <div className="flex-1 min-w-0 space-y-6">
+            <div className="flex-1 min-w-0 lg:space-y-6">
                 {/* Active Promotions Display */}
                 <div className="hidden px-4 pt-0 pb-4 lg:block">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -1031,32 +1031,30 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                             ))}
                         </div>
 
-                        <div className="lg:hidden relative h-[100dvh] overflow-hidden">
-                            <div className="sticky inset-x-0 top-0 z-30 bg-[#7d004a] px-2 pt-2 pb-1">
-                                <div className="relative">
-                                    <ActivePromotionsDisplay compact />
-                                    <button
-                                        type="button"
-                                        onClick={handleScrollToCart}
-                                        className="absolute right-0 top-0 inline-flex items-center gap-1 rounded-full border border-orange-200/70 bg-white/95 px-3 py-1.5 text-xs font-semibold text-orange-700 shadow"
-                                        aria-label="Ir al carrito"
-                                    >
-                                        <span className="relative flex items-center">
-                                            <ShoppingCart size={14} />
-                                            {cartItemCount > 0 && (
-                                                <span className="absolute -right-2 -top-2 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white shadow">
-                                                    {cartItemCount}
-                                                </span>
-                                            )}
-                                        </span>
-                                        <span>Carrito</span>
-                                    </button>
-                                </div>
+                        <div className="relative h-[100dvh] overflow-hidden lg:hidden">
+                            <div className="pointer-events-none absolute inset-x-0 top-0 z-30 bg-transparent px-1 pt-[max(env(safe-area-inset-top),0.25rem)]">
+                                <ActivePromotionsDisplay compact showTitle={false} />
                             </div>
 
-                            <div className="h-[calc(100dvh-9.5rem)] overflow-y-auto snap-y snap-mandatory overscroll-y-contain">
+                            <button
+                                type="button"
+                                onClick={handleScrollToCart}
+                                className="fixed right-3 top-[max(env(safe-area-inset-top),0.75rem)] z-40 inline-flex h-14 w-14 items-center justify-center rounded-full border border-orange-200/70 bg-white/95 text-orange-700 shadow-xl"
+                                aria-label="Ir al carrito"
+                            >
+                                <span className="relative flex items-center justify-center">
+                                    <ShoppingCart size={20} />
+                                    {cartItemCount > 0 && (
+                                        <span className="absolute -right-2 -top-2 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white shadow">
+                                            {cartItemCount}
+                                        </span>
+                                    )}
+                                </span>
+                            </button>
+
+                            <div className="h-[100dvh] overflow-y-auto snap-y snap-mandatory overscroll-y-contain">
                                 {filteredProducts.map(product => product && (
-                                    <div key={product.id} className="h-[calc(100dvh-9.5rem)] snap-start snap-always">
+                                    <div key={product.id} className="h-[100dvh] snap-start snap-always">
                                         <ProductCardWithPromotion
                                             product={product}
                                             onClick={() => handleProductClick(product)}
