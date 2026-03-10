@@ -7,7 +7,7 @@ import { Product, Category, OrderItem, Order, SelectedProductExtraOption, Ingred
 import { api } from '../services/api';
 import { formatCurrencyCOP } from '../utils/formatIntegerAmount';
 import { uploadPaymentReceipt } from '../services/cloudinary';
-import { ShoppingCart, ArrowLeft, Clock, Minus, Plus, PlusCircle } from 'lucide-react';
+import { ShoppingCart, ArrowLeft, ArrowUp, Clock, Minus, Plus, PlusCircle } from 'lucide-react';
 import { storeActiveCustomerOrder, ONE_DAY_IN_MS } from '../services/customerOrderStorage';
 import ProductCardWithPromotion from '../components/ProductCardWithPromotion';
 import ActivePromotionsDisplay from '../components/ActivePromotionsDisplay';
@@ -432,6 +432,8 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
     const [now, setNow] = useState(() => new Date());
     const cartUpdateTimeouts = useRef<Map<string, NodeJS.Timeout>>(new Map());
     const cartSectionRef = useRef<HTMLDivElement | null>(null);
+    const mobileMenuScrollRef = useRef<HTMLDivElement | null>(null);
+    const [isCartModeActive, setIsCartModeActive] = useState(false);
 
     useEffect(() => {
         if (typeof window === 'undefined') {
@@ -821,8 +823,78 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
         if (!cartSectionRef.current) {
             return;
         }
+        setIsCartModeActive(true);
         cartSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, []);
+
+
+    const handleScrollToMenuTop = useCallback(() => {
+        setIsCartModeActive(false);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        mobileMenuScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    }, []);
+    useEffect(() => {
+        if (orderType !== 'pedir_en_linea') {
+            setIsCartModeActive(false);
+        }
+    }, [orderType]);
+
+
+    useEffect(() => {
+        if (typeof window === 'undefined') {
+            return;
+        }
+
+        const shouldLockUpScroll = isCartModeActive && orderType === 'pedir_en_linea' && window.innerWidth < 1024;
+        if (!shouldLockUpScroll) {
+            return;
+        }
+
+        let lastTouchY: number | null = null;
+
+        const isAtCartTop = () => {
+            if (!cartSectionRef.current) {
+                return false;
+            }
+            const cartTop = cartSectionRef.current.getBoundingClientRect().top + window.scrollY;
+            return window.scrollY <= cartTop + 8;
+        };
+
+        const onWheel = (event: WheelEvent) => {
+            if (event.deltaY < 0 && isAtCartTop()) {
+                event.preventDefault();
+            }
+        };
+
+        const onTouchStart = (event: TouchEvent) => {
+            lastTouchY = event.touches[0]?.clientY ?? null;
+        };
+
+        const onTouchMove = (event: TouchEvent) => {
+            if (lastTouchY === null) {
+                return;
+            }
+
+            const currentY = event.touches[0]?.clientY ?? lastTouchY;
+            const deltaY = currentY - lastTouchY;
+            lastTouchY = currentY;
+
+            if (deltaY > 0 && isAtCartTop()) {
+                event.preventDefault();
+            }
+        };
+
+        window.addEventListener('wheel', onWheel, { passive: false });
+        window.addEventListener('touchstart', onTouchStart, { passive: true });
+        window.addEventListener('touchmove', onTouchMove, { passive: false });
+
+        return () => {
+            window.removeEventListener('wheel', onWheel);
+            window.removeEventListener('touchstart', onTouchStart);
+            window.removeEventListener('touchmove', onTouchMove);
+        };
+    }, [isCartModeActive, orderType]);
+
 
     const handleSubmitOrder = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -948,7 +1020,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
     }
 
     return (
-        <div className="order-online-page min-h-screen flex flex-col lg:flex-row lg:items-start gap-6 lg:gap-10 px-4 pb-10 pt-4 lg:px-8 lg:pt-8" style={orderBackgroundStyle}>
+        <div className="order-online-page min-h-screen flex flex-col px-0 pb-0 pt-0 lg:flex-row lg:items-start lg:gap-10 lg:px-8 lg:pb-10 lg:pt-8" style={orderBackgroundStyle}>
             <button
                 type="button"
                 onClick={handleScrollToCart}
@@ -966,7 +1038,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                 <span>Carrito</span>
             </button>
             {/* Main Content */}
-            <div className="flex-1 min-w-0 space-y-6">
+            <div className="flex-1 min-w-0 lg:space-y-6">
                 {/* Active Promotions Display */}
                 <div className="hidden px-4 pt-0 pb-4 lg:block">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -1031,32 +1103,47 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                             ))}
                         </div>
 
-                        <div className="lg:hidden relative h-[100dvh] overflow-hidden">
-                            <div className="sticky inset-x-0 top-0 z-30 bg-[#7d004a] px-2 pt-2 pb-1">
-                                <div className="relative">
-                                    <ActivePromotionsDisplay compact />
-                                    <button
-                                        type="button"
-                                        onClick={handleScrollToCart}
-                                        className="absolute right-0 top-0 inline-flex items-center gap-1 rounded-full border border-orange-200/70 bg-white/95 px-3 py-1.5 text-xs font-semibold text-orange-700 shadow"
-                                        aria-label="Ir al carrito"
-                                    >
-                                        <span className="relative flex items-center">
-                                            <ShoppingCart size={14} />
-                                            {cartItemCount > 0 && (
-                                                <span className="absolute -right-2 -top-2 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white shadow">
-                                                    {cartItemCount}
-                                                </span>
-                                            )}
-                                        </span>
-                                        <span>Carrito</span>
-                                    </button>
-                                </div>
+                        <div className="relative h-[100dvh] overflow-hidden lg:hidden">
+                            <div className="pointer-events-none absolute inset-x-0 top-0 z-30 bg-transparent px-1 pt-[max(env(safe-area-inset-top),0.25rem)]">
+                                <ActivePromotionsDisplay compact showTitle={false} />
                             </div>
 
-                            <div className="h-[calc(100dvh-9.5rem)] overflow-y-auto snap-y snap-mandatory overscroll-y-contain">
+                            {isCartModeActive ? (
+                                <button
+                                    type="button"
+                                    onClick={handleScrollToMenuTop}
+                                    className="fixed right-3 top-[max(env(safe-area-inset-top),0.75rem)] z-40 inline-flex h-14 w-14 items-center justify-center rounded-full border border-orange-200/70 bg-white/95 text-orange-700 shadow-xl"
+                                    aria-label="Volver al menú"
+                                    title="Volver al menú"
+                                >
+                                    <span className="flex flex-col items-center leading-none">
+                                        <ArrowUp size={18} />
+                                        <span className="text-[10px] font-bold uppercase tracking-tight">Menu</span>
+                                    </span>
+                                </button>
+                            ) : (
+                                <button
+                                    type="button"
+                                    onClick={handleScrollToCart}
+                                    className="fixed right-3 top-[max(env(safe-area-inset-top),0.75rem)] z-40 inline-flex h-14 w-14 items-center justify-center rounded-full border border-orange-200/70 bg-white/95 text-orange-700 shadow-xl"
+                                    aria-label="Ir al carrito"
+                                    title="Ir al carrito"
+                                >
+                                    <span className="relative flex flex-col items-center leading-none">
+                                        <ShoppingCart size={20} />
+                                        <span className="text-[10px] font-bold tracking-tight">carrito</span>
+                                        {cartItemCount > 0 && (
+                                            <span className="absolute -right-2 -top-2 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white shadow">
+                                                {cartItemCount}
+                                            </span>
+                                        )}
+                                    </span>
+                                </button>
+                            )}
+
+                            <div ref={mobileMenuScrollRef} className="h-[100dvh] overflow-y-auto snap-y snap-mandatory overscroll-y-contain">
                                 {filteredProducts.map(product => product && (
-                                    <div key={product.id} className="h-[calc(100dvh-9.5rem)] snap-start snap-always">
+                                    <div key={product.id} className="h-[100dvh] snap-start snap-always">
                                         <ProductCardWithPromotion
                                             product={product}
                                             onClick={() => handleProductClick(product)}
