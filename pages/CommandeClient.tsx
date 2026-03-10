@@ -433,7 +433,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
     const cartUpdateTimeouts = useRef<Map<string, NodeJS.Timeout>>(new Map());
     const cartSectionRef = useRef<HTMLDivElement | null>(null);
     const mobileMenuScrollRef = useRef<HTMLDivElement | null>(null);
-    const [isCartViewActive, setIsCartViewActive] = useState(false);
+    const [isCartModeActive, setIsCartModeActive] = useState(false);
 
     useEffect(() => {
         if (typeof window === 'undefined') {
@@ -823,30 +823,20 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
         if (!cartSectionRef.current) {
             return;
         }
+        setIsCartModeActive(true);
         cartSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, []);
 
 
     const handleScrollToMenuTop = useCallback(() => {
+        setIsCartModeActive(false);
         window.scrollTo({ top: 0, behavior: 'smooth' });
         mobileMenuScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
     }, []);
-
     useEffect(() => {
-        if (typeof window === 'undefined' || !cartSectionRef.current) {
-            return;
+        if (orderType !== 'pedir_en_linea') {
+            setIsCartModeActive(false);
         }
-
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                setIsCartViewActive(entry.isIntersecting && window.innerWidth < 1024 && orderType === 'pedir_en_linea');
-            },
-            { threshold: 0.35 },
-        );
-
-        observer.observe(cartSectionRef.current);
-
-        return () => observer.disconnect();
     }, [orderType]);
 
 
@@ -855,7 +845,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
             return;
         }
 
-        const shouldLockUpScroll = isCartViewActive && orderType === 'pedir_en_linea' && window.innerWidth < 1024;
+        const shouldLockUpScroll = isCartModeActive && orderType === 'pedir_en_linea' && window.innerWidth < 1024;
         if (!shouldLockUpScroll) {
             return;
         }
@@ -903,7 +893,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
             window.removeEventListener('touchstart', onTouchStart);
             window.removeEventListener('touchmove', onTouchMove);
         };
-    }, [isCartViewActive, orderType]);
+    }, [isCartModeActive, orderType]);
 
 
     const handleSubmitOrder = async (e: React.FormEvent) => {
@@ -1118,7 +1108,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                                 <ActivePromotionsDisplay compact showTitle={false} />
                             </div>
 
-                            {isCartViewActive ? (
+                            {isCartModeActive ? (
                                 <button
                                     type="button"
                                     onClick={handleScrollToMenuTop}
@@ -1139,8 +1129,9 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                                     aria-label="Ir al carrito"
                                     title="Ir al carrito"
                                 >
-                                    <span className="relative flex items-center justify-center">
-                                        <ShoppingCart size={28} />
+                                    <span className="relative flex flex-col items-center leading-none">
+                                        <ShoppingCart size={20} />
+                                        <span className="text-[10px] font-bold tracking-tight">carrito</span>
                                         {cartItemCount > 0 && (
                                             <span className="absolute -right-2 -top-2 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white shadow">
                                                 {cartItemCount}
