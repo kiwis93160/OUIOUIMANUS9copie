@@ -841,27 +841,44 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
 
 
     useEffect(() => {
-        if (typeof window === 'undefined') {
-            return;
-        }
-
-        const shouldLockUpScroll = isCartModeActive && orderType === 'pedir_en_linea' && window.innerWidth < 1024;
-        if (!shouldLockUpScroll) {
+        if (typeof window === 'undefined' || orderType !== 'pedir_en_linea' || window.innerWidth >= 1024 || !cartSectionRef.current) {
             return;
         }
 
         let lastTouchY: number | null = null;
 
-        const isAtCartTop = () => {
+        const getCartTop = () => {
             if (!cartSectionRef.current) {
-                return false;
+                return 0;
             }
-            const cartTop = cartSectionRef.current.getBoundingClientRect().top + window.scrollY;
-            return window.scrollY <= cartTop + 8;
+            return cartSectionRef.current.getBoundingClientRect().top + window.scrollY;
+        };
+
+        const enforceSectionBoundary = () => {
+            const cartTop = getCartTop();
+
+            if (isCartModeActive) {
+                if (window.scrollY < cartTop) {
+                    window.scrollTo({ top: cartTop, behavior: 'auto' });
+                }
+                return;
+            }
+
+            const maxMenuScroll = Math.max(0, cartTop - 8);
+            if (window.scrollY > maxMenuScroll) {
+                window.scrollTo({ top: maxMenuScroll, behavior: 'auto' });
+            }
         };
 
         const onWheel = (event: WheelEvent) => {
-            if (event.deltaY < 0 && isAtCartTop()) {
+            const cartTop = getCartTop();
+            const maxMenuScroll = Math.max(0, cartTop - 8);
+
+            if (isCartModeActive && event.deltaY < 0 && window.scrollY <= cartTop + 8) {
+                event.preventDefault();
+            }
+
+            if (!isCartModeActive && event.deltaY > 0 && window.scrollY >= maxMenuScroll - 1) {
                 event.preventDefault();
             }
         };
@@ -879,7 +896,14 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
             const deltaY = currentY - lastTouchY;
             lastTouchY = currentY;
 
-            if (deltaY > 0 && isAtCartTop()) {
+            const cartTop = getCartTop();
+            const maxMenuScroll = Math.max(0, cartTop - 8);
+
+            if (isCartModeActive && deltaY > 0 && window.scrollY <= cartTop + 8) {
+                event.preventDefault();
+            }
+
+            if (!isCartModeActive && deltaY < 0 && window.scrollY >= maxMenuScroll - 1) {
                 event.preventDefault();
             }
         };
@@ -887,11 +911,15 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
         window.addEventListener('wheel', onWheel, { passive: false });
         window.addEventListener('touchstart', onTouchStart, { passive: true });
         window.addEventListener('touchmove', onTouchMove, { passive: false });
+        window.addEventListener('scroll', enforceSectionBoundary, { passive: true });
+
+        enforceSectionBoundary();
 
         return () => {
             window.removeEventListener('wheel', onWheel);
             window.removeEventListener('touchstart', onTouchStart);
             window.removeEventListener('touchmove', onTouchMove);
+            window.removeEventListener('scroll', enforceSectionBoundary);
         };
     }, [isCartModeActive, orderType]);
 
