@@ -862,8 +862,16 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
 
         let lastTouchY: number | null = null;
 
+        const isAtCartTop = () => {
+            if (!cartSectionRef.current) {
+                return false;
+            }
+            const cartTop = cartSectionRef.current.getBoundingClientRect().top + window.scrollY;
+            return window.scrollY <= cartTop + 8;
+        };
+
         const onWheel = (event: WheelEvent) => {
-            if (event.deltaY < 0) {
+            if (event.deltaY < 0 && isAtCartTop()) {
                 event.preventDefault();
             }
         };
@@ -881,7 +889,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
             const deltaY = currentY - lastTouchY;
             lastTouchY = currentY;
 
-            if (deltaY > 0) {
+            if (deltaY > 0 && isAtCartTop()) {
                 event.preventDefault();
             }
         };
