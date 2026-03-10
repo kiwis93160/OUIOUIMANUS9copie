@@ -216,6 +216,9 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
   const bottomProduct = secondaryProducts[2];
   const hasSecondaryProducts = secondaryProducts.length > 0;
 
+  const { fontFamily: _menuTitleFontFamily, color: _menuTitleColor, ...menuCardTitleStyle } = menuTextStyle;
+  const { fontFamily: _menuBodyFontFamily, color: _menuBodyColor, ...menuCardBodyStyle } = menuBodyTextStyle;
+
   const renderMenuCard = (product: Product, variant: 'featured' | 'small' | 'medium') => {
     const hasImage = Boolean(product.image);
 
@@ -231,15 +234,15 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
           <div className="menu-card__media bg-gradient-to-br from-orange-200 via-amber-100 to-orange-50" />
         )}
         <div className="menu-card__body">
-          <h3 className="menu-card__title" style={{ ...menuTextStyle, color: '#ffffff' }}>
+          <h3 className="menu-card__title" style={menuCardTitleStyle}>
             {product.nom_produit}
           </h3>
           {product.description && (
-            <p className="menu-card__description" style={{ ...menuBodyTextStyle, color: '#ffffff' }}>
+            <p className="menu-card__description" style={menuCardBodyStyle}>
               {product.description}
             </p>
           )}
-          <p className="menu-card__price" style={{ ...menuBodyTextStyle, color: '#ffffff' }}>
+          <p className="menu-card__price" style={menuCardBodyStyle}>
             {formatCurrencyCOP(product.prix_vente)}
           </p>
         </div>

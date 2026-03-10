@@ -444,6 +444,9 @@ const Login: React.FC = () => {
   const bottomProduct = secondaryProducts[2];
   const hasSecondaryProducts = secondaryProducts.length > 0;
 
+  const { fontFamily: _menuTitleFontFamily, color: _menuTitleColor, ...menuCardTitleStyle } = menuTextStyle;
+  const { fontFamily: _menuBodyFontFamily, color: _menuBodyColor, ...menuCardBodyStyle } = menuBodyTextStyle;
+
   const renderMenuCard = (product: Product, variant: 'featured' | 'small' | 'medium') => {
     const showDescription = variant !== 'small';
 
@@ -458,15 +461,15 @@ const Login: React.FC = () => {
             </div>
             <div className="menu-card__body">
               <div className="menu-card__copy">
-                <h3 className="menu-card__title" style={{ ...menuTextStyle, color: '#ffffff' }}>
+                <h3 className="menu-card__title" style={menuCardTitleStyle}>
                   {product.nom_produit}
                 </h3>
                 {showDescription && (
-                  <p className="menu-card__description" style={{ ...menuBodyTextStyle, color: '#e7e7e7' }}>
+                  <p className="menu-card__description" style={menuCardBodyStyle}>
                     {product.description}
                   </p>
                 )}
-                <span className="menu-card__price" style={{ ...menuBodyTextStyle, color: '#ffffff' }}>
+                <span className="menu-card__price" style={menuCardBodyStyle}>
                   {formatCurrencyCOP(product.prix_vente)}
                 </span>
               </div>
