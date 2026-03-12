@@ -444,11 +444,14 @@ const Login: React.FC = () => {
   const bottomProduct = secondaryProducts[2];
   const hasSecondaryProducts = secondaryProducts.length > 0;
 
-  const renderMenuCard = (product: Product, variant: 'featured' | 'small' | 'medium') => {
+  const { fontFamily: _menuTitleFontFamily, color: _menuTitleColor, ...menuCardTitleStyle } = menuTextStyle;
+  const { fontFamily: _menuBodyFontFamily, color: _menuBodyColor, ...menuCardBodyStyle } = menuBodyTextStyle;
+
+  const renderMenuCard = (product: Product, variant: 'featured' | 'small' | 'medium', styleOption: number) => {
     const showDescription = variant !== 'small';
 
     return (
-      <article key={product.id} className={`ui-card menu-card best-seller-card best-seller-card--${variant}`}>
+      <article key={product.id} className={`ui-card menu-card best-seller-card best-seller-card--${variant} menu-card--style-${styleOption}`}>
         <div className={`menu-card__visual menu-card__visual--${variant}`}>
           <img src={product.image} alt={product.nom_produit} className="menu-card__backdrop" />
           <div className="menu-card__backdrop-overlay" />
@@ -458,15 +461,15 @@ const Login: React.FC = () => {
             </div>
             <div className="menu-card__body">
               <div className="menu-card__copy">
-                <h3 className="menu-card__title" style={{ ...menuTextStyle, color: '#ffffff' }}>
+                <h3 className="menu-card__title" style={menuCardTitleStyle}>
                   {product.nom_produit}
                 </h3>
                 {showDescription && (
-                  <p className="menu-card__description" style={{ ...menuBodyTextStyle, color: '#e7e7e7' }}>
+                  <p className="menu-card__description" style={menuCardBodyStyle}>
                     {product.description}
                   </p>
                 )}
-                <span className="menu-card__price" style={{ ...menuBodyTextStyle, color: '#ffffff' }}>
+                <span className="menu-card__price" style={menuCardBodyStyle}>
                   {formatCurrencyCOP(product.prix_vente)}
                 </span>
               </div>
@@ -857,13 +860,13 @@ const Login: React.FC = () => {
               <div
                 className={`menu-grid ${hasSecondaryProducts ? 'grid grid-cols-1 lg:grid-cols-2' : 'menu-grid--best-sellers-single'}`}
               >
-                {featuredProduct && renderMenuCard(featuredProduct, 'featured')}
+                {featuredProduct && renderMenuCard(featuredProduct, 'featured', 1)}
                 {hasSecondaryProducts && (
                   <div className="best-seller-rail">
                     <div className="best-seller-top">
-                      {topRowProducts.map(product => renderMenuCard(product, 'small'))}
+                      {topRowProducts.map((product, index) => renderMenuCard(product, 'small', index + 2))}
                     </div>
-                    {bottomProduct && renderMenuCard(bottomProduct, 'medium')}
+                    {bottomProduct && renderMenuCard(bottomProduct, 'medium', 4)}
                   </div>
                 )}
               </div>

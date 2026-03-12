@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Montserrat:wght@500;600;700&family=Nunito:wght@500;600;700&family=Poppins:wght@500;600;700&family=Raleway:wght@500;600;700&family=Work+Sans:wght@500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -1420,6 +1420,8 @@ body {
 
 .menu-card__title {
   font-size: clamp(1.05rem, 2.3vw, 1.45rem);
+  font-family: 'Poppins', 'Montserrat', 'Nunito', 'Raleway', 'Work Sans', sans-serif;
+  font-weight: 600;
   line-height: 1.2;
   color: var(--color-heading);
   margin: 0;
@@ -1430,6 +1432,7 @@ body {
 
 .menu-card__description {
   font-size: var(--font-size-sm);
+  font-family: 'Nunito', 'Poppins', 'Montserrat', 'Raleway', 'Work Sans', sans-serif;
   color: var(--color-text-muted);
   flex: 1;
   margin: 0;
@@ -1437,8 +1440,98 @@ body {
 
 .menu-card__price {
   font-size: var(--font-size-lg);
+  font-family: 'Montserrat', 'Poppins', 'Nunito', 'Raleway', 'Work Sans', sans-serif;
   font-weight: 700;
   color: var(--color-accent);
+}
+
+/* Card-by-card style options in online ordering menu */
+.menu-card--style-1 .menu-card__title,
+.menu-card--style-1 .menu-card__description,
+.menu-card--style-1 .menu-card__price {
+  font-family: 'Poppins', 'Trebuchet MS', sans-serif !important;
+}
+
+.menu-card--style-1 .menu-card__title {
+  color: #fff1e6;
+  letter-spacing: 0.01em;
+}
+
+.menu-card--style-1 .menu-card__price {
+  color: #ffd166;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
+}
+
+.menu-card--style-2 .menu-card__title,
+.menu-card--style-2 .menu-card__description,
+.menu-card--style-2 .menu-card__price {
+  font-family: 'Montserrat', 'Arial Black', sans-serif !important;
+}
+
+.menu-card--style-2 .menu-card__title {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.menu-card--style-2 .menu-card__price {
+  color: #93f5ff;
+  border: 1px solid rgba(147, 245, 255, 0.35);
+  border-radius: 999px;
+  padding: 0.2rem 0.65rem;
+  display: inline-flex;
+  width: fit-content;
+}
+
+.menu-card--style-3 .menu-card__title,
+.menu-card--style-3 .menu-card__description,
+.menu-card--style-3 .menu-card__price {
+  font-family: 'Nunito', 'Verdana', sans-serif !important;
+}
+
+.menu-card--style-3 .menu-card__title {
+  color: #e8fffb;
+}
+
+.menu-card--style-3 .menu-card__price {
+  color: #7cf5c7;
+  background: rgba(124, 245, 199, 0.15);
+  border-radius: 0.5rem;
+  padding: 0.15rem 0.5rem;
+  display: inline-flex;
+  width: fit-content;
+}
+
+.menu-card--style-4 .menu-card__title,
+.menu-card--style-4 .menu-card__description,
+.menu-card--style-4 .menu-card__price {
+  font-family: 'Raleway', 'Gill Sans', sans-serif !important;
+}
+
+.menu-card--style-4 .menu-card__title {
+  font-weight: 700;
+  text-shadow: 0 3px 10px rgba(0, 0, 0, 0.33);
+}
+
+.menu-card--style-4 .menu-card__price {
+  color: #ffb4f0;
+  letter-spacing: 0.04em;
+}
+
+.menu-card--style-5 .menu-card__title,
+.menu-card--style-5 .menu-card__description,
+.menu-card--style-5 .menu-card__price {
+  font-family: 'Work Sans', 'Tahoma', sans-serif !important;
+}
+
+.menu-card--style-5 .menu-card__title {
+  font-weight: 700;
+  color: #f2e9ff;
+}
+
+.menu-card--style-5 .menu-card__price {
+  color: #f9c74f;
+  transform: rotate(-2deg);
+  display: inline-flex;
 }
 
 .contact-grid {

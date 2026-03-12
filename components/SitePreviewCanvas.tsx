@@ -216,11 +216,14 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
   const bottomProduct = secondaryProducts[2];
   const hasSecondaryProducts = secondaryProducts.length > 0;
 
-  const renderMenuCard = (product: Product, variant: 'featured' | 'small' | 'medium') => {
+  const { fontFamily: _menuTitleFontFamily, color: _menuTitleColor, ...menuCardTitleStyle } = menuTextStyle;
+  const { fontFamily: _menuBodyFontFamily, color: _menuBodyColor, ...menuCardBodyStyle } = menuBodyTextStyle;
+
+  const renderMenuCard = (product: Product, variant: 'featured' | 'small' | 'medium', styleOption: number) => {
     const hasImage = Boolean(product.image);
 
     return (
-      <article key={product.id} className={`ui-card menu-card best-seller-card best-seller-card--${variant}`}>
+      <article key={product.id} className={`ui-card menu-card best-seller-card best-seller-card--${variant} menu-card--style-${styleOption}`}>
         {hasImage ? (
           <img
             src={product.image}
@@ -231,15 +234,15 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
           <div className="menu-card__media bg-gradient-to-br from-orange-200 via-amber-100 to-orange-50" />
         )}
         <div className="menu-card__body">
-          <h3 className="menu-card__title" style={{ ...menuTextStyle, color: '#ffffff' }}>
+          <h3 className="menu-card__title" style={menuCardTitleStyle}>
             {product.nom_produit}
           </h3>
           {product.description && (
-            <p className="menu-card__description" style={{ ...menuBodyTextStyle, color: '#ffffff' }}>
+            <p className="menu-card__description" style={menuCardBodyStyle}>
               {product.description}
             </p>
           )}
-          <p className="menu-card__price" style={{ ...menuBodyTextStyle, color: '#ffffff' }}>
+          <p className="menu-card__price" style={menuCardBodyStyle}>
             {formatCurrencyCOP(product.prix_vente)}
           </p>
         </div>
@@ -710,13 +713,13 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
               >
                 {bestSellersToDisplay.length > 0 ? (
                   <>
-                    {featuredProduct && renderMenuCard(featuredProduct, 'featured')}
+                    {featuredProduct && renderMenuCard(featuredProduct, 'featured', 1)}
                     {hasSecondaryProducts && (
                       <div className="best-seller-rail">
                         <div className="best-seller-top">
-                          {topRowProducts.map(product => renderMenuCard(product, 'small'))}
+                          {topRowProducts.map((product, index) => renderMenuCard(product, 'small', index + 2))}
                         </div>
-                        {bottomProduct && renderMenuCard(bottomProduct, 'medium')}
+                        {bottomProduct && renderMenuCard(bottomProduct, 'medium', 4)}
                       </div>
                     )}
                   </>
