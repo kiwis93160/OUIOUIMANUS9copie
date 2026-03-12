@@ -1445,35 +1445,35 @@ body {
   color: var(--color-accent);
 }
 
-/* Card-by-card style options in online ordering menu (rotates every 5 cards) */
-.menu-grid .best-seller-card:nth-child(5n + 1) .menu-card__title,
-.menu-grid .best-seller-card:nth-child(5n + 1) .menu-card__description,
-.menu-grid .best-seller-card:nth-child(5n + 1) .menu-card__price {
-  font-family: 'Poppins', sans-serif;
+/* Card-by-card style options in online ordering menu */
+.menu-card--style-1 .menu-card__title,
+.menu-card--style-1 .menu-card__description,
+.menu-card--style-1 .menu-card__price {
+  font-family: 'Poppins', 'Trebuchet MS', sans-serif !important;
 }
 
-.menu-grid .best-seller-card:nth-child(5n + 1) .menu-card__title {
+.menu-card--style-1 .menu-card__title {
   color: #fff1e6;
   letter-spacing: 0.01em;
 }
 
-.menu-grid .best-seller-card:nth-child(5n + 1) .menu-card__price {
+.menu-card--style-1 .menu-card__price {
   color: #ffd166;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
 }
 
-.menu-grid .best-seller-card:nth-child(5n + 2) .menu-card__title,
-.menu-grid .best-seller-card:nth-child(5n + 2) .menu-card__description,
-.menu-grid .best-seller-card:nth-child(5n + 2) .menu-card__price {
-  font-family: 'Montserrat', sans-serif;
+.menu-card--style-2 .menu-card__title,
+.menu-card--style-2 .menu-card__description,
+.menu-card--style-2 .menu-card__price {
+  font-family: 'Montserrat', 'Arial Black', sans-serif !important;
 }
 
-.menu-grid .best-seller-card:nth-child(5n + 2) .menu-card__title {
+.menu-card--style-2 .menu-card__title {
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
-.menu-grid .best-seller-card:nth-child(5n + 2) .menu-card__price {
+.menu-card--style-2 .menu-card__price {
   color: #93f5ff;
   border: 1px solid rgba(147, 245, 255, 0.35);
   border-radius: 999px;
@@ -1482,17 +1482,17 @@ body {
   width: fit-content;
 }
 
-.menu-grid .best-seller-card:nth-child(5n + 3) .menu-card__title,
-.menu-grid .best-seller-card:nth-child(5n + 3) .menu-card__description,
-.menu-grid .best-seller-card:nth-child(5n + 3) .menu-card__price {
-  font-family: 'Nunito', sans-serif;
+.menu-card--style-3 .menu-card__title,
+.menu-card--style-3 .menu-card__description,
+.menu-card--style-3 .menu-card__price {
+  font-family: 'Nunito', 'Verdana', sans-serif !important;
 }
 
-.menu-grid .best-seller-card:nth-child(5n + 3) .menu-card__title {
+.menu-card--style-3 .menu-card__title {
   color: #e8fffb;
 }
 
-.menu-grid .best-seller-card:nth-child(5n + 3) .menu-card__price {
+.menu-card--style-3 .menu-card__price {
   color: #7cf5c7;
   background: rgba(124, 245, 199, 0.15);
   border-radius: 0.5rem;
@@ -1501,34 +1501,34 @@ body {
   width: fit-content;
 }
 
-.menu-grid .best-seller-card:nth-child(5n + 4) .menu-card__title,
-.menu-grid .best-seller-card:nth-child(5n + 4) .menu-card__description,
-.menu-grid .best-seller-card:nth-child(5n + 4) .menu-card__price {
-  font-family: 'Raleway', sans-serif;
+.menu-card--style-4 .menu-card__title,
+.menu-card--style-4 .menu-card__description,
+.menu-card--style-4 .menu-card__price {
+  font-family: 'Raleway', 'Gill Sans', sans-serif !important;
 }
 
-.menu-grid .best-seller-card:nth-child(5n + 4) .menu-card__title {
+.menu-card--style-4 .menu-card__title {
   font-weight: 700;
   text-shadow: 0 3px 10px rgba(0, 0, 0, 0.33);
 }
 
-.menu-grid .best-seller-card:nth-child(5n + 4) .menu-card__price {
+.menu-card--style-4 .menu-card__price {
   color: #ffb4f0;
   letter-spacing: 0.04em;
 }
 
-.menu-grid .best-seller-card:nth-child(5n + 5) .menu-card__title,
-.menu-grid .best-seller-card:nth-child(5n + 5) .menu-card__description,
-.menu-grid .best-seller-card:nth-child(5n + 5) .menu-card__price {
-  font-family: 'Work Sans', sans-serif;
+.menu-card--style-5 .menu-card__title,
+.menu-card--style-5 .menu-card__description,
+.menu-card--style-5 .menu-card__price {
+  font-family: 'Work Sans', 'Tahoma', sans-serif !important;
 }
 
-.menu-grid .best-seller-card:nth-child(5n + 5) .menu-card__title {
+.menu-card--style-5 .menu-card__title {
   font-weight: 700;
   color: #f2e9ff;
 }
 
-.menu-grid .best-seller-card:nth-child(5n + 5) .menu-card__price {
+.menu-card--style-5 .menu-card__price {
   color: #f9c74f;
   transform: rotate(-2deg);
   display: inline-flex;

@@ -219,11 +219,11 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
   const { fontFamily: _menuTitleFontFamily, color: _menuTitleColor, ...menuCardTitleStyle } = menuTextStyle;
   const { fontFamily: _menuBodyFontFamily, color: _menuBodyColor, ...menuCardBodyStyle } = menuBodyTextStyle;
 
-  const renderMenuCard = (product: Product, variant: 'featured' | 'small' | 'medium') => {
+  const renderMenuCard = (product: Product, variant: 'featured' | 'small' | 'medium', styleOption: number) => {
     const hasImage = Boolean(product.image);
 
     return (
-      <article key={product.id} className={`ui-card menu-card best-seller-card best-seller-card--${variant}`}>
+      <article key={product.id} className={`ui-card menu-card best-seller-card best-seller-card--${variant} menu-card--style-${styleOption}`}>
         {hasImage ? (
           <img
             src={product.image}
@@ -713,13 +713,13 @@ const SitePreviewCanvas: React.FC<SitePreviewCanvasProps> = ({
               >
                 {bestSellersToDisplay.length > 0 ? (
                   <>
-                    {featuredProduct && renderMenuCard(featuredProduct, 'featured')}
+                    {featuredProduct && renderMenuCard(featuredProduct, 'featured', 1)}
                     {hasSecondaryProducts && (
                       <div className="best-seller-rail">
                         <div className="best-seller-top">
-                          {topRowProducts.map(product => renderMenuCard(product, 'small'))}
+                          {topRowProducts.map((product, index) => renderMenuCard(product, 'small', index + 2))}
                         </div>
-                        {bottomProduct && renderMenuCard(bottomProduct, 'medium')}
+                        {bottomProduct && renderMenuCard(bottomProduct, 'medium', 4)}
                       </div>
                     )}
                   </>
