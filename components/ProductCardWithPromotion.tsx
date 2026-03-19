@@ -12,12 +12,16 @@ interface ProductCardWithPromotionProps {
   fontVariantIndex?: number;
 }
 
-const MENU_CARD_FONT_STYLE = {
-  titleFamily: '"DM Serif Display", "Playfair Display", serif',
-  bodyFamily: '"Inter", "Nunito Sans", sans-serif',
-  priceFamily: '"Inter", "Nunito Sans", sans-serif',
-  titleLetterSpacing: '0.01em',
-} as const;
+const PRODUCT_CARD_FONT_VARIANTS = [
+  {
+    titleFamily: '"DM Serif Display", "Playfair Display", serif',
+    bodyFamily: '"Inter", "Nunito Sans", sans-serif',
+    priceFamily: '"Inter", "Nunito Sans", sans-serif',
+    titleLetterSpacing: '0.01em',
+  },
+] as const;
+
+const MENU_CARD_FONT_STYLE = PRODUCT_CARD_FONT_VARIANTS[0];
 
 /**
  * Composant de carte produit avec badge promotionnel
