@@ -1067,11 +1067,12 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                 ) : (
                     <>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-lg:hidden">
-                            {filteredProducts.map(product => product && (
+                            {filteredProducts.map((product, index) => product && (
                                 <ProductCardWithPromotion
                                     key={product.id}
                                     product={product}
                                     onClick={() => handleProductClick(product)}
+                                    fontVariantIndex={index}
                                 />
                             ))}
                         </div>
@@ -1081,13 +1082,14 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                                 <ActivePromotionsDisplay compact showTitle={false} />
                             </div>
                             <div ref={mobileMenuScrollRef} className="h-[100dvh] overflow-y-auto snap-y snap-mandatory overscroll-y-contain">
-                                {filteredProducts.map(product => product && (
+                                {filteredProducts.map((product, index) => product && (
                                     <div key={product.id} className="h-[100dvh] snap-start snap-always">
                                         <ProductCardWithPromotion
                                             product={product}
                                             onClick={() => handleProductClick(product)}
                                             immersiveMobile
                                             className="h-full"
+                                            fontVariantIndex={index}
                                         />
                                     </div>
                                 ))}
