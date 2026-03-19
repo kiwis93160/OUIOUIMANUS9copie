@@ -9,6 +9,7 @@ interface ProductCardWithPromotionProps {
   onClick: () => void;
   className?: string;
   immersiveMobile?: boolean;
+  fontVariantIndex?: number;
 }
 
 const MENU_CARD_FONT_STYLE = {
@@ -26,10 +27,12 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
   onClick,
   className = '',
   immersiveMobile = false,
+  fontVariantIndex = 0,
 }) => {
   // Récupérer toutes les promotions applicables au produit
   const { promotions, loading } = useProductPromotions(product);
   const hasPromotionBadges = !loading && promotions.length > 0 && product.estado === 'disponible';
+  const fontVariant = PRODUCT_CARD_FONT_VARIANTS[((fontVariantIndex % PRODUCT_CARD_FONT_VARIANTS.length) + PRODUCT_CARD_FONT_VARIANTS.length) % PRODUCT_CARD_FONT_VARIANTS.length];
 
   return (
     <div
@@ -42,6 +45,12 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
         hasPromotionBadges ? (immersiveMobile ? 'pt-12' : 'pt-16') : ''
       } ${className}`}
     >
+      <div
+        className={`absolute left-3 z-10 inline-flex rounded-full border border-white/70 bg-black/55 px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-sm ${immersiveMobile ? 'top-4' : 'top-3'}`}
+      >
+        {fontVariant.label}
+      </div>
+
       {/* Afficher tous les badges promotionnels si des promotions sont applicables */}
       {hasPromotionBadges && (
         <div className="absolute right-3 top-3 z-10 flex max-w-[calc(100%-1.25rem)] flex-wrap justify-end gap-1">
