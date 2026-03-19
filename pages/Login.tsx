@@ -447,11 +447,11 @@ const Login: React.FC = () => {
   const { fontFamily: _menuTitleFontFamily, color: _menuTitleColor, ...menuCardTitleStyle } = menuTextStyle;
   const { fontFamily: _menuBodyFontFamily, color: _menuBodyColor, ...menuCardBodyStyle } = menuBodyTextStyle;
 
-  const renderMenuCard = (product: Product, variant: 'featured' | 'small' | 'medium', styleOption: number) => {
+  const renderMenuCard = (product: Product, variant: 'featured' | 'small' | 'medium') => {
     const showDescription = variant !== 'small';
 
     return (
-      <article key={product.id} className={`ui-card menu-card best-seller-card best-seller-card--${variant} menu-card--style-${styleOption}`}>
+      <article key={product.id} className={`ui-card menu-card best-seller-card best-seller-card--${variant}`}>
         <div className={`menu-card__visual menu-card__visual--${variant}`}>
           <img src={product.image} alt={product.nom_produit} className="menu-card__backdrop" />
           <div className="menu-card__backdrop-overlay" />
@@ -860,13 +860,13 @@ const Login: React.FC = () => {
               <div
                 className={`menu-grid ${hasSecondaryProducts ? 'grid grid-cols-1 lg:grid-cols-2' : 'menu-grid--best-sellers-single'}`}
               >
-                {featuredProduct && renderMenuCard(featuredProduct, 'featured', 1)}
+                {featuredProduct && renderMenuCard(featuredProduct, 'featured')}
                 {hasSecondaryProducts && (
                   <div className="best-seller-rail">
                     <div className="best-seller-top">
-                      {topRowProducts.map((product, index) => renderMenuCard(product, 'small', index + 2))}
+                      {topRowProducts.map(product => renderMenuCard(product, 'small'))}
                     </div>
-                    {bottomProduct && renderMenuCard(bottomProduct, 'medium', 4)}
+                    {bottomProduct && renderMenuCard(bottomProduct, 'medium')}
                   </div>
                 )}
               </div>
