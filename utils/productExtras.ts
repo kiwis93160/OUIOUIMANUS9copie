@@ -5,7 +5,7 @@ import type {
     SelectedProductExtraOption,
 } from '../types';
 
-const INGREDIENT_REMOVAL_EXTRA_NAME = 'Retirer des ingrédients';
+const INGREDIENT_REMOVAL_EXTRA_NAME = 'Retirar';
 
 const normalizeIngredientName = (name?: string | null) => name?.trim() ?? '';
 
