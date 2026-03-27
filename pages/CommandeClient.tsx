@@ -25,6 +25,7 @@ import {
     mapSelectedExtrasFromState,
 } from '../utils/productExtras';
 import { createIngredientNameMap, mapIngredientIdsToNames } from '../utils/ingredientNames';
+import { sortCategoriesForMenu, sortProductsForMenu } from '../utils/menuCategoryOrder';
 
 const DOMICILIO_FEE = 8000;
 const DOMICILIO_ITEM_NAME = 'Domicilio';
@@ -559,10 +560,12 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
         }
     }, [loading, products]);
 
+    const orderedCategories = useMemo(() => sortCategoriesForMenu(categories), [categories]);
     const filteredProducts = useMemo(() => {
-        if (activeCategoryId === 'all') return products;
-        return products.filter(p => p.categoria_id === activeCategoryId);
-    }, [products, activeCategoryId]);
+        const sortedProducts = sortProductsForMenu(products, orderedCategories);
+        if (activeCategoryId === 'all') return sortedProducts;
+        return sortedProducts.filter(p => p.categoria_id === activeCategoryId);
+    }, [products, activeCategoryId, orderedCategories]);
     const ingredientNameMap = useMemo(() => createIngredientNameMap(ingredients), [ingredients]);
     const categoriesById = useMemo(
         () =>
@@ -1037,7 +1040,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                     >
                         Todos
                     </button>
-                    {categories.map(category => (
+                    {orderedCategories.map(category => (
                         <button
                             key={category.id}
                             onClick={() => setActiveCategoryId(category.id)}

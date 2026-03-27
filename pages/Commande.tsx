@@ -11,6 +11,7 @@ import ProductGrid, { ProductStockStatus, ProductStockStatusMap } from '../compo
 import OrderSummary from '../components/commande/OrderSummary';
 import ItemCustomizationModal, { type ItemCustomizationResult } from '../components/commande/ItemCustomizationModal';
 import { createIngredientNameMap } from '../utils/ingredientNames';
+import { sortCategoriesForMenu, sortProductsForMenu } from '../utils/menuCategoryOrder';
 
 const isPersistedItemId = (value?: string) =>
     !!value && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
@@ -347,48 +348,17 @@ const Commande: React.FC = () => {
         }, {} as { [key: string]: number });
     }, [order]);
 
+    const orderedCategories = useMemo(() => sortCategoriesForMenu(categories), [categories]);
+
     const filteredProducts = useMemo(() => {
-        const normalizeCategoryName = (value: string) => value
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .toLowerCase()
-            .trim();
-
-        const categoryPriorityKeywords: Array<{ priority: number; keywords: string[] }> = [
-            { priority: 0, keywords: ['entrada', 'entradas'] },
-            { priority: 1, keywords: ['plato principal', 'platos principales', 'main', 'principale', 'principal'] },
-            { priority: 2, keywords: ['postre', 'postres', 'dessert', 'desserts'] },
-            { priority: 4, keywords: ['bebida', 'bebidas', 'drink', 'boisson'] },
-        ];
-
-        const categoryPriorityById = new Map(
-            categories.map(category => {
-                const normalizedName = normalizeCategoryName(category.nom);
-                const match = categoryPriorityKeywords.find(({ keywords }) =>
-                    keywords.some(keyword => normalizedName.includes(keyword))
-                );
-
-                return [category.id, match?.priority ?? 3] as const;
-            })
-        );
-
-        const sortedProducts = [...products].sort((productA, productB) => {
-            const priorityA = categoryPriorityById.get(productA.categoria_id) ?? 3;
-            const priorityB = categoryPriorityById.get(productB.categoria_id) ?? 3;
-
-            if (priorityA !== priorityB) {
-                return priorityA - priorityB;
-            }
-
-            return productA.nom_produit.localeCompare(productB.nom_produit, 'es', { sensitivity: 'base' });
-        });
+        const sortedProducts = sortProductsForMenu(products, orderedCategories);
 
         if (activeCategoryId === 'all') {
             return sortedProducts;
         }
 
         return sortedProducts.filter(product => product.categoria_id === activeCategoryId);
-    }, [activeCategoryId, categories, products]);
+    }, [activeCategoryId, orderedCategories, products]);
 
     const productStockStatuses = useMemo<ProductStockStatusMap>(() => {
         if (products.length === 0) {
@@ -842,7 +812,7 @@ const Commande: React.FC = () => {
                     onAdd={handleProductSelection}
                     onQuickAdd={handleQuickAddProduct}
                     activeCategoryId={activeCategoryId}
-                    categories={categories}
+                    categories={orderedCategories}
                     onSelectCategory={setActiveCategoryId}
                     handleProductPointerDown={handleProductPointerDown}
                     handleProductKeyDown={handleProductKeyDown}
