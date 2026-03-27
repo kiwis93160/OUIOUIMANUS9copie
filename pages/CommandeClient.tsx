@@ -318,7 +318,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, selectedPr
 
                             {removalExtras.length > 0 && (
                                 <div className="space-y-3 rounded-xl border border-orange-100 bg-gradient-to-br from-orange-50 via-rose-50 to-red-50 p-3">
-                                    <p className="font-bold text-gray-800">Ingredientes para quitar</p>
+                                    <p className="font-bold text-gray-800">Quitar ingredientes</p>
                                     <div className="space-y-3">
                                         {removalExtras.map(extra => (
                                             <div key={extra.name} className="rounded-lg border border-gray-200 bg-white/70 p-3">
@@ -359,7 +359,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, selectedPr
                                     </div>
                                     {removalLabels.length > 0 && (
                                         <div className="rounded-lg bg-white/70 p-3 text-sm text-gray-700 border border-gray-200">
-                                            <p className="font-semibold">Sin ingredientes</p>
+                                            <p className="font-semibold">Ingredientes quitados</p>
                                             <p className="text-xs text-gray-600">{removalLabels.join(', ')}</p>
                                         </div>
                                     )}

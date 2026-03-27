@@ -183,7 +183,7 @@ const ItemCustomizationModal: React.FC<ItemCustomizationModalProps> = ({
 
                         {removalExtras.length > 0 && (
                             <div className="space-y-3 rounded-xl border border-orange-100 bg-gradient-to-br from-orange-50 via-rose-50 to-red-50 p-4">
-                                <p className="text-sm font-semibold text-black">Ingredientes para quitar</p>
+                                <p className="text-sm font-semibold text-black">Quitar ingredientes</p>
                                 {removalExtras.map(extra => (
                                     <div key={extra.name} className="space-y-2">
                                         <p className="text-xs uppercase tracking-wide text-black">{extra.name}</p>
