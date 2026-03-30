@@ -3,6 +3,7 @@ import { Product } from '../types';
 import { formatCurrencyCOP } from '../utils/formatIntegerAmount';
 import PromotionBadge from './promotions/PromotionBadge';
 import useProductPromotions from '../hooks/useProductPromotions';
+import { buildOptimizedCloudinaryUrl } from '../utils/image';
 
 interface ProductCardWithPromotionProps {
   product: Product;
@@ -38,6 +39,12 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
   const hasPromotionBadges = !loading && promotions.length > 0 && product.estado === 'disponible';
   const fontVariant = PRODUCT_CARD_FONT_VARIANTS[((fontVariantIndex % PRODUCT_CARD_FONT_VARIANTS.length) + PRODUCT_CARD_FONT_VARIANTS.length) % PRODUCT_CARD_FONT_VARIANTS.length];
 
+  const cardImage = buildOptimizedCloudinaryUrl(product.image, {
+    width: immersiveMobile ? 1200 : 640,
+    height: immersiveMobile ? 1400 : 480,
+    fit: 'fill',
+  });
+
   return (
     <div
       onClick={() => product.estado === 'disponible' && onClick()}
@@ -66,9 +73,13 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
 
       {/* Image du produit */}
       <img
-        src={product.image}
+        src={cardImage || product.image}
         alt={product.nom_produit}
         className={`w-full object-cover ${immersiveMobile ? 'h-[57dvh] min-h-[45dvh] max-h-[61dvh] rounded-none mb-0' : 'mb-3 aspect-[4/3] rounded-xl border border-white/70 shadow-md sm:aspect-square'}`}
+        loading={immersiveMobile ? 'eager' : 'lazy'}
+        decoding="async"
+        fetchPriority={immersiveMobile ? 'high' : 'auto'}
+        sizes={immersiveMobile ? '100vw' : '(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw'}
       />
 
       {/* Nom du produit */}
