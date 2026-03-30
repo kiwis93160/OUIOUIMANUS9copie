@@ -26,6 +26,7 @@ import {
 } from '../utils/productExtras';
 import { createIngredientNameMap, mapIngredientIdsToNames } from '../utils/ingredientNames';
 import { sortCategoriesForMenu, sortProductsForMenu } from '../utils/menuCategoryOrder';
+import { buildOptimizedCloudinaryUrl } from '../utils/image';
 
 const DOMICILIO_FEE = 8000;
 const DOMICILIO_ITEM_NAME = 'Domicilio';
@@ -175,6 +176,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, selectedPr
     const selectedExtras = buildExtrasFromSelectionState(product, selectedExtrasState);
     const extrasTotal = calculateExtrasTotal(selectedExtras);
     const unitPrice = product.prix_vente + extrasTotal;
+    const modalImage = buildOptimizedCloudinaryUrl(product.image, { width: 960, height: 720, fit: 'fill' });
 
     const handleAddToCart = () => {
         if (!product) {
@@ -235,7 +237,14 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, selectedPr
                         </button>
                     </div>
                     
-                    <img src={product.image} alt={product.nom_produit} className="w-full h-48 object-cover rounded-lg mb-4" />
+                    <img
+                        src={modalImage || product.image}
+                        alt={product.nom_produit}
+                        className="w-full h-48 object-cover rounded-lg mb-4"
+                        loading="lazy"
+                        decoding="async"
+                        sizes="(max-width: 768px) 100vw, 40vw"
+                    />
 
                     <p className="text-gray-600 mb-4">{product.description}</p>
 
