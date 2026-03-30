@@ -1543,6 +1543,8 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                 </div>
             </div>
 
+            </div>
+
             {selectedProduct && (
                 <ProductModal
                     isOpen={modalOpen}
@@ -1571,7 +1573,6 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                 />
             )}
         </div>
-    </div>
     );
 };
 
