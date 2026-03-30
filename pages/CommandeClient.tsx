@@ -30,7 +30,6 @@ import { sortCategoriesForMenu, sortProductsForMenu } from '../utils/menuCategor
 const DOMICILIO_FEE = 8000;
 const DOMICILIO_ITEM_NAME = 'Domicilio';
 const PENDING_CART_ITEM_KEY = 'customer-cart-pending-item';
-const NEQUI_PHONE_NUMBER = '3238090562';
 
 const isDeliveryFeeItem = (item: OrderItem) => item.nom_produit === DOMICILIO_ITEM_NAME;
 
@@ -47,21 +46,6 @@ const createDeliveryFeeItem = (isFree: boolean = false): OrderItem => ({
 });
 
 const isFreeShippingType = (type?: string | null) => (type ?? '').toLowerCase() === 'free_shipping';
-
-const buildNequiDeepLinks = (amount: number) => {
-    const normalizedAmount = Math.max(0, Math.round(amount));
-    const reference = `pedido-${Date.now()}`;
-    const params = new URLSearchParams({
-        phone: NEQUI_PHONE_NUMBER,
-        amount: String(normalizedAmount),
-        reference,
-    });
-
-    return {
-        app: `nequi://payment?${params.toString()}`,
-        intent: `intent://payment?${params.toString()}#Intent;scheme=nequi;package=com.nequi.MobileApp;end`,
-    };
-};
 
 const DEFAULT_CATEGORY_NAME = 'Otros';
 
@@ -841,20 +825,6 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
         setPromoCode('');
         setPromoCodeError('');
     };
-
-    const handlePayWithNequi = useCallback(() => {
-        if (typeof window === 'undefined') {
-            return;
-        }
-
-        const { app, intent } = buildNequiDeepLinks(total);
-        window.location.href = app;
-
-        window.setTimeout(() => {
-            window.location.href = intent;
-        }, 450);
-    }, [total]);
-
     const handleScrollToCart = useCallback(() => {
         setIsCartModeActive(true);
 
@@ -1544,21 +1514,6 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                                 />
                                 {paymentProofError && (
                                     <p className="mt-2 text-sm text-red-600">{paymentProofError}</p>
-                                )}
-
-                                {isMobileViewport && total > 0 && (
-                                    <button
-                                        type="button"
-                                        onClick={handlePayWithNequi}
-                                        className="mt-4 w-full rounded-lg bg-gradient-to-r from-purple-600 to-fuchsia-600 px-4 py-3 font-bold text-white shadow-md transition hover:from-purple-700 hover:to-fuchsia-700"
-                                    >
-                                        Pagar por transferencia
-                                    </button>
-                                )}
-                                {isMobileViewport && total > 0 && (
-                                    <p className="mt-2 text-xs text-gray-500">
-                                        Abriremos Nequi con un pago sugerido de {formatCurrencyCOP(total)} al número {NEQUI_PHONE_NUMBER}.
-                                    </p>
                                 )}
                             </div>
                         )}
