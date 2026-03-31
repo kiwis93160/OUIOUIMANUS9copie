@@ -55,6 +55,18 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
 }) => {
     const [activeStockProductId, setActiveStockProductId] = useState<string | null>(null);
 
+    const getIngredientChips = useCallback((description?: string) => {
+        if (!description) {
+            return [];
+        }
+
+        return description
+            .split(/[•,.;-]/)
+            .map((chunk) => chunk.trim())
+            .filter(Boolean)
+            .slice(0, 2);
+    }, []);
+
     const formatUnit = useCallback((unit: ProductStockIssue['unit']) => {
         switch (unit) {
             case 'unite':
@@ -155,6 +167,7 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
                         const quantityInCart = quantities[product.id] || 0;
                         const isSelected = quantityInCart > 0;
                         const isAvailable = product.estado === 'disponible';
+                        const ingredientChips = getIngredientChips(product.description);
                         const handleProductClick = () => {
                             if (!isAvailable) {
                                 return;
@@ -242,12 +255,26 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
                                         )}
                                     </div>
                                 )}
-                                <img
-                                    src={product.image}
-                                    alt={product.nom_produit}
-                                    className="mb-4 aspect-[4/3] w-full rounded-xl object-cover shadow-sm"
-                                />
-                                <div className="flex w-full flex-1 flex-col items-center">
+                                <div className="relative mb-4 w-full pt-5">
+                                    {ingredientChips.length > 0 && (
+                                        <div className="absolute left-3 right-3 top-0 z-20 flex flex-wrap gap-1.5">
+                                            {ingredientChips.map((chip, index) => (
+                                                <span
+                                                    key={`${product.id}-chip-${index}`}
+                                                    className="rounded-full border border-orange-200 bg-white/95 px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-orange-700 shadow-md backdrop-blur-sm"
+                                                >
+                                                    {chip}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
+                                    <img
+                                        src={product.image}
+                                        alt={product.nom_produit}
+                                        className="aspect-[4/3] w-full rounded-xl border border-white/80 object-cover shadow-[0_16px_28px_rgba(15,23,42,0.18)]"
+                                    />
+                                </div>
+                                <div className="-mt-7 flex w-full flex-1 flex-col items-center rounded-2xl border border-white/85 bg-white/96 px-3 pb-3 pt-8 shadow-[0_20px_35px_rgba(15,23,42,0.14)]">
                                     <p
                                         className="text-[clamp(1rem,2vw,1.2rem)] font-extrabold leading-snug text-gray-900 text-balance text-center break-words whitespace-normal [hyphens:auto]"
                                         style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
