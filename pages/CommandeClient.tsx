@@ -1093,9 +1093,9 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                             <div className="pointer-events-none absolute inset-x-0 top-0 z-30 bg-transparent px-1 pt-[max(env(safe-area-inset-top),0.25rem)]">
                                 <ActivePromotionsDisplay compact showTitle={false} />
                             </div>
-                            <div ref={mobileMenuScrollRef} className="h-[100dvh] overflow-y-auto snap-y snap-mandatory overscroll-y-contain">
+                            <div ref={mobileMenuScrollRef} className="h-[100dvh] overflow-y-auto snap-y snap-proximity overscroll-y-contain">
                                 {filteredProducts.map((product, index) => product && (
-                                    <div key={product.id} className="h-[100dvh] snap-start snap-always">
+                                    <div key={product.id} className="h-[100dvh] snap-start">
                                         <ProductCardWithPromotion
                                             product={product}
                                             onClick={() => handleProductClick(product)}
@@ -1543,6 +1543,8 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                 </div>
             </div>
 
+            </div>
+
             {selectedProduct && (
                 <ProductModal
                     isOpen={modalOpen}
@@ -1571,7 +1573,6 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                 />
             )}
         </div>
-    </div>
     );
 };
 
