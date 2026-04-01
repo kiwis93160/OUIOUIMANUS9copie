@@ -34,6 +34,22 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
   immersiveMobile = false,
   fontVariantIndex = 0,
 }) => {
+  const lastOpenTimestampRef = React.useRef(0);
+
+  const handleOpenProduct = React.useCallback(() => {
+    if (product.estado !== 'disponible') {
+      return;
+    }
+
+    const now = Date.now();
+    if (now - lastOpenTimestampRef.current < 350) {
+      return;
+    }
+
+    lastOpenTimestampRef.current = now;
+    onClick();
+  }, [onClick, product.estado]);
+
   // Récupérer toutes les promotions applicables au produit
   const { promotions, loading } = useProductPromotions(product);
   const hasPromotionBadges = !loading && promotions.length > 0 && product.estado === 'disponible';
@@ -47,7 +63,7 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
 
   return (
     <div
-      onClick={() => product.estado === 'disponible' && onClick()}
+      onClick={handleOpenProduct}
       className={`relative flex h-full flex-col items-center text-center transition-all duration-300 ${
         immersiveMobile
           ? 'rounded-none border-0 bg-transparent p-0 shadow-none backdrop-blur-none'
@@ -121,9 +137,16 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
           {product.estado !== 'disponible' && <span className="text-xs font-bold text-red-500">Agotado</span>}
           {product.estado === 'disponible' && (
             <button
-              onClick={(e) => {
+              type="button"
+              onPointerUp={(e) => {
+                e.preventDefault();
                 e.stopPropagation();
-                onClick();
+                handleOpenProduct();
+              }}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleOpenProduct();
               }}
               className={`w-full rounded-lg bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 font-bold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:from-orange-600 hover:via-orange-700 hover:to-red-700 ${immersiveMobile ? 'py-2.5 text-[clamp(1.6rem,6vw,2rem)] leading-none' : 'py-2'}`}
               style={{ fontFamily: MENU_CARD_FONT_STYLE.bodyFamily, letterSpacing: '0.04em' }}
