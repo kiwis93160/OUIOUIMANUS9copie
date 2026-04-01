@@ -1,9 +1,11 @@
 import React from 'react';
+import { Tag, Truck } from 'lucide-react';
 import { Product } from '../types';
 import { formatCurrencyCOP } from '../utils/formatIntegerAmount';
 import PromotionBadge from './promotions/PromotionBadge';
 import useProductPromotions from '../hooks/useProductPromotions';
 import { buildOptimizedCloudinaryUrl } from '../utils/image';
+import { Promotion } from '../types/promotions';
 
 interface ProductCardWithPromotionProps {
   product: Product;
@@ -21,6 +23,35 @@ const PRODUCT_CARD_FONT_VARIANTS = [
     titleLetterSpacing: '0.01em',
   },
 ] as const;
+
+const getCompactPromoText = (promotion: Promotion): { title: string; subtitle?: string; isShipping: boolean } => {
+  const config = promotion.config;
+  const visuals = config.visuals || {};
+  const customTitle = visuals.badge_text || promotion.name;
+  const customSubtitle = visuals.description || promotion.description || '';
+
+  if (customTitle) {
+    return {
+      title: customTitle,
+      subtitle: customSubtitle || undefined,
+      isShipping: config.applies_to === 'shipping',
+    };
+  }
+
+  if (config.applies_to === 'shipping') {
+    return { title: 'Envío gratis', subtitle: customSubtitle || undefined, isShipping: true };
+  }
+
+  if (config.discount_type === 'percentage') {
+    return { title: `-${config.discount_value}%`, subtitle: customSubtitle || undefined, isShipping: false };
+  }
+
+  if (config.discount_type === 'fixed_amount') {
+    return { title: `-$${config.discount_value.toLocaleString()}`, subtitle: customSubtitle || undefined, isShipping: false };
+  }
+
+  return { title: promotion.name || 'Promoción', subtitle: customSubtitle || undefined, isShipping: false };
+};
 
 /**
  * Composant de carte produit avec badge promotionnel
@@ -51,6 +82,8 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
   // Récupérer toutes les promotions applicables au produit
   const { promotions, loading } = useProductPromotions(product);
   const hasPromotionBadges = !loading && promotions.length > 0 && product.estado === 'disponible';
+  const mobilePromoItems = promotions.slice(0, 2).map(getCompactPromoText);
+  const discountBubblePromo = promotions.find((promotion) => promotion.config.discount_type === 'percentage');
   const fontVariant = PRODUCT_CARD_FONT_VARIANTS[((fontVariantIndex % PRODUCT_CARD_FONT_VARIANTS.length) + PRODUCT_CARD_FONT_VARIANTS.length) % PRODUCT_CARD_FONT_VARIANTS.length];
 
   const cardImage = buildOptimizedCloudinaryUrl(product.image, {
@@ -72,11 +105,39 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
     >
       {/* Afficher tous les badges promotionnels si des promotions sont applicables */}
       {hasPromotionBadges && (
-        <div className={`absolute z-10 flex max-w-[calc(100%-1.25rem)] flex-wrap gap-1 ${immersiveMobile ? 'left-3 right-3 top-3 justify-between' : 'right-3 top-3 justify-end'}`}>
-          {promotions.map((promotion, index) => (
-            <PromotionBadge key={promotion.id || index} promotion={promotion} />
-          ))}
-        </div>
+        <>
+          {immersiveMobile ? (
+            <div className="absolute left-3 right-3 top-3 z-20">
+              {discountBubblePromo && (
+                <div className="pointer-events-none mx-auto mb-1.5 w-fit rounded-full bg-[#8f775f]/90 px-3 py-0.5 text-lg font-extrabold text-white shadow-md">
+                  -{discountBubblePromo.config.discount_value}%
+                </div>
+              )}
+              <div className="grid grid-cols-2 gap-2">
+                {mobilePromoItems.map((promo, index) => (
+                  <div
+                    key={`${promo.title}-${index}`}
+                    className="min-h-[58px] rounded-2xl border border-[#e8dccd] bg-[#fffaf2]/95 px-3 py-2 text-left text-[#4b3b31] shadow-md backdrop-blur-[2px]"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#f1e3cf] text-[#6b5648]">
+                        {promo.isShipping ? <Truck size={15} /> : <Tag size={15} />}
+                      </span>
+                      <p className="line-clamp-1 text-[0.95rem] font-extrabold uppercase leading-tight">{promo.title}</p>
+                    </div>
+                    {promo.subtitle && <p className="mt-0.5 line-clamp-1 pl-9 text-xs leading-tight text-[#5f4b40]">{promo.subtitle}</p>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="absolute right-3 top-3 z-10 flex max-w-[calc(100%-1.25rem)] flex-wrap justify-end gap-1">
+              {promotions.map((promotion, index) => (
+                <PromotionBadge key={promotion.id || index} promotion={promotion} />
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       {/* Image du produit */}
@@ -89,6 +150,12 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
         fetchPriority={immersiveMobile ? 'high' : 'auto'}
         sizes={immersiveMobile ? '100vw' : '(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw'}
       />
+      {immersiveMobile && (
+        <div
+          aria-hidden
+          className="-mt-16 h-16 w-full bg-gradient-to-b from-transparent via-[#d9f1eb]/85 to-[#d9f1eb]"
+        />
+      )}
 
       {/* Nom du produit */}
       <div
@@ -140,7 +207,7 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
                 e.stopPropagation();
                 handleOpenProduct();
               }}
-              className={`w-full font-bold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] ${immersiveMobile ? 'rounded-2xl bg-[#97856c] py-3.5 text-[clamp(1.35rem,5.4vw,1.7rem)] uppercase tracking-[0.03em] hover:bg-[#8a7962]' : 'rounded-lg bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-2 hover:from-orange-600 hover:via-orange-700 hover:to-red-700'}`}
+              className={`w-full font-bold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] ${immersiveMobile ? 'rounded-2xl bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-3.5 text-[clamp(1.35rem,5.4vw,1.7rem)] uppercase tracking-[0.03em] hover:from-orange-600 hover:via-orange-700 hover:to-red-700' : 'rounded-lg bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-2 hover:from-orange-600 hover:via-orange-700 hover:to-red-700'}`}
               style={{ fontFamily: fontVariant.bodyFamily, letterSpacing: '0.04em' }}
             >
               {immersiveMobile ? 'Agregar al carrito' : 'Agregar'}
