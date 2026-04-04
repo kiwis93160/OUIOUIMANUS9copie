@@ -442,8 +442,10 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
     const [now, setNow] = useState(() => new Date());
     const cartUpdateTimeouts = useRef<Map<string, NodeJS.Timeout>>(new Map());
     const cartSectionRef = useRef<HTMLDivElement | null>(null);
-    const mobileMenuScrollRef = useRef<HTMLDivElement | null>(null);
+    const mobileSwipeStartYRef = useRef<number | null>(null);
     const [isCartModeActive, setIsCartModeActive] = useState(false);
+    const [activeMobileProductIndex, setActiveMobileProductIndex] = useState(0);
+    const [mobileSlideDirection, setMobileSlideDirection] = useState<'up' | 'down' | null>(null);
     const [isMobileViewport, setIsMobileViewport] = useState(
         typeof window !== 'undefined' ? window.innerWidth < 1024 : false,
     );
@@ -625,6 +627,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
         () => cart.reduce((acc, item) => acc + item.quantite, 0),
         [cart],
     );
+    const activeMobileProduct = filteredProducts[activeMobileProductIndex] ?? null;
 
     const [orderTotals, setOrderTotals] = useState({
         subtotal: 0,
@@ -849,13 +852,38 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
         setIsCartModeActive(false);
 
         if (isMobileViewport) {
-            mobileMenuScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+            setActiveMobileProductIndex(0);
             return;
         }
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        mobileMenuScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
     }, [isMobileViewport]);
+
+    const handleMobileTouchStart = useCallback((event: React.TouchEvent<HTMLDivElement>) => {
+        mobileSwipeStartYRef.current = event.touches[0]?.clientY ?? null;
+    }, []);
+
+    const handleMobileTouchEnd = useCallback((event: React.TouchEvent<HTMLDivElement>) => {
+        const startY = mobileSwipeStartYRef.current;
+        const endY = event.changedTouches[0]?.clientY;
+        mobileSwipeStartYRef.current = null;
+
+        if (startY === null || typeof endY !== 'number') {
+            return;
+        }
+
+        const deltaY = startY - endY;
+        if (Math.abs(deltaY) < 35) {
+            return;
+        }
+
+        const isSwipeUp = deltaY > 0;
+        setMobileSlideDirection(isSwipeUp ? 'up' : 'down');
+        setActiveMobileProductIndex(prev => {
+            const maxIndex = Math.max(0, filteredProducts.length - 1);
+            return isSwipeUp ? Math.min(prev + 1, maxIndex) : Math.max(prev - 1, 0);
+        });
+    }, [filteredProducts.length]);
 
     useEffect(() => {
         if (typeof window === 'undefined') {
@@ -879,6 +907,15 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
             setIsCartModeActive(false);
         }
     }, [orderType]);
+
+    useEffect(() => {
+        setActiveMobileProductIndex(prev => {
+            if (filteredProducts.length === 0) {
+                return 0;
+            }
+            return Math.min(prev, filteredProducts.length - 1);
+        });
+    }, [filteredProducts.length]);
 
 
     const handleSubmitOrder = async (e: React.FormEvent) => {
@@ -1089,22 +1126,30 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                             ))}
                         </div>
 
-                        <div className={`relative h-[100dvh] overflow-hidden lg:hidden ${isCartModeActive ? 'hidden' : 'block'}`}>
+                        <div
+                            className={`relative h-[100svh] overflow-hidden lg:hidden touch-pan-y ${isCartModeActive ? 'hidden' : 'block'}`}
+                            onTouchStart={handleMobileTouchStart}
+                            onTouchEnd={handleMobileTouchEnd}
+                        >
                             <div className="pointer-events-none absolute inset-x-0 top-0 z-30 bg-transparent px-1 pt-[max(env(safe-area-inset-top),0.25rem)]">
                                 <ActivePromotionsDisplay compact showTitle={false} />
                             </div>
-                            <div ref={mobileMenuScrollRef} className="h-[100dvh] overflow-y-auto snap-y snap-mandatory overscroll-y-contain">
-                                {filteredProducts.map((product, index) => product && (
-                                    <div key={product.id} className="h-[100dvh] snap-start snap-always">
+                            <div className="h-[100svh] overflow-hidden">
+                                {activeMobileProduct && (
+                                    <div
+                                        key={activeMobileProduct.id}
+                                        className={`h-[100svh] ${mobileSlideDirection === 'up' ? 'mobile-card-slide-up' : ''} ${mobileSlideDirection === 'down' ? 'mobile-card-slide-down' : ''}`}
+                                        onAnimationEnd={() => setMobileSlideDirection(null)}
+                                    >
                                         <ProductCardWithPromotion
-                                            product={product}
-                                            onClick={() => handleProductClick(product)}
+                                            product={activeMobileProduct}
+                                            onClick={() => handleProductClick(activeMobileProduct)}
                                             immersiveMobile
                                             className="h-full"
-                                            fontVariantIndex={index}
+                                            fontVariantIndex={activeMobileProductIndex}
                                         />
                                     </div>
-                                ))}
+                                )}
                             </div>
                         </div>
                     </>
@@ -1543,6 +1588,8 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                 </div>
             </div>
 
+            </div>
+
             {selectedProduct && (
                 <ProductModal
                     isOpen={modalOpen}
@@ -1571,7 +1618,6 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                 />
             )}
         </div>
-    </div>
     );
 };
 
