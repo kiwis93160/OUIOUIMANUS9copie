@@ -4016,3 +4016,33 @@ p {
     font-size: 1.75rem;
   }
 }
+
+@keyframes mobile-card-slide-up {
+  from {
+    transform: translateY(14px);
+    opacity: 0.92;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes mobile-card-slide-down {
+  from {
+    transform: translateY(-14px);
+    opacity: 0.92;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.mobile-card-slide-up {
+  animation: mobile-card-slide-up 170ms ease-out;
+}
+
+.mobile-card-slide-down {
+  animation: mobile-card-slide-down 170ms ease-out;
+}

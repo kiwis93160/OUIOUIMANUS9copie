@@ -445,6 +445,7 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
     const mobileSwipeStartYRef = useRef<number | null>(null);
     const [isCartModeActive, setIsCartModeActive] = useState(false);
     const [activeMobileProductIndex, setActiveMobileProductIndex] = useState(0);
+    const [mobileSlideDirection, setMobileSlideDirection] = useState<'up' | 'down' | null>(null);
     const [isMobileViewport, setIsMobileViewport] = useState(
         typeof window !== 'undefined' ? window.innerWidth < 1024 : false,
     );
@@ -876,12 +877,11 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
             return;
         }
 
+        const isSwipeUp = deltaY > 0;
+        setMobileSlideDirection(isSwipeUp ? 'up' : 'down');
         setActiveMobileProductIndex(prev => {
             const maxIndex = Math.max(0, filteredProducts.length - 1);
-            if (deltaY > 0) {
-                return Math.min(prev + 1, maxIndex);
-            }
-            return Math.max(prev - 1, 0);
+            return isSwipeUp ? Math.min(prev + 1, maxIndex) : Math.max(prev - 1, 0);
         });
     }, [filteredProducts.length]);
 
@@ -1127,16 +1127,20 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                         </div>
 
                         <div
-                            className={`relative h-[100dvh] overflow-hidden lg:hidden touch-pan-y ${isCartModeActive ? 'hidden' : 'block'}`}
+                            className={`relative h-[100svh] overflow-hidden lg:hidden touch-pan-y ${isCartModeActive ? 'hidden' : 'block'}`}
                             onTouchStart={handleMobileTouchStart}
                             onTouchEnd={handleMobileTouchEnd}
                         >
                             <div className="pointer-events-none absolute inset-x-0 top-0 z-30 bg-transparent px-1 pt-[max(env(safe-area-inset-top),0.25rem)]">
                                 <ActivePromotionsDisplay compact showTitle={false} />
                             </div>
-                            <div className="h-[100dvh] overflow-hidden">
+                            <div className="h-[100svh] overflow-hidden">
                                 {activeMobileProduct && (
-                                    <div key={activeMobileProduct.id} className="h-[100dvh]">
+                                    <div
+                                        key={activeMobileProduct.id}
+                                        className={`h-[100svh] ${mobileSlideDirection === 'up' ? 'mobile-card-slide-up' : ''} ${mobileSlideDirection === 'down' ? 'mobile-card-slide-down' : ''}`}
+                                        onAnimationEnd={() => setMobileSlideDirection(null)}
+                                    >
                                         <ProductCardWithPromotion
                                             product={activeMobileProduct}
                                             onClick={() => handleProductClick(activeMobileProduct)}

@@ -144,7 +144,7 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
       <img
         src={cardImage || product.image}
         alt={product.nom_produit}
-        className={`w-full object-cover ${immersiveMobile ? 'mb-0 h-[61dvh] min-h-[50dvh] max-h-[65dvh] rounded-none' : 'mb-3 aspect-[4/3] rounded-xl border border-white/70 shadow-md sm:aspect-square'}`}
+        className={`w-full object-cover ${immersiveMobile ? 'h-[56svh] min-h-[42svh] max-h-[58svh] rounded-none mb-0' : 'mb-3 aspect-[4/3] rounded-xl border border-white/70 shadow-md sm:aspect-square'}`}
         loading={immersiveMobile ? 'eager' : 'lazy'}
         decoding="async"
         fetchPriority={immersiveMobile ? 'high' : 'auto'}
@@ -191,7 +191,7 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
           {product.description}
         </p>
 
-        <div className={`mt-auto w-full ${immersiveMobile ? 'pt-4' : 'pt-3'}`}>
+        <div className={`mt-auto w-full ${immersiveMobile ? 'pt-3 pb-[max(env(safe-area-inset-bottom),0.75rem)]' : 'pt-3'}`}>
           {/* Statut */}
           {product.estado !== 'disponible' && <span className={`${immersiveMobile ? 'text-base' : 'text-xs'} font-bold text-red-500`}>Agotado</span>}
           {product.estado === 'disponible' && (
