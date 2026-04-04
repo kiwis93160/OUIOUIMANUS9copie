@@ -95,7 +95,7 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
   return (
     <div
       onClick={handleOpenProduct}
-      className={`relative flex h-full flex-col items-center text-center transition-all duration-300 ${
+      className={`relative flex h-full flex-col items-center overflow-hidden text-center transition-all duration-300 ${
         immersiveMobile
           ? 'rounded-none border-0 bg-[#d9f1eb] p-0 shadow-none backdrop-blur-none'
           : 'rounded-2xl border border-emerald-200/80 bg-gradient-to-br from-emerald-100 via-teal-50 to-cyan-100 p-4 shadow-lg shadow-emerald-200/50 backdrop-blur-md hover:shadow-xl hover:shadow-teal-200/60'
@@ -144,7 +144,7 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
       <img
         src={cardImage || product.image}
         alt={product.nom_produit}
-        className={`w-full object-cover ${immersiveMobile ? 'h-[56svh] min-h-[42svh] max-h-[58svh] rounded-none mb-0' : 'mb-3 aspect-[4/3] rounded-xl border border-white/70 shadow-md sm:aspect-square'}`}
+        className={`w-full object-cover ${immersiveMobile ? 'h-[56svh] min-h-[42svh] max-h-[58svh] rounded-none mb-0' : 'mb-2 aspect-[4/3] rounded-xl border border-white/70 shadow-md sm:aspect-square'}`}
         loading={immersiveMobile ? 'eager' : 'lazy'}
         decoding="async"
         fetchPriority={immersiveMobile ? 'high' : 'auto'}
@@ -161,37 +161,36 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
       <div
         className={`flex min-h-0 w-full flex-1 flex-col items-center ${
           immersiveMobile
-            ? 'bg-[#d9f1eb] px-5 pb-[max(env(safe-area-inset-bottom),0.85rem)] pt-4'
-            : 'rounded-2xl bg-white/55 px-3 py-3 backdrop-blur-sm'
+            ? 'bg-[#d9f1eb] px-2 pb-0 pt-3'
+            : 'rounded-2xl bg-white/55 px-3 py-2 backdrop-blur-sm'
         }`}
       >
-        <div className="flex w-full items-start justify-between gap-3">
-          <p
-            className={`flex-1 text-left font-extrabold text-gray-900 break-words text-balance whitespace-normal [hyphens:auto] ${immersiveMobile ? 'text-[clamp(2rem,8.8vw,2.8rem)] leading-[0.98]' : 'text-[clamp(0.78rem,1.7vw,0.95rem)] leading-snug'}`}
-            style={{
-              fontFamily: fontVariant.titleFamily,
-              letterSpacing: fontVariant.titleLetterSpacing,
-            }}
-          >
-            {product.nom_produit}
-          </p>
-          <p
-            className={`shrink-0 whitespace-nowrap text-right font-bold text-emerald-900 ${immersiveMobile ? 'pt-1 text-[clamp(1.75rem,7vw,2.3rem)]' : 'text-[clamp(0.88rem,1.6vw,1.04rem)]'}`}
-            style={{ fontFamily: fontVariant.priceFamily, letterSpacing: '0.02em' }}
-          >
-            {formatCurrencyCOP(product.prix_vente)}
-          </p>
-        </div>
+        <p
+          className={`w-full font-extrabold text-gray-900 break-words text-balance text-center whitespace-normal [hyphens:auto] ${immersiveMobile ? 'text-[clamp(1.8rem,8vw,2.45rem)] leading-[0.98]' : 'text-[clamp(0.74rem,1.55vw,0.9rem)] leading-snug'}`}
+          style={{
+            fontFamily: fontVariant.titleFamily,
+            letterSpacing: fontVariant.titleLetterSpacing,
+          }}
+        >
+          {product.nom_produit}
+        </p>
+
+        <p
+          className={`mt-1.5 w-full whitespace-nowrap text-center font-bold text-emerald-900 ${immersiveMobile ? 'text-[clamp(1.65rem,6.6vw,2.15rem)]' : 'text-[clamp(0.86rem,1.5vw,1rem)]'}`}
+          style={{ fontFamily: fontVariant.priceFamily, letterSpacing: '0.02em' }}
+        >
+          {formatCurrencyCOP(product.prix_vente)}
+        </p>
 
         {/* Description */}
         <p
-          className={`mt-2 px-1 text-left text-gray-700 ${immersiveMobile ? 'text-[clamp(1.06rem,4.2vw,1.3rem)] leading-snug line-clamp-4' : 'text-sm max-h-10 overflow-hidden line-clamp-2'}`}
+          className={`mt-1.5 w-full px-0 text-center text-gray-700 ${immersiveMobile ? 'text-[clamp(1rem,3.9vw,1.2rem)] leading-snug line-clamp-4' : 'text-sm max-h-12 overflow-hidden line-clamp-3'}`}
           style={{ fontFamily: fontVariant.bodyFamily, letterSpacing: '0.01em' }}
         >
           {product.description}
         </p>
 
-        <div className={`mt-auto w-full ${immersiveMobile ? 'pt-3 pb-[max(env(safe-area-inset-bottom),0.75rem)]' : 'pt-3'}`}>
+        <div className={`mt-auto w-full ${immersiveMobile ? 'pt-2' : 'pt-2'}`}>
           {/* Statut */}
           {product.estado !== 'disponible' && <span className={`${immersiveMobile ? 'text-base' : 'text-xs'} font-bold text-red-500`}>Agotado</span>}
           {product.estado === 'disponible' && (
@@ -207,7 +206,7 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
                 e.stopPropagation();
                 handleOpenProduct();
               }}
-              className={`w-full font-bold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] ${immersiveMobile ? 'rounded-2xl bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-3.5 text-[clamp(1.35rem,5.4vw,1.7rem)] uppercase tracking-[0.03em] hover:from-orange-600 hover:via-orange-700 hover:to-red-700' : 'rounded-lg bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-2 hover:from-orange-600 hover:via-orange-700 hover:to-red-700'}`}
+              className={`w-full font-bold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] ${immersiveMobile ? '-mx-2 block w-[calc(100%+1rem)] rounded-none bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-3 text-[clamp(1.28rem,5.1vw,1.6rem)] uppercase tracking-[0.03em] hover:from-orange-600 hover:via-orange-700 hover:to-red-700' : '-mx-3 block w-[calc(100%+1.5rem)] rounded-b-2xl rounded-t-none bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-2.5 hover:from-orange-600 hover:via-orange-700 hover:to-red-700'}`}
               style={{ fontFamily: fontVariant.bodyFamily, letterSpacing: '0.04em' }}
             >
               {immersiveMobile ? 'Agregar al carrito' : 'Agregar'}
