@@ -118,10 +118,10 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
 
       <div
         className={`absolute inset-0 z-30 flex w-full flex-col ${
-          immersiveMobile ? 'px-3 pb-[max(env(safe-area-inset-bottom),0.55rem)] pt-[max(env(safe-area-inset-top),0.7rem)]' : 'px-4 pb-0 pt-4'
+          immersiveMobile ? 'px-3 pb-[max(env(safe-area-inset-bottom),0.55rem)] pt-[max(env(safe-area-inset-top),0.7rem)]' : 'px-0 pb-0 pt-4'
         }`}
       >
-        <div className="flex items-start justify-between gap-2">
+        <div className="flex items-start justify-between gap-2 px-4">
           <div className={`flex flex-wrap gap-2 ${immersiveMobile ? 'max-w-[calc(100%-3.5rem)]' : 'max-w-[calc(100%-3.25rem)]'}`}>
             {hasPromotionBadges ? (
               (immersiveMobile ? mobilePromoItems : promotions.slice(0, 2).map(getCompactPromoText)).map((promo, index) => (
@@ -144,7 +144,7 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
           </div>
         </div>
 
-        <div className="mt-auto flex flex-col items-center px-2 text-center text-white">
+        <div className={`mt-3 flex flex-col items-center px-4 text-center text-white ${immersiveMobile ? '' : 'mb-auto'}`}>
           <p
             className={`w-full font-extrabold uppercase text-[#f8ebd7] ${immersiveMobile ? 'text-[clamp(2.45rem,11vw,3.1rem)] leading-[0.94]' : 'text-[clamp(2rem,3.35vw,2.65rem)] leading-[0.95]'}`}
             style={{
@@ -155,48 +155,50 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
           >
             {product.nom_produit}
           </p>
+        </div>
 
+        <div className="mt-auto flex flex-col items-center text-center text-white">
           <p
-            className={`mt-2 w-full whitespace-nowrap font-extrabold text-[#fff2df] ${immersiveMobile ? 'text-[clamp(2rem,8vw,2.6rem)]' : 'text-[clamp(1.9rem,3vw,2.3rem)]'}`}
+            className={`mt-2 w-full whitespace-nowrap px-4 font-extrabold text-[#fff2df] ${immersiveMobile ? 'text-[clamp(2rem,8vw,2.6rem)]' : 'text-[clamp(1.9rem,3vw,2.3rem)]'}`}
             style={{ fontFamily: fontVariant.priceFamily, letterSpacing: '0.01em' }}
           >
             {formatCurrencyCOP(product.prix_vente)}
           </p>
 
           <p
-            className={`mt-2 w-full font-semibold text-[#f6f0e7] ${immersiveMobile ? 'text-[clamp(1rem,4.35vw,1.32rem)] leading-snug line-clamp-3' : 'text-[0.95rem] leading-snug line-clamp-3'}`}
+            className={`mt-2 w-full px-4 font-semibold text-[#f6f0e7] ${immersiveMobile ? 'text-[clamp(1rem,4.35vw,1.32rem)] leading-snug line-clamp-3' : 'text-[0.95rem] leading-snug line-clamp-3'}`}
             style={{ fontFamily: fontVariant.bodyFamily, letterSpacing: '0.01em', textShadow: '0 3px 14px rgba(0,0,0,0.45)' }}
           >
             {product.description}
           </p>
 
-          <div className={`mt-4 w-full`}>
+          <div className={`mt-2 w-full`}>
             {product.estado !== 'disponible' && (
               <span className={`font-bold uppercase tracking-[0.05em] text-red-200 ${immersiveMobile ? 'text-base' : 'text-sm'}`}>Agotado</span>
             )}
-          {product.estado === 'disponible' && (
-            <button
-              type="button"
-              onPointerUp={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleOpenProduct();
-              }}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleOpenProduct();
-              }}
-              className={`block w-full font-black uppercase text-white shadow-lg transition-all duration-300 hover:brightness-110 ${
-                immersiveMobile
-                  ? 'rounded-none bg-gradient-to-b from-[#ad4a1a] to-[#8a2d0d] py-4 text-[clamp(1.2rem,5.2vw,1.55rem)]'
-                  : '-mx-4 w-[calc(100%+2rem)] rounded-none bg-gradient-to-b from-[#ad4a1a] to-[#8a2d0d] py-3 text-lg'
-              }`}
-              style={{ fontFamily: fontVariant.bodyFamily, letterSpacing: '0.04em', textShadow: '0 2px 8px rgba(0,0,0,0.35)' }}
-            >
-              Agregar al carrito
-            </button>
-          )}
+            {product.estado === 'disponible' && (
+              <button
+                type="button"
+                onPointerUp={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleOpenProduct();
+                }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleOpenProduct();
+                }}
+                className={`block w-full font-black uppercase text-white shadow-lg transition-all duration-300 hover:brightness-110 ${
+                  immersiveMobile
+                    ? 'rounded-none bg-gradient-to-b from-[#ad4a1a] to-[#8a2d0d] py-4 text-[clamp(1.2rem,5.2vw,1.55rem)]'
+                    : 'rounded-b-[2rem] bg-gradient-to-b from-[#ad4a1a] to-[#8a2d0d] py-3 text-lg'
+                }`}
+                style={{ fontFamily: fontVariant.bodyFamily, letterSpacing: '0.04em', textShadow: '0 2px 8px rgba(0,0,0,0.35)' }}
+              >
+                Agregar al carrito
+              </button>
+            )}
           </div>
         </div>
       </div>
