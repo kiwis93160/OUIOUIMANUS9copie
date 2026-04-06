@@ -150,68 +150,60 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
         fetchPriority={immersiveMobile ? 'high' : 'auto'}
         sizes={immersiveMobile ? '100vw' : '(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw'}
       />
-      {immersiveMobile && (
-        <div
-          aria-hidden
-          className="-mt-16 h-16 w-full bg-gradient-to-b from-transparent via-[#d9f1eb]/85 to-[#d9f1eb]"
-        />
-      )}
-
-      {/* Nom du produit */}
       <div
-        className={`flex min-h-0 w-full flex-1 flex-col items-center ${
+        className={`pointer-events-none absolute inset-x-0 bottom-0 flex min-h-0 w-full flex-col items-center justify-end ${
           immersiveMobile
-            ? 'bg-[#d9f1eb] px-1.5 pb-0 pt-3'
-            : 'overflow-hidden rounded-2xl bg-white/55 px-2 py-2 backdrop-blur-sm'
+            ? 'bg-gradient-to-t from-black/85 via-black/50 to-transparent px-3 pb-0 pt-24'
+            : 'bg-gradient-to-t from-black/88 via-black/58 to-transparent px-3 pb-0 pt-20'
         }`}
       >
-        <p
-          className={`w-full font-extrabold text-gray-900 break-words text-balance text-center whitespace-normal [hyphens:auto] ${immersiveMobile ? 'text-[clamp(1.8rem,8vw,2.45rem)] leading-[0.98]' : 'text-[clamp(0.74rem,1.55vw,0.9rem)] leading-snug'}`}
-          style={{
-            fontFamily: fontVariant.titleFamily,
-            letterSpacing: fontVariant.titleLetterSpacing,
-          }}
-        >
-          {product.nom_produit}
-        </p>
+        <div className="pointer-events-auto flex w-full flex-col items-center">
+          <p
+            className={`w-full font-extrabold text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.65)] break-words text-balance text-center whitespace-normal [hyphens:auto] ${immersiveMobile ? 'text-[clamp(1.75rem,7.9vw,2.3rem)] leading-[0.98]' : 'text-[clamp(0.74rem,1.5vw,0.88rem)] leading-snug'}`}
+            style={{
+              fontFamily: fontVariant.titleFamily,
+              letterSpacing: fontVariant.titleLetterSpacing,
+            }}
+          >
+            {product.nom_produit}
+          </p>
 
-        <p
-          className={`mt-1.5 w-full whitespace-nowrap text-center font-bold text-emerald-900 ${immersiveMobile ? 'text-[clamp(1.65rem,6.6vw,2.15rem)]' : 'text-[clamp(0.86rem,1.5vw,1rem)]'}`}
-          style={{ fontFamily: fontVariant.priceFamily, letterSpacing: '0.02em' }}
-        >
-          {formatCurrencyCOP(product.prix_vente)}
-        </p>
+          <p
+            className={`mt-1.5 w-full whitespace-nowrap text-center font-bold text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.65)] ${immersiveMobile ? 'text-[clamp(1.6rem,6.4vw,2.05rem)]' : 'text-[clamp(0.85rem,1.45vw,0.98rem)]'}`}
+            style={{ fontFamily: fontVariant.priceFamily, letterSpacing: '0.02em' }}
+          >
+            {formatCurrencyCOP(product.prix_vente)}
+          </p>
 
-        {/* Description */}
-        <p
-          className={`mt-1.5 w-full px-0 text-center text-gray-700 ${immersiveMobile ? 'text-[clamp(1rem,3.9vw,1.2rem)] leading-snug line-clamp-4' : 'text-sm max-h-12 overflow-hidden line-clamp-3'}`}
-          style={{ fontFamily: fontVariant.bodyFamily, letterSpacing: '0.01em' }}
-        >
-          {product.description}
-        </p>
+          <p
+            className={`mt-1.5 w-full px-0.5 text-center text-white/95 drop-shadow-[0_1px_6px_rgba(0,0,0,0.6)] ${immersiveMobile ? 'text-[clamp(1rem,3.8vw,1.18rem)] leading-snug line-clamp-4' : 'text-sm max-h-12 overflow-hidden line-clamp-3'}`}
+            style={{ fontFamily: fontVariant.bodyFamily, letterSpacing: '0.01em' }}
+          >
+            {product.description}
+          </p>
 
-        <div className={`mt-auto w-full ${immersiveMobile ? 'pt-2' : 'pt-2'}`}>
-          {/* Statut */}
-          {product.estado !== 'disponible' && <span className={`${immersiveMobile ? 'text-base' : 'text-xs'} font-bold text-red-500`}>Agotado</span>}
-          {product.estado === 'disponible' && (
-            <button
-              type="button"
-              onPointerUp={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleOpenProduct();
-              }}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleOpenProduct();
-              }}
-              className={`w-full font-bold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] ${immersiveMobile ? '-mx-1.5 block w-[calc(100%+0.75rem)] rounded-none bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-3 text-[clamp(1.28rem,5.1vw,1.6rem)] uppercase tracking-[0.03em] hover:from-orange-600 hover:via-orange-700 hover:to-red-700' : '-mx-2 block w-[calc(100%+1rem)] rounded-none bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-2.5 hover:from-orange-600 hover:via-orange-700 hover:to-red-700'}`}
-              style={{ fontFamily: fontVariant.bodyFamily, letterSpacing: '0.04em' }}
-            >
-              {immersiveMobile ? 'Agregar al carrito' : 'Agregar'}
-            </button>
-          )}
+          <div className={`mt-2 w-full ${immersiveMobile ? '' : ''}`}>
+            {product.estado !== 'disponible' && <span className={`${immersiveMobile ? 'text-base' : 'text-xs'} font-bold text-red-200`}>Agotado</span>}
+            {product.estado === 'disponible' && (
+              <button
+                type="button"
+                onPointerUp={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleOpenProduct();
+                }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleOpenProduct();
+                }}
+                className={`w-full font-bold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] ${immersiveMobile ? '-mx-3 block w-[calc(100%+1.5rem)] rounded-none bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-3 text-[clamp(1.28rem,5.1vw,1.6rem)] uppercase tracking-[0.03em] hover:from-orange-600 hover:via-orange-700 hover:to-red-700' : '-mx-3 block w-[calc(100%+1.5rem)] rounded-none bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-2.5 hover:from-orange-600 hover:via-orange-700 hover:to-red-700'}`}
+                style={{ fontFamily: fontVariant.bodyFamily, letterSpacing: '0.04em' }}
+              >
+                {immersiveMobile ? 'Agregar al carrito' : 'Agregar'}
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
