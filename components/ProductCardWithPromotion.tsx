@@ -161,8 +161,8 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
       <div
         className={`flex min-h-0 w-full flex-1 flex-col items-center ${
           immersiveMobile
-            ? 'bg-[#d9f1eb] px-2 pb-0 pt-3'
-            : 'rounded-2xl bg-white/55 px-3 py-2 backdrop-blur-sm'
+            ? 'bg-[#d9f1eb] px-1.5 pb-0 pt-3'
+            : 'overflow-hidden rounded-2xl bg-white/55 px-2 py-2 backdrop-blur-sm'
         }`}
       >
         <p
@@ -206,7 +206,7 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
                 e.stopPropagation();
                 handleOpenProduct();
               }}
-              className={`w-full font-bold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] ${immersiveMobile ? '-mx-2 block w-[calc(100%+1rem)] rounded-none bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-3 text-[clamp(1.28rem,5.1vw,1.6rem)] uppercase tracking-[0.03em] hover:from-orange-600 hover:via-orange-700 hover:to-red-700' : '-mx-3 block w-[calc(100%+1.5rem)] rounded-b-2xl rounded-t-none bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-2.5 hover:from-orange-600 hover:via-orange-700 hover:to-red-700'}`}
+              className={`w-full font-bold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] ${immersiveMobile ? '-mx-1.5 block w-[calc(100%+0.75rem)] rounded-none bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-3 text-[clamp(1.28rem,5.1vw,1.6rem)] uppercase tracking-[0.03em] hover:from-orange-600 hover:via-orange-700 hover:to-red-700' : '-mx-2 block w-[calc(100%+1rem)] rounded-none bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 py-2.5 hover:from-orange-600 hover:via-orange-700 hover:to-red-700'}`}
               style={{ fontFamily: fontVariant.bodyFamily, letterSpacing: '0.04em' }}
             >
               {immersiveMobile ? 'Agregar al carrito' : 'Agregar'}
