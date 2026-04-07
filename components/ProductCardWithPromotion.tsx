@@ -107,7 +107,7 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
         <img
           src={cardImage || product.image}
           alt={product.nom_produit}
-          className="h-full w-full object-cover opacity-90"
+          className="h-full w-full object-cover opacity-70"
           loading={immersiveMobile ? 'eager' : 'lazy'}
           decoding="async"
           fetchPriority={immersiveMobile ? 'high' : 'auto'}
@@ -159,7 +159,7 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
 
         <div className="mt-auto flex flex-col items-center text-center text-white">
           <p
-            className={`mt-1.5 w-full whitespace-nowrap px-4 font-extrabold text-[#fff2df] ${immersiveMobile ? 'text-[clamp(2rem,8vw,2.6rem)]' : 'text-[clamp(1.9rem,3vw,2.3rem)]'}`}
+            className={`mt-[10px] w-full whitespace-nowrap px-4 font-extrabold text-[#fff2df] ${immersiveMobile ? 'text-[clamp(2rem,8vw,2.6rem)]' : 'text-[clamp(1.9rem,3vw,2.3rem)]'}`}
             style={{ fontFamily: fontVariant.priceFamily, letterSpacing: '0.01em' }}
           >
             {formatCurrencyCOP(product.prix_vente)}
