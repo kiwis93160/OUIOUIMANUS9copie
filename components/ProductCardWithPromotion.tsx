@@ -103,11 +103,11 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
         <div className="pointer-events-none absolute inset-0 z-20 bg-gradient-to-t from-[#14060f]/85 via-[#14060f]/25 to-transparent" />
       )}
 
-      <div className={`relative ${immersiveMobile ? 'h-[100svh]' : 'aspect-[3/4]'}`}>
+      <div className={`relative ${immersiveMobile ? 'h-[100svh]' : 'min-h-[clamp(28rem,60vh,34rem)] h-full'}`}>
         <img
           src={cardImage || product.image}
           alt={product.nom_produit}
-          className="h-full w-full object-cover opacity-70"
+          className="h-full w-full object-cover opacity-90"
           loading={immersiveMobile ? 'eager' : 'lazy'}
           decoding="async"
           fetchPriority={immersiveMobile ? 'high' : 'auto'}
@@ -117,7 +117,7 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
       </div>
 
       <div
-        className={`absolute inset-0 z-30 flex w-full flex-col ${
+        className={`absolute inset-0 z-30 flex w-full flex-col overflow-y-auto ${
           immersiveMobile ? 'px-3 pb-[max(env(safe-area-inset-bottom),0.55rem)] pt-[max(env(safe-area-inset-top),0.7rem)]' : 'px-0 pb-0 pt-4'
         }`}
       >
@@ -159,14 +159,14 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
 
         <div className="mt-auto flex flex-col items-center text-center text-white">
           <p
-            className={`mt-[10px] w-full whitespace-nowrap px-4 font-extrabold text-[#fff2df] ${immersiveMobile ? 'text-[clamp(2rem,8vw,2.6rem)]' : 'text-[clamp(1.9rem,3vw,2.3rem)]'}`}
+            className={`mt-[10px] mb-[10px] w-full whitespace-nowrap px-4 font-extrabold text-[#fff2df] ${immersiveMobile ? 'text-[clamp(2rem,8vw,2.6rem)]' : 'text-[clamp(1.9rem,3vw,2.3rem)]'}`}
             style={{ fontFamily: fontVariant.priceFamily, letterSpacing: '0.01em' }}
           >
             {formatCurrencyCOP(product.prix_vente)}
           </p>
 
           <p
-            className={`mt-1.5 w-full px-4 font-semibold text-[#f6f0e7] ${immersiveMobile ? 'text-[clamp(1rem,4.35vw,1.32rem)] leading-snug line-clamp-3' : 'text-[0.95rem] leading-snug line-clamp-3'}`}
+            className={`w-full px-4 font-semibold text-[#f6f0e7] ${immersiveMobile ? 'text-[clamp(1rem,4.35vw,1.32rem)] leading-snug' : 'text-[0.95rem] leading-snug'}`}
             style={{ fontFamily: fontVariant.bodyFamily, letterSpacing: '0.01em', textShadow: '0 3px 14px rgba(0,0,0,0.45)' }}
           >
             {product.description}
