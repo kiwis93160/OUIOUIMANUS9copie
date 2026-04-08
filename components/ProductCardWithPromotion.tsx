@@ -82,6 +82,11 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
   const { promotions, loading } = useProductPromotions(product);
   const hasPromotionBadges = !loading && promotions.length > 0 && product.estado === 'disponible';
   const mobilePromoItems = promotions.slice(0, 2).map(getCompactPromoText);
+  const mobileHeaderSpacingClass = immersiveMobile
+    ? hasPromotionBadges
+      ? 'pt-[max(env(safe-area-inset-top),5.55rem)]'
+      : 'pt-[max(env(safe-area-inset-top),0.95rem)]'
+    : 'pt-4';
   const fontVariant = PRODUCT_CARD_FONT_VARIANTS[((fontVariantIndex % PRODUCT_CARD_FONT_VARIANTS.length) + PRODUCT_CARD_FONT_VARIANTS.length) % PRODUCT_CARD_FONT_VARIANTS.length];
 
   const cardImage = buildOptimizedCloudinaryUrl(product.image, {
@@ -99,7 +104,7 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
           : 'rounded-[2rem] border border-white/15 bg-[#3a0b2b] p-0 shadow-[0_18px_35px_rgba(28,7,22,0.42)] hover:-translate-y-0.5 hover:shadow-[0_24px_40px_rgba(28,7,22,0.5)]'
       } ${product.estado === 'disponible' ? 'cursor-pointer' : 'opacity-60'} ${className}`}
     >
-      <div className={`relative ${immersiveMobile ? 'h-[100svh]' : 'min-h-[clamp(28rem,60vh,34rem)] h-full'}`}>
+      <div className={`relative ${immersiveMobile ? 'h-full min-h-0' : 'min-h-[clamp(28rem,60vh,34rem)] h-full'}`}>
         <img
           src={cardImage || product.image}
           alt={product.nom_produit}
@@ -114,7 +119,7 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
 
       <div
         className={`absolute inset-0 z-30 flex w-full flex-col overflow-y-auto ${
-          immersiveMobile ? 'px-3 pb-[max(env(safe-area-inset-bottom),0.55rem)] pt-[max(env(safe-area-inset-top),0.7rem)]' : 'px-0 pb-0 pt-4'
+          immersiveMobile ? 'px-3 pb-[max(env(safe-area-inset-bottom),0.55rem)]' : 'px-0 pb-0'
         }`}
       >
         {immersiveMobile && hasPromotionBadges && (
@@ -133,7 +138,7 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
           </div>
         )}
 
-        <div className={`mt-3 flex flex-col items-center px-4 text-center text-white ${immersiveMobile ? '' : 'mb-auto'}`}>
+        <div className={`${mobileHeaderSpacingClass} flex flex-col items-center px-4 text-center text-white ${immersiveMobile ? '' : 'mb-auto'}`}>
           <p
             className={`w-full font-extrabold uppercase text-[#f8ebd7] ${immersiveMobile ? 'text-[clamp(2.45rem,11vw,3.1rem)] leading-[0.94]' : 'text-[clamp(2rem,3.35vw,2.65rem)] leading-[0.95]'}`}
             style={{
