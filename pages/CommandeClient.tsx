@@ -1127,18 +1127,18 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                         </div>
 
                         <div
-                            className={`relative h-[100svh] overflow-hidden lg:hidden touch-pan-y ${isCartModeActive ? 'hidden' : 'block'}`}
+                            className={`relative h-[100dvh] overflow-hidden lg:hidden touch-pan-y ${isCartModeActive ? 'hidden' : 'block'}`}
                             onTouchStart={handleMobileTouchStart}
                             onTouchEnd={handleMobileTouchEnd}
                         >
                             <div className="pointer-events-none absolute inset-x-0 top-0 z-30 bg-transparent px-1 pt-[max(env(safe-area-inset-top),0.25rem)]">
                                 <ActivePromotionsDisplay compact showTitle={false} />
                             </div>
-                            <div className="h-[100svh] overflow-hidden">
+                            <div className="h-[100dvh] overflow-hidden">
                                 {activeMobileProduct && (
                                     <div
                                         key={activeMobileProduct.id}
-                                        className={`h-[100svh] ${mobileSlideDirection === 'up' ? 'mobile-card-slide-up' : ''} ${mobileSlideDirection === 'down' ? 'mobile-card-slide-down' : ''}`}
+                                        className={`h-[100dvh] ${mobileSlideDirection === 'up' ? 'mobile-card-slide-up' : ''} ${mobileSlideDirection === 'down' ? 'mobile-card-slide-down' : ''}`}
                                         onAnimationEnd={() => setMobileSlideDirection(null)}
                                     >
                                         <ProductCardWithPromotion
