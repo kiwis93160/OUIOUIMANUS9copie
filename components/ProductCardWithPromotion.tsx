@@ -99,21 +99,17 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
           : 'rounded-[2rem] border border-white/15 bg-[#3a0b2b] p-0 shadow-[0_18px_35px_rgba(28,7,22,0.42)] hover:-translate-y-0.5 hover:shadow-[0_24px_40px_rgba(28,7,22,0.5)]'
       } ${product.estado === 'disponible' ? 'cursor-pointer' : 'opacity-60'} ${className}`}
     >
-      {!immersiveMobile && (
-        <div className="pointer-events-none absolute inset-0 z-20 bg-gradient-to-t from-[#14060f]/85 via-[#14060f]/25 to-transparent" />
-      )}
-
       <div className={`relative ${immersiveMobile ? 'h-[100svh]' : 'min-h-[clamp(28rem,60vh,34rem)] h-full'}`}>
         <img
           src={cardImage || product.image}
           alt={product.nom_produit}
-          className="h-full w-full object-cover opacity-100"
+          className="h-full w-full object-cover opacity-80"
           loading={immersiveMobile ? 'eager' : 'lazy'}
           decoding="async"
           fetchPriority={immersiveMobile ? 'high' : 'auto'}
           sizes={immersiveMobile ? '100vw' : '(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw'}
         />
-        <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-[#11060f]/80 via-[#11060f]/35 to-transparent" />
+        <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-[#11060f]/60 via-[#11060f]/20 to-transparent" />
       </div>
 
       <div
