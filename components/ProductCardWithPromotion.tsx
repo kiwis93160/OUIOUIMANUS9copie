@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tag, Truck } from 'lucide-react';
+import { Heart, Tag, Truck } from 'lucide-react';
 import { Product } from '../types';
 import { formatCurrencyCOP } from '../utils/formatIntegerAmount';
 import useProductPromotions from '../hooks/useProductPromotions';
