@@ -107,7 +107,7 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
         <img
           src={cardImage || product.image}
           alt={product.nom_produit}
-          className="h-full w-full object-cover opacity-90"
+          className="h-full w-full object-cover opacity-100"
           loading={immersiveMobile ? 'eager' : 'lazy'}
           decoding="async"
           fetchPriority={immersiveMobile ? 'high' : 'auto'}
@@ -121,10 +121,10 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
           immersiveMobile ? 'px-3 pb-[max(env(safe-area-inset-bottom),0.55rem)] pt-[max(env(safe-area-inset-top),0.7rem)]' : 'px-0 pb-0 pt-4'
         }`}
       >
-        <div className="flex items-start justify-between gap-2 px-4">
-          <div className={`flex flex-wrap gap-2 ${immersiveMobile ? 'max-w-[calc(100%-3.5rem)]' : 'max-w-[calc(100%-3.25rem)]'}`}>
-            {hasPromotionBadges ? (
-              (immersiveMobile ? mobilePromoItems : promotions.slice(0, 2).map(getCompactPromoText)).map((promo, index) => (
+        {immersiveMobile && hasPromotionBadges && (
+          <div className="flex items-start justify-between gap-2 px-4">
+            <div className="flex max-w-full flex-wrap gap-2">
+              {mobilePromoItems.map((promo, index) => (
                 <div
                   key={`${promo.title}-${index}`}
                   className="inline-flex items-center gap-1 rounded-full bg-[#f7edd9] px-3 py-1 text-[0.73rem] font-black uppercase tracking-[0.03em] text-[#8c4f12]"
@@ -132,17 +132,10 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
                   {promo.isShipping ? <Truck size={13} /> : <Tag size={13} />}
                   <span className="line-clamp-1">{promo.title}</span>
                 </div>
-              ))
-            ) : (
-              <span className="inline-flex items-center rounded-full bg-[#f7edd9] px-3 py-1 text-[0.73rem] font-black uppercase tracking-[0.03em] text-[#8c4f12]">
-                Más vendido
-              </span>
-            )}
+              ))}
+            </div>
           </div>
-          <div className={`inline-flex items-center justify-center rounded-full bg-black/45 ${immersiveMobile ? 'h-10 w-10' : 'h-9 w-9'}`}>
-            <Heart size={immersiveMobile ? 18 : 16} className="fill-white text-white" />
-          </div>
-        </div>
+        )}
 
         <div className={`mt-3 flex flex-col items-center px-4 text-center text-white ${immersiveMobile ? '' : 'mb-auto'}`}>
           <p
