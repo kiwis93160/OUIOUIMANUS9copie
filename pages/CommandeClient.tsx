@@ -909,6 +909,28 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
     }, [orderType]);
 
     useEffect(() => {
+        if (typeof document === 'undefined') {
+            return;
+        }
+
+        const shouldLockScroll = isMobileViewport && orderType === 'pedir_en_linea' && !isCartModeActive;
+        if (!shouldLockScroll) {
+            return;
+        }
+
+        const previousBodyOverflow = document.body.style.overflow;
+        const previousHtmlOverflow = document.documentElement.style.overflow;
+
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+
+        return () => {
+            document.body.style.overflow = previousBodyOverflow;
+            document.documentElement.style.overflow = previousHtmlOverflow;
+        };
+    }, [isCartModeActive, isMobileViewport, orderType]);
+
+    useEffect(() => {
         setActiveMobileProductIndex(prev => {
             if (filteredProducts.length === 0) {
                 return 0;
@@ -1127,18 +1149,18 @@ const OrderMenuView: React.FC<OrderMenuViewProps> = ({ onOrderSubmitted }) => {
                         </div>
 
                         <div
-                            className={`relative h-[100svh] min-h-[100svh] overflow-hidden lg:hidden touch-pan-y ${isCartModeActive ? 'hidden' : 'block'}`}
+                            className={`fixed inset-0 z-20 h-[100svh] min-h-[100svh] w-full overflow-hidden overscroll-none lg:hidden touch-pan-y ${isCartModeActive ? 'hidden' : 'block'}`}
                             onTouchStart={handleMobileTouchStart}
                             onTouchEnd={handleMobileTouchEnd}
                         >
                             <div className="pointer-events-none absolute inset-x-0 top-0 z-30 bg-transparent px-1 pt-[max(env(safe-area-inset-top),0.25rem)]">
                                 <ActivePromotionsDisplay compact showTitle={false} />
                             </div>
-                            <div className="h-[100svh] min-h-[100svh] overflow-hidden">
+                            <div className="h-full min-h-full overflow-hidden">
                                 {activeMobileProduct && (
                                     <div
                                         key={activeMobileProduct.id}
-                                        className={`h-[100svh] min-h-[100svh] ${mobileSlideDirection === 'up' ? 'mobile-card-slide-up' : ''} ${mobileSlideDirection === 'down' ? 'mobile-card-slide-down' : ''}`}
+                                        className={`h-full min-h-full ${mobileSlideDirection === 'up' ? 'mobile-card-slide-up' : ''} ${mobileSlideDirection === 'down' ? 'mobile-card-slide-down' : ''}`}
                                         onAnimationEnd={() => setMobileSlideDirection(null)}
                                     >
                                         <ProductCardWithPromotion

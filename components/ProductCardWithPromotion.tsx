@@ -104,7 +104,7 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
           : 'rounded-[2rem] border border-white/15 bg-[#3a0b2b] p-0 shadow-[0_18px_35px_rgba(28,7,22,0.42)] hover:-translate-y-0.5 hover:shadow-[0_24px_40px_rgba(28,7,22,0.5)]'
       } ${product.estado === 'disponible' ? 'cursor-pointer' : 'opacity-60'} ${className}`}
     >
-      <div className={`relative ${immersiveMobile ? 'h-[100svh] min-h-[100svh]' : 'min-h-[clamp(28rem,60vh,34rem)] h-full'}`}>
+      <div className={`relative ${immersiveMobile ? 'h-full min-h-full' : 'min-h-[clamp(28rem,60vh,34rem)] h-full'}`}>
         <img
           src={cardImage || product.image}
           alt={product.nom_produit}
