@@ -1405,6 +1405,23 @@ body {
   text-align: left;
 }
 
+.best-seller-card .menu-card__copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.best-seller-card .menu-card__body {
+  position: relative;
+  padding-right: clamp(3.2rem, 6vw, 4.2rem);
+}
+
+.best-seller-card .menu-card__action {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  flex-shrink: 0;
+}
+
 .best-seller-card--featured .menu-card__description {
   text-align: left;
 }
