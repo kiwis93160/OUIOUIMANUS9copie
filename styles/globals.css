@@ -4019,22 +4019,18 @@ p {
 
 @keyframes mobile-card-slide-up {
   from {
-    transform: translateY(14px);
-    opacity: 0.92;
+    opacity: 0.9;
   }
   to {
-    transform: translateY(0);
     opacity: 1;
   }
 }
 
 @keyframes mobile-card-slide-down {
   from {
-    transform: translateY(-14px);
-    opacity: 0.92;
+    opacity: 0.9;
   }
   to {
-    transform: translateY(0);
     opacity: 1;
   }
 }
