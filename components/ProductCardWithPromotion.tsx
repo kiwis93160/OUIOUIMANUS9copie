@@ -99,7 +99,7 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
           : 'rounded-[2rem] border border-white/15 bg-[#3a0b2b] p-0 shadow-[0_18px_35px_rgba(28,7,22,0.42)] hover:-translate-y-0.5 hover:shadow-[0_24px_40px_rgba(28,7,22,0.5)]'
       } ${product.estado === 'disponible' ? 'cursor-pointer' : 'opacity-60'} ${className}`}
     >
-      <div className={`relative ${immersiveMobile ? 'h-[100svh]' : 'min-h-[clamp(28rem,60vh,34rem)] h-full'}`}>
+      <div className={`relative ${immersiveMobile ? 'h-[100dvh] min-h-[100svh]' : 'min-h-[clamp(28rem,60vh,34rem)] h-full'}`}>
         <img
           src={cardImage || product.image}
           alt={product.nom_produit}
@@ -113,8 +113,10 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
       </div>
 
       <div
-        className={`absolute inset-0 z-30 flex w-full flex-col overflow-y-auto ${
-          immersiveMobile ? 'px-3 pb-[max(env(safe-area-inset-bottom),0.55rem)] pt-[max(env(safe-area-inset-top),0.7rem)]' : 'px-0 pb-0 pt-4'
+        className={`absolute inset-0 z-30 flex w-full flex-col ${
+          immersiveMobile
+            ? 'overflow-y-hidden px-3 pb-[max(env(safe-area-inset-bottom),0.55rem)] pt-[max(env(safe-area-inset-top),4.9rem)]'
+            : 'overflow-y-auto px-0 pb-0 pt-4'
         }`}
       >
         {immersiveMobile && hasPromotionBadges && (
