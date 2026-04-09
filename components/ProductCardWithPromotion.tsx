@@ -113,8 +113,10 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
       </div>
 
       <div
-        className={`absolute inset-0 z-30 flex w-full flex-col overflow-y-auto ${
-          immersiveMobile ? 'px-3 pb-[max(env(safe-area-inset-bottom),0.55rem)] pt-[max(env(safe-area-inset-top),0.7rem)]' : 'px-0 pb-0 pt-4'
+        className={`absolute inset-0 z-30 flex w-full flex-col ${
+          immersiveMobile
+            ? 'overflow-y-hidden px-3 pb-[max(env(safe-area-inset-bottom),0.55rem)] pt-[max(env(safe-area-inset-top),4.9rem)]'
+            : 'overflow-y-auto px-0 pb-0 pt-4'
         }`}
       >
         {immersiveMobile && hasPromotionBadges && (
