@@ -82,6 +82,11 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
   const { promotions, loading } = useProductPromotions(product);
   const hasPromotionBadges = !loading && promotions.length > 0 && product.estado === 'disponible';
   const mobilePromoItems = promotions.slice(0, 2).map(getCompactPromoText);
+  const mobileHeaderSpacingClass = immersiveMobile
+    ? hasPromotionBadges
+      ? 'pt-[max(env(safe-area-inset-top),5.55rem)]'
+      : 'pt-[max(env(safe-area-inset-top),0.95rem)]'
+    : 'pt-4';
   const fontVariant = PRODUCT_CARD_FONT_VARIANTS[((fontVariantIndex % PRODUCT_CARD_FONT_VARIANTS.length) + PRODUCT_CARD_FONT_VARIANTS.length) % PRODUCT_CARD_FONT_VARIANTS.length];
 
   const cardImage = buildOptimizedCloudinaryUrl(product.image, {
@@ -135,7 +140,7 @@ const ProductCardWithPromotion: React.FC<ProductCardWithPromotionProps> = ({
           </div>
         )}
 
-        <div className={`mt-3 flex flex-col items-center px-4 text-center text-white ${immersiveMobile ? '' : 'mb-auto'}`}>
+        <div className={`${mobileHeaderSpacingClass} flex flex-col items-center px-4 text-center text-white ${immersiveMobile ? '' : 'mb-auto'}`}>
           <p
             className={`w-full font-extrabold uppercase text-[#f8ebd7] ${immersiveMobile ? 'text-[clamp(2.45rem,11vw,3.1rem)] leading-[0.94]' : 'text-[clamp(2rem,3.35vw,2.65rem)] leading-[0.95]'}`}
             style={{
