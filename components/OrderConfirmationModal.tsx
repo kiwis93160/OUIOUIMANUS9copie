@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle } from 'lucide-react';
 import { Order } from '../types';
@@ -139,19 +139,15 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
     const message = generateWhatsAppMessage();
     const whatsappUrl = buildWhatsAppUrl(whatsappNumber, message);
 
-    // Redirect the current tab first so that returning from WhatsApp lands on the tracker page.
+    // Keep the browsing history on `/` so when the customer returns from WhatsApp,
+    // they land on the order tracker instead of this modal.
     navigate('/', { replace: true });
 
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
-      const whatsappWindow = window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-
-      // Mobile browsers can block popups or reuse the same tab.
-      // Falling back to same-tab navigation keeps the previous history entry on `/`.
-      if (!whatsappWindow) {
-        window.location.assign(whatsappUrl);
-      }
+      // Same-tab redirect to avoid opening a new window/tab.
+      window.location.assign(whatsappUrl);
     }, 100);
   };
 
