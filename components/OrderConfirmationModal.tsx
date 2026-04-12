@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle } from 'lucide-react';
 import { Order } from '../types';
@@ -8,7 +8,6 @@ interface OrderConfirmationModalProps {
   isOpen: boolean;
   order: Order | null;
   whatsappNumber?: string;
-  onClose?: () => void;
 }
 
 const isFreeShippingType = (type?: string | null) => (type ?? '').toLowerCase() === 'free_shipping';
@@ -18,8 +17,7 @@ const sanitizeWhatsappNumber = (value: string): string => value.replace(/[^\d]/g
 const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
   isOpen,
   order,
-  whatsappNumber = DEFAULT_WHATSAPP_NUMBER, // Default number
-  onClose
+  whatsappNumber = DEFAULT_WHATSAPP_NUMBER // Default number
 }) => {
   const navigate = useNavigate();
 
@@ -141,15 +139,19 @@ const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
     const message = generateWhatsAppMessage();
     const whatsappUrl = buildWhatsAppUrl(whatsappNumber, message);
 
-    onClose?.();
-
-    // Keep navigation in the same tab: we move to `/` first so that when the user comes
-    // back from WhatsApp they land directly on the home/tracker screen.
+    // Redirect the current tab first so that returning from WhatsApp lands on the tracker page.
     navigate('/', { replace: true });
 
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      window.location.assign(whatsappUrl);
+
+      const whatsappWindow = window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+
+      // Mobile browsers can block popups or reuse the same tab.
+      // Falling back to same-tab navigation keeps the previous history entry on `/`.
+      if (!whatsappWindow) {
+        window.location.assign(whatsappUrl);
+      }
     }, 100);
   };
 
