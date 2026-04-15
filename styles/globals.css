@@ -942,7 +942,7 @@ body {
   --best-seller-medium-height: 236px;
   --best-seller-square-size: 300px;
   --best-seller-wide-width: 630px;
-  --best-seller-featured-width: 630px;
+  --best-seller-featured-width: 580px;
   --best-seller-featured-media-height: 420px;
   --best-seller-rail-width: 630px;
   --best-seller-gap: 30px;
@@ -988,7 +988,7 @@ body {
   --best-seller-square-size: 300px;
   --best-seller-medium-height: 260px;
   --best-seller-wide-width: 630px;
-  --best-seller-featured-width: 630px;
+  --best-seller-featured-width: 580px;
   --best-seller-featured-media-height: 420px;
   --best-seller-rail-width: 630px;
   --best-seller-gap: 30px;
@@ -1008,7 +1008,7 @@ body {
 }
 
 .best-seller-card--featured {
-  width: var(--best-seller-featured-width);
+  width: min(var(--best-seller-featured-width), 100%);
   min-height: 440px;
 }
 
